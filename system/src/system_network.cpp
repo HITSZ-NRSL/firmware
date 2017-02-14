@@ -61,12 +61,12 @@ const void* network_config(network_handle_t network, uint32_t param, void* reser
 
 void network_connect(network_handle_t network, uint32_t flags, uint32_t param, void* reserved)
 {
-    SYSTEM_THREAD_CONTEXT_ASYNC_CALL(nif(network).connect());
+    nif(network).connect();
 }
 
 void network_disconnect(network_handle_t network, uint32_t param, void* reserved)
 {
-    SYSTEM_THREAD_CONTEXT_ASYNC_CALL(nif(network).disconnect());
+    nif(network).disconnect();
 }
 
 bool network_ready(network_handle_t network, uint32_t param, void* reserved)
@@ -93,19 +93,17 @@ bool network_connecting(network_handle_t network, uint32_t param, void* reserved
  */
 void network_on(network_handle_t network, uint32_t flags, uint32_t param, void* reserved)
 {
-    SYSTEM_THREAD_CONTEXT_ASYNC_CALL(nif(network).on());
+    nif(network).on();
 }
 
 bool network_has_credentials(network_handle_t network, uint32_t param, void* reserved)
 {
-    SYSTEM_THREAD_CONTEXT_SYNC_CALL_RESULT(nif(network).has_credentials());
+    return nif(network).has_credentials();
 }
 
 void network_off(network_handle_t network, uint32_t flags, uint32_t param, void* reserved)
 {
-    //nif(network).connect_cancel(true);
-    // flags & 1 means also disconnect the cloud (so it doesn't autmatically connect when network resumed.)
-    SYSTEM_THREAD_CONTEXT_ASYNC_CALL(nif(network).off(flags & 1));
+    nif(network).off(flags & 1);
 }
 
 /**
@@ -126,17 +124,17 @@ bool network_listening(network_handle_t network, uint32_t, void*)
 
 int network_set_credentials(network_handle_t network, uint32_t, NetworkCredentials* credentials, void*)
 {
-    SYSTEM_THREAD_CONTEXT_SYNC_CALL_RESULT(nif(network).set_credentials(credentials));
+    return nif(network).set_credentials(credentials);
 }
 
 bool network_clear_credentials(network_handle_t network, uint32_t, NetworkCredentials* creds, void*)
 {
-    SYSTEM_THREAD_CONTEXT_SYNC_CALL_RESULT(nif(network).clear_credentials());
+    return nif(network).clear_credentials();
 }
 
 void network_setup(network_handle_t network, uint32_t flags, void* reserved)
 {
-    SYSTEM_THREAD_CONTEXT_ASYNC_CALL(nif(network).setup());
+    nif(network).setup();
 }
 
 void manage_ip_config()

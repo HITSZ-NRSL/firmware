@@ -6,9 +6,9 @@
  * concurrency primitives that aren't supported natively by GCC ARM.
  */
 #ifndef GTHR_DEFAULT_H
-#define GTHR_DEFAULT_H
+#define	GTHR_DEFAULT_H
 
-#define INTOROBOT_GTHREAD_INCLUDED 1
+#define PARTICLE_GTHREAD_INCLUDED 1
 
 typedef int __gthread_key_t;
 typedef int __gthread_once_t;

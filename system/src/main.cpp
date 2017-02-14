@@ -356,25 +356,6 @@ static void load_system_fwlib_version(void)
     }
 }
 
-#if PLATFORM_THREADING
-
-// This is the application loop ActiveObject.
-
-void app_thread_idle()
-{
-    app_loop();
-}
-
-// don't wait to get items from the queue, so the application loop is processed as often as possible
-// timeout after attempting to put calls into the application queue, so the system thread does not deadlock  (since the application may also
-// be trying to put events in the system queue.)
-ActiveObjectCurrentThreadQueue ApplicationThread(ActiveObjectConfiguration(app_thread_idle,
-            0, /* take time */
-            5000, /* put time */
-            20 /* queue size */));
-
-#endif
-
 /*******************************************************************************
  * Function Name  : main.
  * Description    : main routine.
@@ -420,21 +401,8 @@ void app_setup_and_loop_initial(void)
     NEWORK_FN(Network_Setup(), (void)0);
 #endif
 
-    bool threaded = system_thread_get_state(NULL) != intorobot::feature::DISABLED &&
-      (system_mode()!=SAFE_MODE);
-
 #if PLATFORM_THREADING
-    if (threaded)
-    {
-        SystemThread.start();
-        ApplicationThread.start();
-    }
-    else
-    {
-        SystemThread.setCurrentThread();
-        ApplicationThread.setCurrentThread();
-    }
-    //create_system_task();
+    create_system_task();
 #else
     HAL_Core_Set_System_Loop_Handler(&system_process_loop);
 #endif
@@ -450,12 +418,10 @@ void app_setup_and_loop_initial(void)
 void app_setup_and_loop(void)
 {
     app_setup_and_loop_initial();
-#if !PLATFORM_THREADING
     /* Main loop */
     while (1) {
         app_loop();
     }
-#endif
 }
 
 #ifdef USE_FULL_ASSERT

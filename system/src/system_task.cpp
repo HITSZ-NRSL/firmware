@@ -308,6 +308,10 @@ void manage_cloud_connection(void)
 
 void system_process_loop(void)
 {
+#if PLATFORM_THREADING
+    while (1) {
+#endif
+
 #ifdef configSETUP_ENABLE
         if(!g_intorobot_system_config)
         {
@@ -318,6 +322,10 @@ void system_process_loop(void)
             CLOUD_FN(manage_app_auto_update(), (void)0);
 #ifdef configSETUP_ENABLE
         }
+#endif
+
+#if PLATFORM_THREADING
+    }
 #endif
 }
 

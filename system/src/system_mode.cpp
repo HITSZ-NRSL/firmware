@@ -79,8 +79,7 @@ System_Mode_TypeDef system_mode()
 
 #if PLATFORM_THREADING
 
-//static volatile intorobot::feature::State system_thread_enable = intorobot::feature::DISABLED;
-static volatile intorobot::feature::State system_thread_enable = intorobot::feature::ENABLED;
+static volatile intorobot::feature::State system_thread_enable = intorobot::feature::DISABLED;
 
 void system_thread_set_state(intorobot::feature::State state, void*)
 {

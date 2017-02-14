@@ -16,10 +16,32 @@
   License along with this library; if not, see <http://www.gnu.org/licenses/>.
   ******************************************************************************
 */
-#ifndef SYSTEM_THREADING_H
-#define	SYSTEM_THREADING_H
+
+#ifndef SYSTEM_THREADING_H_
+#define SYSTEM_THREADING_H_
 
 #if PLATFORM_THREADING
+#include "concurrent_hal.h"
+
+void create_system_task(void);
+void close_system_task(void);
+
+#endif
+
+
+
+
+
+
+
+
+
+
+
+#if 0
+
+#if PLATFORM_THREADING
+
 
 #include "concurrent_hal.h"
 #include "active_object.h"
@@ -28,7 +50,7 @@
 #include <mutex>
 #include <future>
 
-#ifndef INTOROBOT_GTHREAD_INCLUDED
+#ifndef PARTICLE_GTHREAD_INCLUDED
 #error "GTHREAD header not included. This is required for correct mutex implementation on embedded platforms."
 #endif
 
@@ -129,6 +151,6 @@ FFL(F const &func)
 #define APPLICATION_THREAD_CURRENT() (1)
 #endif
 
+#endif
 
-#endif	/* SYSTEM_THREADING_H */
-
+#endif	/* SYSTEM_THREADING_H_ */

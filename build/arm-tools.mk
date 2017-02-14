@@ -19,7 +19,7 @@ CFLAGS += -mfloat-abi=softfp -mfpu=fpv4-sp-d16
 endif
 
 # 如果程序没有按预期工作   尝试去掉-fdata-sections
-CFLAGS += -g3 -gdwarf-2 -Os -mthumb -fno-strict-aliasing -Wfatal-errors -w -fno-common -ffunction-sections -fdata-sections -Wno-switch -Wno-error=deprecated-declarations -fmessage-length=0
+CFLAGS += -g3 -gdwarf-2 -Os -mthumb -fno-strict-aliasing -Wfatal-errors -fno-common -ffunction-sections -fdata-sections -Wno-switch -Wno-error=deprecated-declarations -fmessage-length=0
 
 CONLYFLAGS += -Wno-pointer-sign -std=gnu99
 
