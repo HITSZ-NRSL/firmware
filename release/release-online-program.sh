@@ -156,8 +156,6 @@ release_online_program_package() {
         # cp linker
         cp -rf $BUILD_DIR/linker/arm/neutron/* $LINKER
         cp -rf $PROJECT_DIR/newlib_nano/src/custom-nano.specs $LINKER
-        # cp hal inc
-        cp -rf $PROJECT_DIR/hal/src/stm32/* $INC_HAL
         # cp platform inc
         cp -rf $PROJECT_DIR/platform/MCU/shared/STM32/inc/* $INC_PLATFORM
         cp -rf $PROJECT_DIR/platform/MCU/STM32F4xx/CMSIS/Include/*  $INC_PLATFORM

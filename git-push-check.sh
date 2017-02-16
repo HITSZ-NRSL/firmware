@@ -11,43 +11,43 @@ export INTOROBOT_DEVELOP=1
 
 echo "github push check begin!!!"
 echo "------------------------创客核心板-------------------------"
-echo "---->neutron"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!neutron!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=neutron clean all COMPILE_LTO=n APP=smartLight-default
 
-echo "---->nut"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!nut!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=nut clean all COMPILE_LTO=n APP=smartLight-default
 
-echo "---->atom"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!atom!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=atom clean all COMPILE_LTO=n APP=smartLight-default
 
-echo "---->fig"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!fig!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=fig clean all COMPILE_LTO=n APP=blink
 
-echo "---->lora"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!lora!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=lora clean all COMPILE_LTO=n APP=blink
 
-echo "---->littlebee"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!littlebee!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=littlebee clean all COMPILE_LTO=n APP=smartLight-default
 
 echo "------------------------商业模块-------------------------"
-echo "---->w67"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!w67!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=w67 clean all COMPILE_LTO=n APP=smartLight-w67
 
-echo "---->w323"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!w323!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=w323 clean all COMPILE_LTO=n APP=blank
 
-echo "---->l6"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!l6!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=l6 clean all COMPILE_LTO=n APP=blink
 echo "------------------------------------------------------------"
 
 echo "------------------------其他-------------------------"
-echo "---->gcc"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!gcc!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 #make $VERBOSE PLATFORM=gcc clean all COMPILE_LTO=n
 
-echo "---->neutron-net"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!neutron-net!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=neutron-net clean all COMPILE_LTO=n
 
-echo "---->anytest"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!anytest!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 make $VERBOSE PLATFORM=anytest clean all COMPILE_LTO=n APP=default-anytest
 
 echo "------------------------------------------------------------"

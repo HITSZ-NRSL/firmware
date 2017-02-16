@@ -713,7 +713,13 @@ bool intorobot_publish(api_version_t version, const char* topic, uint8_t* payloa
     String fulltopic;
 
     fill_mqtt_topic(fulltopic, version, topic, NULL);
-    SYSTEM_THREAD_CONTEXT_SYNC_CALL_RESULT(g_mqtt_client.publish(fulltopic.c_str(), payload, plength, retained));
+    if(g_mqtt_client.publish(fulltopic.c_str(), payload, plength, retained))
+    {
+        SCLOUD_DEBUG("OK! published topic: %s, payload: %s ", fulltopic.c_str(), payload);
+        return true;
+    }
+    SCLOUD_DEBUG("Error! publish topic: %s, payload: %s ", fulltopic.c_str(), payload);
+    return false;
 }
 
 bool intorobot_subscribe(api_version_t version, const char* topic, const char *device_id, void (*callback)(uint8_t*, uint32_t), uint8_t qos)
@@ -722,8 +728,13 @@ bool intorobot_subscribe(api_version_t version, const char* topic, const char *d
 
     add_subscribe_callback(version, (char *)topic, (char *)device_id, callback, qos);
     fill_mqtt_topic(fulltopic, version, topic, device_id);
-
-    SYSTEM_THREAD_CONTEXT_SYNC_CALL_RESULT(g_mqtt_client.subscribe(fulltopic.c_str(), qos));
+    if(g_mqtt_client.subscribe(fulltopic.c_str(), qos))
+    {
+        SCLOUD_DEBUG("OK! subscribe topic: %s", fulltopic.c_str());
+        return true;
+    }
+    SCLOUD_DEBUG("Error! subscribe topic: %s", fulltopic.c_str());
+    return false;
 }
 
 bool intorobot_widget_subscribe(api_version_t version, const char* topic, const char *device_id, WidgetBaseClass *pWidgetBase, uint8_t qos)
@@ -732,7 +743,7 @@ bool intorobot_widget_subscribe(api_version_t version, const char* topic, const 
 
     add_widget_subscibe_callback(version, (char *)topic, (char *)device_id, pWidgetBase, qos);
     fill_mqtt_topic(fulltopic, version, topic, device_id);
-    SYSTEM_THREAD_CONTEXT_SYNC_CALL_RESULT(g_mqtt_client.subscribe(fulltopic.c_str(), qos));
+    return g_mqtt_client.subscribe(fulltopic.c_str(), qos);
 }
 
 bool intorobot_unsubscribe(api_version_t version, const char *topic, const char *device_id)
@@ -741,7 +752,7 @@ bool intorobot_unsubscribe(api_version_t version, const char *topic, const char 
 
     del_subscribe_callback(version, (char *)topic, (char *)device_id);
     fill_mqtt_topic(fulltopic, version, topic, device_id);
-    SYSTEM_THREAD_CONTEXT_SYNC_CALL_RESULT(g_mqtt_client.unsubscribe(fulltopic.c_str()));
+    return g_mqtt_client.unsubscribe(fulltopic.c_str());
 }
 
 size_t intorobot_debug_info_write(uint8_t byte)
