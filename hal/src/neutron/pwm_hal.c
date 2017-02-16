@@ -22,6 +22,18 @@
 #include "pinmap_impl.h"
 #include "service_debug.h"
 
+#define TIM_NUM   4
+
+typedef struct pwm_state_t {
+    uint8_t resolution;
+} pwm_state_t;
+
+static pwm_state_t PWM_State[TIM_NUM] = {
+    // Initialise all timers to 8-bit resolution
+    [0 ... (TIM_NUM - 1)].resolution = 8
+};
+
+#define TIM_PERIPHERAL_TO_STATE_IDX(tim) (((uint32_t)tim) == APB1PERIPH_BASE ? (((uint32_t)tim) - APB1PERIPH_BASE) / 0x400 : 0)
 /*
  * @brief Should take an integer 0-255 and create a PWM signal with a duty cycle from 0-100%.
  * configTIM_PWM_FREQ is set at 500 Hz
@@ -178,11 +190,12 @@ void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm
         uint32_t TIM_Prescaler = (uint32_t)((SystemCoreClock / TIM_COUNTER_CLOCK_FREQ) - 1);
 
         uint32_t TIM_ARR = (uint32_t)((TIM_COUNTER_CLOCK_FREQ / pwm_frequency) - 1);
-        uint32_t TIM_CCR = (uint32_t)(value * (TIM_ARR + 1) / 255);
+        /* uint32_t TIM_CCR = (uint32_t)(value * (TIM_ARR + 1) / 255); */
+        uint32_t TIM_CCR = (uint32_t)(value * (TIM_ARR + 1) / ((1 << HAL_PWM_Get_Resolution(pin))-1));
 
-        //DEBUG("TIM_Prescaler: %d", TIM_Prescaler);
-        //DEBUG("TIM_ARR: %d", TIM_ARR);
-        //DEBUG("TIM_CCR: %d", TIM_CCR);
+        DEBUG("TIM_Prescaler: %d", TIM_Prescaler);
+        DEBUG("TIM_ARR: %d", TIM_ARR);
+        DEBUG("TIM_CCR: %d", TIM_CCR);
 
         TIM_HandleTypeDef TimHandle;
         TIM_OC_InitTypeDef sConfig;
@@ -265,9 +278,34 @@ void HAL_PWM_UpdateDutyCycle_Ext(uint16_t pin, uint32_t value)
 
 uint8_t HAL_PWM_Get_Resolution(uint16_t pin)
 {
-    return 0;
+    STM32_Pin_Info* PIN_MAP = HAL_Pin_Map();
+    if(PIN_MAP[pin].timer_peripheral)
+    {
+        return PWM_State[TIM_PERIPHERAL_TO_STATE_IDX(PIN_MAP[pin].timer_peripheral)].resolution;
+    }
+
+   return 0;
+}
+
+uint8_t HAL_PWM_Timer_Resolution(uint16_t pin)
+{
+    STM32_Pin_Info* PIN_MAP = HAL_Pin_Map();
+
+    if(PIN_MAP[pin].timer_peripheral == TIM2 || PIN_MAP[pin].timer_peripheral == TIM5)
+    {
+       return 32;
+    }
+    return 16;
 }
 
 void HAL_PWM_Set_Resolution(uint16_t pin, uint8_t resolution)
 {
+    STM32_Pin_Info* PIN_MAP = HAL_Pin_Map();
+    if(PIN_MAP[pin].timer_peripheral)
+    {
+        if (resolution > 1 && resolution <= (HAL_PWM_Timer_Resolution(pin) - 1))
+        {
+            PWM_State[TIM_PERIPHERAL_TO_STATE_IDX(PIN_MAP[pin].timer_peripheral)].resolution = resolution;
+        }
+    }
 }

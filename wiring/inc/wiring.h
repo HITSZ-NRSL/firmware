@@ -85,5 +85,6 @@ bool timerIsEnd(uint32_t timerID, uint32_t time);
 
 void analogWrite(uint16_t pin, uint16_t value);
 void analogWrite(uint16_t pin, uint16_t value, uint16_t pwm_frequency);
-
+uint8_t analogWriteResolution(pin_t pin, uint8_t value);
+uint8_t analogWriteResolution(pin_t pin);
 #endif /* __WIRING_H_ */
