@@ -37,8 +37,8 @@
 
 /* config wiring usart serial. */
 #define configWIRING_USARTSERIAL_ENABLE
-//#define configWIRING_USARTSERIAL1_ENABLE
-//#define configWIRING_USARTSERIAL2_ENABLE
+#define configWIRING_USARTSERIAL1_ENABLE
+#define configWIRING_USARTSERIAL2_ENABLE
 //#define configWIRING_USARTSERIAL3_ENABLE
 //#define configWIRING_USARTSERIAL4_ENABLE
 //#define configWIRING_USARTSERIAL5_ENABLE
@@ -75,10 +75,10 @@
 //#define configNO_LORAWAN
 
 /* config rgb ui */
-//#define configNO_RGB_UI
+#define configNO_RGB_UI
 
 /* config setup button ui */
-//#define configNO_SETUPBUTTON_UI
+#define configNO_SETUPBUTTON_UI
 
 /* config panic */
 #define configPANIC_BUT_KEEP_CALM

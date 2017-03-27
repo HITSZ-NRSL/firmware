@@ -23,7 +23,10 @@
  ******************************************************************************
  */
 
+#include "platforms.h"
 /* Includes ------------------------------------------------------------------*/
+#if (PLATFORM_ID != PLATFORM_ANYTEST)
+
 #include "hw_config.h"
 #include "rtc_hal.h"
 
@@ -50,7 +53,7 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
     HAL_PWR_EnableBkUpAccess();
 
     /* Enable BKP CLK enable for backup registers */
-    __HAL_RCC_BKP_CLK_ENABLE();
+    /* __HAL_RCC_BKP_CLK_ENABLE(); */
 
     /*##-1- Configure LSE as RTC clock source ###################################*/
     RCC_OscInitStruct.OscillatorType =  RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_LSE;
@@ -74,6 +77,7 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
     /*##-3- Configure the NVIC for RTC Alarm ###################################*/
     HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 0x0F, 0);
     HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn);
+    DEBUG("RCCEx_PeriphCLKConfig ok");
 }
 /**
  * @brief RTC MSP De-Initialization
@@ -152,6 +156,7 @@ void HAL_RTC_Initial(void)
         DEBUG("RTC Init Error!");
     }
     RTC_CalendarAlarmConfig();
+    /* DEBUG("rtc inintilaze"); */
 }
 
 time_t HAL_RTC_Get_UnixTime(void)
@@ -277,4 +282,5 @@ void RTC_Alarm_IRQHandler(void)
 {
     HAL_RTC_AlarmIRQHandler(&RtcHandle);
 }
+#endif
 

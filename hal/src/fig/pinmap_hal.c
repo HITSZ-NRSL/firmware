@@ -141,6 +141,7 @@ ESP32_Pin_Info __PIN_MAP[TOTAL_PINS] =
 /* A7            - 37 */ { GPIO15, NONE, NONE, NONE, PIN_MODE_NONE },
 /* A8            - 38 */ { GPIO13, NONE, NONE, NONE, PIN_MODE_NONE },
 /* A9            - 39 */ { GPIO2,  NONE, NONE, NONE, PIN_MODE_NONE },
+/* A10 sensor    - 40 */ { GPIO34,  NONE, NONE, NONE, PIN_MODE_NONE },
 };
 
 ESP32_Pin_Info* HAL_Pin_Map() {

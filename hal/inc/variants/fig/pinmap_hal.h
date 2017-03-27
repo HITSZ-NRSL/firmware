@@ -76,10 +76,10 @@ EESP32_Pin_Info* HAL_Pin_Map(void);
 * Pin mapping. Borrowed from Wiring
 */
 
-#define TOTAL_PINS           40
+#define TOTAL_PINS           41
 #define TOTAL_DIGITAL_PINS   8
 #define FIRST_DIGITAL_PIN    0
-#define TOTAL_ANALOG_PINS    10
+#define TOTAL_ANALOG_PINS    11
 #define FIRST_ANALOG_PIN     30
 
 #define D0  0
@@ -91,17 +91,18 @@ EESP32_Pin_Info* HAL_Pin_Map(void);
 #define D6  6
 #define D7  7
 
-#define A0  14
-#define A1  15
-#define A2  16
-#define A3  17
-#define A4  18
-#define A5  19
-#define A6  20
-#define A7  21
-#define A8  22
-#define A9  23
+#define A0  30
+#define A1  31
+#define A2  32
+#define A3  33
+#define A4  34
+#define A5  35
+#define A6  36
+#define A7  37
+#define A8  38
+#define A9  39
 
+#define LIGHT_SENSOR_UC 40
 //Serial pins
 #define TX  8
 #define RX  9

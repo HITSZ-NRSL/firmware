@@ -30,20 +30,18 @@
 #include "timer_hal.h"
 
 /* Private define ------------------------------------------------------------*/
-// XXX: Change
-#define TOTAL_I2C   2
+#define TOTAL_I2C       1
 #define BUFFER_LENGTH   (I2C_BUFFER_LENGTH)
 #define EVENT_TIMEOUT   100000 // 100ms
 
 #define TRANSMITTER     0x00
 #define RECEIVER        0x01
 
-// XXX: Change
 /* Private typedef -----------------------------------------------------------*/
-// I2Cnum_SDA_SCL
+// I2C groups number
 typedef enum I2C_Num_Def {
-   I2C1_D0_D1_USER = 0,
-   I2C2_D7_D6_USER = 1
+   I2C_GROUP1 = 0,
+   I2C_GROUP2 = 1,
 } I2C_Num_Def;
 
 typedef enum I2C_Transaction_Ending_Condition {
@@ -90,14 +88,12 @@ typedef struct STM32_I2C_Info {
     uint8_t clkStretchingEnabled;
 } STM32_I2C_Info;
 
-/* Private variables ---------------------------------------------------------*/
-// XXX: Change
 // I2C mapping
 STM32_I2C_Info I2C_MAP[TOTAL_I2C] =
 {
     /* I2C2, PB10-SCL, PB11-SDA */
-    { I2C1, GPIOB, GPIOB, GPIO_PIN_9, GPIO_PIN_8, GPIO_AF4_I2C1, GPIO_AF4_I2C1, I2C1_ER_IRQn, I2C1_EV_IRQn},
     { I2C2, GPIOB, GPIOB, GPIO_PIN_11, GPIO_PIN_10, GPIO_AF4_I2C2, GPIO_AF4_I2C2, I2C2_ER_IRQn, I2C2_EV_IRQn}
+    /* { I2C1, GPIOB, GPIOB, GPIO_PIN_9, GPIO_PIN_8, GPIO_AF4_I2C1, GPIO_AF4_I2C1, I2C1_ER_IRQn, I2C1_EV_IRQn}, */
 };
 
 static STM32_I2C_Info *i2cMap[TOTAL_I2C]; // pointer to I2C_MAP[] containing I2C peripheral info
@@ -110,18 +106,17 @@ static STM32_I2C_Info *i2cMap[TOTAL_I2C]; // pointer to I2C_MAP[] containing I2C
 void HAL_I2C_GPIO_DeInit(HAL_I2C_Interface i2c)
 {
     //DEBUG("Enter HAL_I2C_GPIO_DeInit...\r\n");
-    // XXX: Change
     /*##-1- Reset peripherals ##################################################*/
     if (i2cMap[i2c]->I2C_Peripheral == I2C1)
     {
         __HAL_RCC_I2C1_FORCE_RESET();
         __HAL_RCC_I2C1_RELEASE_RESET();
     }
-   else if (i2cMap[i2c]->I2C_Peripheral == I2C2)
-   {
-       __HAL_RCC_I2C2_FORCE_RESET();
-       __HAL_RCC_I2C2_RELEASE_RESET();
-   }
+    else if (i2cMap[i2c]->I2C_Peripheral == I2C2)
+    {
+        __HAL_RCC_I2C2_FORCE_RESET();
+        __HAL_RCC_I2C2_RELEASE_RESET();
+    }
     /*##-2- Disable peripherals and GPIO Clocks ################################*/
     HAL_GPIO_DeInit(i2cMap[i2c]->I2C_SDA_Port, i2cMap[i2c]->I2C_SDA_Pin);
     HAL_GPIO_DeInit(i2cMap[i2c]->I2C_SCL_Port, i2cMap[i2c]->I2C_SCL_Pin);
@@ -141,21 +136,16 @@ void HAL_I2C_GPIO_Init(HAL_I2C_Interface i2c)
     //DEBUG("Enter HAL_I2C_GPIO_Init...\r\n");
     GPIO_InitTypeDef  GPIO_InitStruct;
 
-    // XXX: Change
-    /* I2C1, PB9, PB8  for sensors*/
-    /* I2C3, PB4, PA8  for usrs*/
-
     /*##-1- Enable GPIO Clocks #################################################*/
     /* Enable GPIO TX/RX clock */
     if (i2cMap[i2c]->I2C_Peripheral == I2C1) // TODO
     {
-        //DEBUG("I2C2 Port Clock Enable...");
         __HAL_RCC_GPIOB_CLK_ENABLE();
     }
-   else if (i2cMap[i2c]->I2C_Peripheral == I2C2)
-   {
-       __HAL_RCC_GPIOB_CLK_ENABLE();
-   }
+    else if (i2cMap[i2c]->I2C_Peripheral == I2C2)
+    {
+        __HAL_RCC_GPIOB_CLK_ENABLE();
+    }
 
     /*##-2- Configure peripheral GPIO ##########################################*/
     /* I2C TX GPIO pin configuration  */
@@ -221,17 +211,14 @@ static void HAL_I2C_SoftwareReset(HAL_I2C_Interface i2c)
  */
 void HAL_I2C_Initial(HAL_I2C_Interface i2c, void* reserved)
 {
-    ////DEBUG("Enter HAL_I2C_Initial...\r\n");
-  if(i2c == HAL_I2C_INTERFACE1) // for users
-  {
-        ////DEBUG("HAL_I2C_Initial, choose sensors configuration!");
-      i2cMap[i2c] = &I2C_MAP[I2C1_D0_D1_USER];
-  }
-  else if(i2c == HAL_I2C_INTERFACE2)// for sensors
-  {
-       ////DEBUG("HAL_I2C_Initial, choose users configuration!");
-     i2cMap[i2c] = &I2C_MAP[I2C2_D7_D6_USER];
-  }
+    if(i2c == HAL_I2C_INTERFACE1) 
+    {
+        i2cMap[i2c] = &I2C_MAP[I2C_GROUP1];
+    }
+    else if(i2c == HAL_I2C_INTERFACE2)
+    {
+        i2cMap[i2c] = &I2C_MAP[I2C_GROUP2];
+    }
 
     i2cMap[i2c]->I2C_ClockSpeed       = CLOCK_SPEED_400KHZ;
     i2cMap[i2c]->I2C_Enabled          = false;

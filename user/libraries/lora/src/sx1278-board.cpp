@@ -12,14 +12,15 @@
 
   Maintainer: Miguel Luis and Gregory Cristian
 */
+#include "platforms.h"
+#if PLATFORM_ID == PLATFORM_ANYTEST
+
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
 
-#include "radio.h"
-// #include "sx1278.h"
 #include "sx1278-board.h"
 #include "wiring.h"
 #include "wiring_interrupts.h"
@@ -28,7 +29,6 @@
 #define         ID1                                 ( 0x1FF80050 )
 #define         ID2                                 ( 0x1FF80054 )
 #define         ID3                                 ( 0x1FF80064 )
-
 
 /*!
  * Flag used to set the RF switch control pins in low power mode when the radio is not active.
@@ -71,14 +71,6 @@ const struct Radio_s Radio =
 
 void SX1278IoInit( void )
 {
-    /*  GpioInit( &SX1278.Spi.Nss, RADIO_NSS, PIN_OUTPUT, PIN_PUSH_PULL, PIN_PULL_UP, 1 );
-        GpioInit( &SX1278.DIO0, RADIO_DIO_0, PIN_INPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0 );
-        GpioInit( &SX1278.DIO1, RADIO_DIO_1, PIN_INPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0 );
-        GpioInit( &SX1278.DIO2, RADIO_DIO_2, PIN_INPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0 );
-        GpioInit( &SX1278.DIO3, RADIO_DIO_3, PIN_INPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0 );
-        GpioInit( &SX1278.DIO4, RADIO_DIO_4, PIN_INPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0 );
-        GpioInit( &SX1278.DIO5, RADIO_DIO_5, PIN_INPUT, PIN_PUSH_PULL, PIN_PULL_UP, 0 );
-    */
     pinMode(NSS_SPI1,OUTPUT);
     digitalWrite(NSS_SPI1,1);
     pinMode(DIO0,INPUT_PULLUP);
@@ -87,46 +79,21 @@ void SX1278IoInit( void )
     pinMode(DIO3,INPUT_PULLUP);
     pinMode(DIO4,INPUT_PULLUP);
     pinMode(DIO5,INPUT_PULLUP);
-
-    // pinMode(DIO0,INPUT);
-    // pinMode(DIO1,INPUT);
-    // pinMode(DIO2,INPUT);
-    // pinMode(DIO3,INPUT);
-    // pinMode(DIO4,INPUT);
-    // pinMode(DIO5,INPUT);
 }
 
 
 void SX1278IoIrqInit( DioIrqHandler **irqHandlers )
 {
-    /*
-      GpioSetInterrupt( &SX1278.DIO0, IRQ_RISING_EDGE, IRQ_HIGH_PRIORITY, irqHandlers[0] );
-      GpioSetInterrupt( &SX1278.DIO1, IRQ_RISING_EDGE, IRQ_HIGH_PRIORITY, irqHandlers[1] );
-      GpioSetInterrupt( &SX1278.DIO2, IRQ_RISING_EDGE, IRQ_HIGH_PRIORITY, irqHandlers[2] );
-      GpioSetInterrupt( &SX1278.DIO3, IRQ_RISING_EDGE, IRQ_HIGH_PRIORITY, irqHandlers[3] );
-      GpioSetInterrupt( &SX1278.DIO4, IRQ_RISING_EDGE, IRQ_HIGH_PRIORITY, irqHandlers[4] );
-      GpioSetInterrupt( &SX1278.DIO5, IRQ_RISING_EDGE, IRQ_HIGH_PRIORITY, irqHandlers[5] );
-    */
     attachInterrupt(DIO0, irqHandlers[0], RISING, 1, 0);
     attachInterrupt(DIO1, irqHandlers[1], RISING, 1, 0);
     attachInterrupt(DIO2, irqHandlers[2], RISING, 1, 0);
     attachInterrupt(DIO3, irqHandlers[3], RISING, 1, 0);
     attachInterrupt(DIO4, irqHandlers[4], RISING, 1, 0);
-    // attachInterrupt(DIO5, irqHandlers[5], RISING, 1, 0);
+    attachInterrupt(DIO5, irqHandlers[5], RISING, 1, 0);
 }
 
 void SX1278IoDeInit( void )
 {
-    /*
-      GpioInit( &SX1278.Spi.Nss, RADIO_NSS, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 1 );
-
-      GpioInit( &SX1278.DIO0, RADIO_DIO_0, PIN_INPUT, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
-      GpioInit( &SX1278.DIO1, RADIO_DIO_1, PIN_INPUT, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
-      GpioInit( &SX1278.DIO2, RADIO_DIO_2, PIN_INPUT, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
-      GpioInit( &SX1278.DIO3, RADIO_DIO_3, PIN_INPUT, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
-      GpioInit( &SX1278.DIO4, RADIO_DIO_4, PIN_INPUT, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
-      GpioInit( &SX1278.DIO5, RADIO_DIO_5, PIN_INPUT, PIN_PUSH_PULL, PIN_NO_PULL, 0 );
-    */
     pinMode(NSS_SPI1,OUTPUT);
     digitalWrite(NSS_SPI1,1);
     pinMode(DIO0,INPUT);
@@ -298,3 +265,4 @@ void BoardGetUniqueId( uint8_t *id )
     id[1] = ( ( *( uint32_t* )ID2 ) ) >> 8;
     id[0] = ( ( *( uint32_t* )ID2 ) );
 }
+#endif

@@ -65,7 +65,7 @@ typedef struct exti_state {
     uint32_t ftsr;
 } exti_state;
 
-static exti_state exti_saved_state;
+static exti_state exti_saved_state  = {0};
 
 /*
  * @brief Attach the pin external interrupt with the defined handler and mode
@@ -83,8 +83,8 @@ static exti_state exti_saved_state;
 void HAL_Interrupts_Attach(uint16_t pin, HAL_InterruptHandler handler, void* data, InterruptMode mode,
         HAL_InterruptExtraConfiguration* config)
 {
-    DEBUG("Enter HAL_Interrupt_Attach...\r\n");
-    DEBUG("Pin: %d", pin);
+    /* DEBUG("Enter HAL_Interrupt_Attach...\r\n"); */
+    /* DEBUG("Pin: %d", pin); */
     uint8_t GPIO_PortSource = 0;    //variable to hold the port number
 
     //Map the pin to the appropriate port and pin on the STM32
@@ -153,7 +153,7 @@ void HAL_Interrupts_Attach(uint16_t pin, HAL_InterruptHandler handler, void* dat
     }
 
     /* Enable and set EXTI line Interrupt to the lowest priority */
-    HAL_NVIC_SetPriority( GPIO_IRQn[GPIO_PinSource], 13, 0); // 14 or 13, which one
+    HAL_NVIC_SetPriority( GPIO_IRQn[GPIO_PinSource], 6, 0); // 14 or 13, which one
     HAL_NVIC_EnableIRQ( GPIO_IRQn[GPIO_PinSource] );
 }
 
@@ -286,6 +286,7 @@ void HAL_enable_irq(int is)
   */
 void EXTI0_IRQHandler(void)
 {
+    /* DEBUG("interrupt 0"); */
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_0) != RESET)
     {
         /* Clear the EXTI line pending bit */
@@ -305,6 +306,7 @@ void EXTI0_IRQHandler(void)
   */
 void EXTI1_IRQHandler(void)
 {
+    /* DEBUG("interrupt 1"); */
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_1) != RESET)
     {
         /* Clear the EXTI line pending bit */
@@ -324,6 +326,7 @@ void EXTI1_IRQHandler(void)
   */
 void EXTI2_IRQHandler(void)
 {
+    /* DEBUG("interrupt 2"); */
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_2) != RESET)
     {
         /* Clear the EXTI line pending bit */
@@ -343,6 +346,7 @@ void EXTI2_IRQHandler(void)
   */
 void EXTI3_IRQHandler(void)
 {
+    /* DEBUG("interrupt 3"); */
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_3) != RESET)
     {
         /* Clear the EXTI line pending bit */
@@ -361,6 +365,7 @@ void EXTI3_IRQHandler(void)
   */
 void EXTI4_IRQHandler(void)
 {
+    /* DEBUG("interrupt 4"); */
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_4) != RESET)
     {
         /* Clear the EXTI line pending bit */
@@ -382,8 +387,10 @@ void EXTI9_5_IRQHandler(void)
 {
     //GPIO_PIN_8 and GPIO_PIN_9 support is not required for CORE_V02
 
+    /* DEBUG("interrupt 9-5"); */
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_5) != RESET)
     {
+        /* DEBUG("interrupt 5"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_5);
 
@@ -395,6 +402,7 @@ void EXTI9_5_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_6) != RESET)
     {
+        /* DEBUG("interrupt 6"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_6);
 
@@ -406,6 +414,7 @@ void EXTI9_5_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_7) != RESET)
     {
+        /* DEBUG("interrupt 7"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_7);
 
@@ -417,6 +426,7 @@ void EXTI9_5_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_8) != RESET)
     {
+        /* DEBUG("interrupt 8"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_8);
 
@@ -428,6 +438,7 @@ void EXTI9_5_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_9) != RESET)
     {
+        /* DEBUG("interrupt 9"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_9);
 
@@ -445,9 +456,11 @@ void EXTI9_5_IRQHandler(void)
   */
 void EXTI15_10_IRQHandler(void)
 {
+    /* DEBUG("interrupt 15-10"); */
     //GPIO_PIN_10 and GPIO_PIN_12 support is not required for CORE_V02
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_10) != RESET)
     {
+        /* DEBUG("interrupt 10"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_10);
 
@@ -459,6 +472,7 @@ void EXTI15_10_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_11) != RESET)
     {
+        /* DEBUG("interrupt 11"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_11);
 
@@ -470,6 +484,7 @@ void EXTI15_10_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_12) != RESET)
     {
+        /* DEBUG("interrupt 12"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_12);
 
@@ -481,6 +496,7 @@ void EXTI15_10_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_13) != RESET)
     {
+        /* DEBUG("interrupt 13"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_13);
 
@@ -492,6 +508,7 @@ void EXTI15_10_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_14) != RESET)
     {
+        /* DEBUG("interrupt 14"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_14);
 
@@ -503,6 +520,7 @@ void EXTI15_10_IRQHandler(void)
 
     if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_15) != RESET)
     {
+        /* DEBUG("interrupt 15"); */
         /* Clear the EXTI line pending bit */
         __HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_15);
 

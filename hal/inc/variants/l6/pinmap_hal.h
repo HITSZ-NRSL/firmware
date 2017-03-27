@@ -66,10 +66,10 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 /*
 * Pin mapping. Borrowed from Wiring
 */
-#define TOTAL_PINS             49
+#define TOTAL_PINS             31
 #define TOTAL_ANALOG_PINS      6
-#define TOTAL_DIGITAL_PINS     8
-#define FIRST_ANALOG_PIN       30
+#define TOTAL_DIGITAL_PINS     24
+#define FIRST_ANALOG_PIN       9
 
 #define D0 0
 #define D1 1
@@ -79,44 +79,89 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 #define D5 5
 #define D6 6
 #define D7 7
+#define D8 8
+#define D9 9
+#define D10 10
+#define D11 11
+#define D12 12
+#define D13 13
+#define D14 14
+#define D15 15
+#define D16 16
+#define D17 17
+#define D18 18
+#define D19 19
+#define D20 20
 
-#define A0 30
-#define A1 31
-#define A2 32
-#define A3 33
-#define A4 34
-#define A5 35
+#define A0  9
+#define A1  10
+#define A2  11
+#define A3  12
+#define A4  13
+#define A5  14
+
+#define PB2  D0
+#define PB10 D1
+#define PB11 D2
+#define PB12 D3
+#define PB13 D4
+#define PB14 D5
+#define PB15 D6
+
+#define PA0 D7
+#define PA1 D8
+#define PA2 D9
+#define PA3 D10
+#define PA4 D11
+#define PA5 D12
+#define PA6 D13
+#define PA7 D14
+#define PA9 D15
+#define PA10 D16
+#define PA11 D17
+#define PA12 D18
+#define PA13 D19
+#define PA14 D20
 
 // lora pins
-#define RESET_EN    36
-#define NSS_SPI1    37
-#define DIO0        38
-#define DIO1        39
-#define DIO2        40
-#define DIO3        41
-#define DIO4        42
-#define DIO5        43
-#define RX_EN       44
-#define TX_EN       45
+#define RESET_EN   21
+#define NSS_SPI1   22
+#define DIO0       23
+#define DIO1       24
+#define DIO2       25
+#define DIO3       26
+#define DIO4       27
+#define DIO5       28
+#define RX_EN      29
+
 //#define A6 36
 //#define A7 37
 
 // Uart pins
-#define TX A0
-#define RX A1
+#define TX  PA2
+#define RX  PA3
 
-#define SS   D7
-#define SCK  D4
-#define MISO D5
-#define MOSI D6
+// Uart pins
+#define TX1  PA9
+#define RX1  PA10
+
+// Uart pins
+#define TX2  PB10
+#define RX2  PB11
+
+//SPI pin
+#define SS   PB12
+#define SCK  PB13
+#define MISO PB14
+#define MOSI PB15
 
 // I2C pins
-#define SDA  D1
-#define SCL  D0
+#define SDA  PB10
+#define SCL  PB11
 
 #define LED_USER  D7
 
-#define TOTAL_USARTS    2
+#define TOTAL_USARTS    3
 #define TOTAL_SPIS      1
 #define TOTAL_I2CS      1
 

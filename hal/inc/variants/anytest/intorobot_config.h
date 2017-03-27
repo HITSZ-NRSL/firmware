@@ -50,7 +50,7 @@
 
 /* config wring spi */
 #define configWIRING_SPI_ENABLE
-// #define configWIRING_SPI1_ENABLE
+#define configWIRING_SPI1_ENABLE
 //#define configWIRING_SPI2_ENABLE
 
 /* config wiring can. */

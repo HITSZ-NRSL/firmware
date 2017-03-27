@@ -23,6 +23,10 @@
  ******************************************************************************
  */
 
+#include "platforms.h"
+
+#if (PLATFORM_ID == PLATFORM_ANYTEST)
+
 /* Includes ------------------------------------------------------------------*/
 #include "hw_config.h"
 #include "rtc_hal.h"
@@ -32,7 +36,6 @@
 #include "service_debug.h"
 
 RTC_HandleTypeDef RtcHandle;
-static bool rtcFailFlag = true;
 
 void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
 {
@@ -43,37 +46,28 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
     HAL_PWR_EnableBkUpAccess();
 
     /*##-1- Configure LSE as RTC clock source ###################################*/
-    RCC_OscInitStruct.OscillatorType =  RCC_OSCILLATORTYPE_LSE;
+    RCC_OscInitStruct.OscillatorType =  RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_LSE;
     RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
     RCC_OscInitStruct.LSEState = RCC_LSE_ON;
-    //RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
+    RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
     if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
-        rtcFailFlag = false;
-        return;
-        /* DEBUG("RCC_OscConfg Error"); */
+        DEBUG("RCC_OscConfg Error");
     }
 
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
     if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
     {
-        /* DEBUG("RCCEx_PeriphCLKConfig Error"); */
-        rtcFailFlag = false;
-        return;
+        DEBUG("RCCEx_PeriphCLKConfig Error");
     }
     /*##-2- Enable RTC peripheral Clocks #######################################*/
     /* Enable RTC Clock */
     __HAL_RCC_RTC_ENABLE();
     /*##-3- Configure the NVIC for RTC Alarm ###################################*/
-    /* HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 0x0F, 0); */
-    /* HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn); */
 }
 
-bool GetRTCSatus(void)
-{
-    return rtcFailFlag;
-}
+
 /**
  * @brief RTC MSP De-Initialization
  *        This function frees the hardware resources
@@ -91,7 +85,8 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
     __HAL_RCC_PWR_CLK_DISABLE();
 }
 
-#if 0
+#if 1
+#if 0 
 /**
  * @brief  Configure the current time and date.
  * @param  None
@@ -119,9 +114,9 @@ static void RTC_CalendarAlarmConfig(void)
     stimestructure.Hours          = 0x00;
     stimestructure.Minutes        = 0x00;
     stimestructure.Seconds        = 0x00;
-    stimestructure.TimeFormat     = RTC_HOURFORMAT12_AM;
-    stimestructure.DayLightSaving = RTC_DAYLIGHTSAVING_NONE ;
-    stimestructure.StoreOperation = RTC_STOREOPERATION_RESET;
+    /* stimestructure.TimeFormat     = RTC_HOURFORMAT12_AM; */
+    /* stimestructure.DayLightSaving = RTC_DAYLIGHTSAVING_NONE ; */
+    /* stimestructure.StoreOperation = RTC_STOREOPERATION_RESET; */
 
     if (HAL_RTC_SetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BCD) != HAL_OK)
     {
@@ -130,37 +125,9 @@ static void RTC_CalendarAlarmConfig(void)
 }
 #endif
 
-#if 0
-void HAL_RTC_Initial(void)
-{
-   /*##-1- Configure the RTC peripheral #######################################*/
-    /* Configure RTC prescaler and RTC data registers */
-    /* RTC configured as follows:
-       - Hour Format    = Format 24
-       - Asynch Prediv  = Value according to source clock
-       - Synch Prediv   = Value according to source clock
-       - OutPut         = Output Disable
-       - OutPutPolarity = High Polarity
-       - OutPutType     = Open Drain */
-    RtcHandle.Instance            = RTC;
-    RtcHandle.Init.HourFormat     = RTC_HOURFORMAT_24;
-    RtcHandle.Init.AsynchPrediv   = 0x7F; //RTC_ASYNCH_PREDIV; //0x7F;
-    RtcHandle.Init.SynchPrediv    = 0x00FF; //RTC_SYNCH_PREDIV;  //0x00FF;
-    RtcHandle.Init.OutPut         = RTC_OUTPUT_DISABLE;
-    RtcHandle.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
-    RtcHandle.Init.OutPutType     = RTC_OUTPUT_TYPE_OPENDRAIN;
-
-    if (HAL_RTC_Init(&RtcHandle) != HAL_OK)
-    {
-        DEBUG("RTC Init Error!");
-    }
-    RTC_CalendarAlarmConfig();
-}
-#endif
-
 time_t HAL_RTC_Get_UnixTime(void)
 {
-    #if 0
+    #if  1 
     RTC_DateTypeDef sdatestructureget;
     RTC_TimeTypeDef stimestructureget;
     struct tm tmstruct;
@@ -205,7 +172,7 @@ static int dec2hex_direct(uint8_t decData)
 
 void HAL_RTC_Set_UnixTime(time_t value)
 {
-    #if 0
+    #if  1 
     struct tm *tmTemp = gmtime( &value );
     RTC_DateTypeDef sdatestructure;
     RTC_TimeTypeDef stimestructure;
@@ -227,9 +194,9 @@ void HAL_RTC_Set_UnixTime(time_t value)
     stimestructure.Hours          = dec2hex_direct(tmTemp->tm_hour);
     stimestructure.Minutes        = dec2hex_direct(tmTemp->tm_min);
     stimestructure.Seconds        = dec2hex_direct(tmTemp->tm_sec);
-    stimestructure.TimeFormat     = RTC_HOURFORMAT12_AM;
-    stimestructure.DayLightSaving = RTC_DAYLIGHTSAVING_NONE ;
-    stimestructure.StoreOperation = RTC_STOREOPERATION_RESET;
+    /* stimestructure.TimeFormat     = RTC_HOURFORMAT12_AM; */
+    /* stimestructure.DayLightSaving = RTC_DAYLIGHTSAVING_NONE ; */
+    /* stimestructure.StoreOperation = RTC_STOREOPERATION_RESET; */
 
     if (HAL_RTC_SetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BCD) != HAL_OK)
     {
@@ -307,6 +274,7 @@ void RTC_Alarm_IRQHandler(void)
 {
     HAL_RTC_AlarmIRQHandler(&RtcHandle);
 }
+#endif
 #endif
 
 /*!
@@ -496,20 +464,11 @@ void HAL_RTC_Initial( void )
         __HAL_RCC_RTC_ENABLE( );
 
         RtcHandle.Instance = RTC;
-        RtcHandle.Init.HourFormat = RTC_HOURFORMAT_24;
         //设置32.768K的分频系数
         //Fclk = 32768/[(SynchPrediv+1)*(AsynchPrediv+1)]
-        RtcHandle.Init.AsynchPrediv = 3;
-        RtcHandle.Init.SynchPrediv = 3;
+        /* RtcHandle.Init.AsynchPrediv = 18-1; */
+        RtcHandle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 
-        //set rtc time base to 1s
-        /* RtcHandle.Init.AsynchPrediv = 0x7f; */
-        /* RtcHandle.Init.SynchPrediv = 0xff; */
-
-
-        RtcHandle.Init.OutPut = RTC_OUTPUT_DISABLE;
-        RtcHandle.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
-        RtcHandle.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
         HAL_RTC_Init( &RtcHandle );
 
         // Set Date: Friday 1st of January 2000
@@ -523,14 +482,12 @@ void HAL_RTC_Initial( void )
         rtcInit.CalendarTime.Hours = 0;
         rtcInit.CalendarTime.Minutes = 0;
         rtcInit.CalendarTime.Seconds = 0;
-        rtcInit.CalendarTime.TimeFormat = RTC_HOURFORMAT12_AM;
-        rtcInit.CalendarTime.DayLightSaving = RTC_DAYLIGHTSAVING_NONE;
-        rtcInit.CalendarTime.StoreOperation = RTC_STOREOPERATION_RESET;
         HAL_RTC_SetTime( &RtcHandle, &rtcInit.CalendarTime, RTC_FORMAT_BIN );
 
         HAL_NVIC_SetPriority( RTC_Alarm_IRQn, 4, 0 );
         HAL_NVIC_EnableIRQ( RTC_Alarm_IRQn );
         RtcInitalized = true;
+        DEBUG("init rtc ");
     }
 }
 /* #endif */
@@ -637,10 +594,10 @@ void RtcEnterLowPowerStopMode( void )
         SET_BIT( PWR->CR, PWR_CR_CWUF );
 
         // Enable Ultra low power mode
-        HAL_PWREx_EnableUltraLowPower( );
+        /* HAL_PWREx_EnableUltraLowPower( ); */
 
         // Enable the fast wake up from Ultra low power mode
-        HAL_PWREx_EnableFastWakeUp( );
+        /* HAL_PWREx_EnableFastWakeUp( ); */
 
         // Enter Stop Mode
         HAL_PWR_EnterSTOPMode( PWR_LOWPOWERREGULATOR_ON, PWR_STOPENTRY_WFI );
@@ -659,8 +616,8 @@ void RtcRecoverMcuStatus( void )
         NonScheduledWakeUp = true;
     }
     // check the clk source and set to full speed if we are coming from sleep mode
-    if( ( __HAL_RCC_GET_SYSCLK_SOURCE( ) == RCC_SYSCLKSOURCE_STATUS_HSI ) ||
-        ( __HAL_RCC_GET_SYSCLK_SOURCE( ) == RCC_SYSCLKSOURCE_STATUS_MSI ) )
+    if( ( __HAL_RCC_GET_SYSCLK_SOURCE( ) == RCC_SYSCLKSOURCE_STATUS_HSI )) //||
+        /* ( __HAL_RCC_GET_SYSCLK_SOURCE( ) == RCC_SYSCLKSOURCE_STATUS_MSI ) ) */
     {
         /* BoardInitMcu( ); */
     }
@@ -694,7 +651,7 @@ static void RtcStartWakeUpAlarm( uint32_t timeoutValue )
     RTC_AlarmTypeDef alarmStructure;
 
     HAL_RTC_DeactivateAlarm( &RtcHandle, RTC_ALARM_A );
-    HAL_RTCEx_DeactivateWakeUpTimer( &RtcHandle );
+    /* HAL_RTCEx_DeactivateWakeUpTimer( &RtcHandle ); */
 
     // Load the RTC calendar
     now = RtcGetCalendar( );
@@ -706,14 +663,9 @@ static void RtcStartWakeUpAlarm( uint32_t timeoutValue )
     alarmTimer = RtcComputeTimerTimeToAlarmTick( timeoutValue, now );
 
     alarmStructure.Alarm = RTC_ALARM_A;
-    alarmStructure.AlarmDateWeekDaySel = RTC_ALARMDATEWEEKDAYSEL_DATE;
-    alarmStructure.AlarmMask = RTC_ALARMMASK_NONE;
-    alarmStructure.AlarmTime.TimeFormat = RTC_HOURFORMAT12_AM;
-
     alarmStructure.AlarmTime.Seconds = alarmTimer.CalendarTime.Seconds;
     alarmStructure.AlarmTime.Minutes = alarmTimer.CalendarTime.Minutes;
     alarmStructure.AlarmTime.Hours = alarmTimer.CalendarTime.Hours;
-    alarmStructure.AlarmDateWeekDay = alarmTimer.CalendarDate.Date;
 
     if( HAL_RTC_SetAlarm_IT( &RtcHandle, &alarmStructure, RTC_FORMAT_BIN ) != HAL_OK )
     {
@@ -1024,3 +976,4 @@ void RTC_Alarm_IRQ( void )
 
     /* TimerIrqHandler( ); */
 }
+#endif
