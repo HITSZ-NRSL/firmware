@@ -8,7 +8,7 @@
 - [[PR #42]](https://github.com/HITSZ-NRSL/firmware/pull/42) [nut] 修改nut jsonGetValue()重启bug
 
 ### INTERNAL(内部)
-
+- [[PR #43]](https://github.com/HITSZ-NRSL/firmware/pull/43) [anytest] 增加各板子测试代码
 
 ## v1.5.0-rc.1
 
