@@ -1240,6 +1240,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, char &ret_char)
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( typeObject->type == aJson_Boolean)
     {
         if( typeObject->valuebool == false)
@@ -1273,6 +1279,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, String &ret_string)
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( typeObject->type == aJson_String )
     {
         ret_string = typeObject->valuestring;
@@ -1295,6 +1307,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, uint8_t &ret_u8)
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( typeObject->type == aJson_Boolean)
     {
         if( typeObject->valuebool == false)
@@ -1328,6 +1346,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, short &ret_short)
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( (typeObject->type == aJson_Int) && (typeObject->valueint >= -32768) &&(typeObject->valueint <= 32767))
     {
         ret_short = typeObject->valueint;
@@ -1361,6 +1385,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, unsigned short &ret_usho
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( (typeObject->type == aJson_Int) && (typeObject->valueint >= 0) &&(typeObject->valueint <= 65535) )
     {
         ret_ushort = typeObject->valueint;
@@ -1394,6 +1424,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, int &ret_int)
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( typeObject->type == aJson_Int )
     {
         ret_int = typeObject->valueint;
@@ -1427,6 +1463,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, unsigned int &ret_uint)
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( (typeObject->type == aJson_Int) && (typeObject->valueint >= 0) &&(typeObject->valueint <= 2147483648) )
     {
         ret_uint = typeObject->valueint;
@@ -1460,6 +1502,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, long &ret_long)
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( typeObject->type == aJson_Int )
     {
         ret_long = typeObject->valueint;
@@ -1493,6 +1541,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, unsigned long &ret_ulong
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( (typeObject->type == aJson_Int) && (typeObject->valueint >= 0) &&(typeObject->valueint <= 2147483648) )
     {
         ret_ulong = typeObject->valueint;
@@ -1526,6 +1580,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, float &ret_float)
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( (typeObject->type == aJson_Float)&&(typeObject->valuefloat >= (-3.40e38) )&& (typeObject->valuefloat <= (3.40e38)) )
     {
         ret_float = (float)typeObject->valuefloat;
@@ -1552,6 +1612,12 @@ bool jsonGetValue(uint8_t *payload, const char *string, double &ret_double)
         return false;
     }
     aJsonObject* typeObject = aJson.getObjectItem(root, string);
+    if(typeObject == NULL)
+    {
+        aJson.deleteItem(root);
+        return false;
+    }
+
     if( typeObject->type == aJson_Float )
     {
         ret_double = typeObject->valuefloat;

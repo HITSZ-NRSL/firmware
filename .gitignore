@@ -37,6 +37,8 @@ tools/xtensa-esp32-elf
 tools/esptool
 tools/esptool-py
 tools/stlink
+tools/esp8266
+tools/esp32
 
 #用户例子
 user/src/*

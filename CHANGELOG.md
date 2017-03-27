@@ -1,3 +1,18 @@
+## v1.5.0-rc.2
+
+### FEATURES(功能)
+
+### ENHANCEMENTS(优化)
+
+
+### BUG FIXES(漏洞修复)
+- [[PR #40]](https://github.com/HITSZ-NRSL/firmware/pull/40) [nut] 解决nut-jsonGetValue解析数据时出现重启问题.
+
+### INTERNAL(内部)
+
+
+
+
 ## v1.5.0-rc.1
 
 ### FEATURES(功能)
