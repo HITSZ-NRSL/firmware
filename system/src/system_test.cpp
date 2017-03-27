@@ -138,11 +138,11 @@ void testDigitalWrite(uint16_t pin, uint16_t value, void* cookie)
     aJson.deleteItem(root);
 
 
-#elif PLATFORM_ID == PLATFORM_LORA
+#elif PLATFORM_ID == PLATFORM_ANT
 
 #elif PLATFORM_ID == PLATFORM_L6
 
-#elif PLATFORM_ID == PLATFORM_GPRS
+#elif PLATFORM_ID == PLATFORM_FOX
 #endif
 }
 
@@ -168,11 +168,11 @@ void testAnalogRead(uint16_t pin, void* cookie)
 
 #elif PLATFORM_ID == PLATFORM_W323
 
-#elif PLATFORM_ID == PLATFORM_LORA
+#elif PLATFORM_ID == PLATFORM_ANT
 
 #elif PLATFORM_ID == PLATFORM_L6
 
-#elif PLATFORM_ID == PLATFORM_GPRS
+#elif PLATFORM_ID == PLATFORM_FOX
 
 #endif
 }
@@ -197,11 +197,11 @@ void testSelfTest(void* cookie)
 
 #elif PLATFORM_ID == PLATFORM_W323
 
-#elif PLATFORM_ID == PLATFORM_LORA
+#elif PLATFORM_ID == PLATFORM_ANT
 
 #elif PLATFORM_ID == PLATFORM_L6
 
-#elif PLATFORM_ID == PLATFORM_GPRS
+#elif PLATFORM_ID == PLATFORM_FOX
 
 #endif
 }

@@ -209,7 +209,7 @@ bool FLASH_Restore(Firmware_TypeDef FmType)
     {
         size = HAL_PARAMS_Get_Boot_ota_app_size();
         if(0 == size) {
-            return false;
+            return true;
         }
         result = copy_raw(CACHE_ONLINE_APP_ADDR, APP_ADDR, size);
     }

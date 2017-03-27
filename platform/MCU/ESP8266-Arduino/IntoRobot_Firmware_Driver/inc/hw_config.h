@@ -31,6 +31,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "sdkqueue.h"
 #include "hw_ticks.h"
 #include "esp8266_timer.h"

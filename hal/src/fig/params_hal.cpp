@@ -230,14 +230,6 @@ int HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_TypeDef flag) {
 /********************************************************************************
  *  添加参数
  ********************************************************************************/
-extern "C" {
-    uint32_t HAL_PARAMS_Get_Boot_ota_app_size(void);
-    int HAL_PARAMS_Set_Boot_ota_app_size(uint32_t size);
-    uint32_t HAL_PARAMS_Get_Boot_def_app_size(void);
-    int HAL_PARAMS_Set_Boot_def_app_size(uint32_t size);
-    uint32_t HAL_PARAMS_Get_Boot_boot_size(void);
-    int HAL_PARAMS_Set_Boot_boot_size(uint32_t size);
-}
 
 /*
  * 读取ota文件大小
@@ -449,17 +441,17 @@ int HAL_PARAMS_Set_System_dw_domain(const char* buffer) {
 }
 
 /*
- * 读取sv_select标志
+ * 读取子系统升级标志
  * */
-SV_SELECT_FLAG_TypeDef HAL_PARAMS_Get_System_sv_select(void) {
-    return (SV_SELECT_FLAG_TypeDef)intorobot_system_params.sv_select;
+uint8_t HAL_PARAMS_Get_System_subsys_flag(void) {
+    return intorobot_system_params.subsys_flag;
 }
 
 /*
- * 保存sv_select标志
+ * 保存子系统升级标志
  * */
-int HAL_PARAMS_Set_System_sv_select(SV_SELECT_FLAG_TypeDef flag) {
-    intorobot_system_params.sv_select = flag;
+int HAL_PARAMS_Set_System_subsys_flag(uint8_t flag) {
+    intorobot_system_params.subsys_flag = flag;
     return 0;
 }
 

@@ -251,7 +251,7 @@ extern "C" void HAL_SysTick_Handler(void)
         }
     }
 
-#elif PLATFORM_ID == PLATFORM_LITTLEBEE || PLATFORM_ID == PLATFORM_LORA
+#elif PLATFORM_ID == PLATFORM_FOX || PLATFORM_ID == PLATFORM_ANT
 
 #define TIMING_MODE_CONFIG_SERIAL                       3000   //进入串口配置模式判断时间
 #define TIMING_MODE_DEFAULT_RESTORE                     7000   //进入默认固件灯程序升级判断时间

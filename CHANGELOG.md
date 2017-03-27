@@ -17,6 +17,7 @@
 
 ### FEATURES(功能)
 - [[PR #28]](https://github.com/HITSZ-NRSL/firmware/pull/28) [fig] 1.添加fig/w32/w33 bootloader和应用
+- [[PR #28]](https://github.com/HITSZ-NRSL/firmware/pull/28) [neutron/nut/fig] neutron/nut/fig 支持子系统版本升级
 
 ### ENHANCEMENTS(优化)
 
@@ -25,8 +26,11 @@
 - [[PR #26]](https://github.com/HITSZ-NRSL/firmware/pull/26) [nut] 解决nut编译出现iram1_0_seg空间不足.
 - [[PR #27]](https://github.com/HITSZ-NRSL/firmware/pull/27) [all] 1.解决usb串口配置，传输大数据指令无效. 2.减少配置等待时间.
 - [[PR #34]](https://github.com/HITSZ-NRSL/firmware/pull/34) [all] 修正bug, 如果imlink配置成功，在进入配置模式配置，无法配置成功
+- [[PR #35]](https://github.com/HITSZ-NRSL/firmware/pull/35) [nut] 修改nut tcp重连重启bug
+- [[PR #35]](https://github.com/HITSZ-NRSL/firmware/pull/35) [nut/fig] 修改fig/nut/w323/w67 bootloader ota升级bug, 如果ota大小为0, 进入ota升级将陷入死循环
 
 ### INTERNAL(内部)
+- [[PR #35]](https://github.com/HITSZ-NRSL/firmware/pull/35) [all] 去掉sv_select相关处理
 
 
 

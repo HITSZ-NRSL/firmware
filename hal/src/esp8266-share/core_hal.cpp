@@ -146,7 +146,7 @@ static void do_global_ctors(void) {
         (*--p)();
 }
 
-extern "C" const char intorobot_subsys_version[32] __attribute__((section(".subsys.version"))) = SUBSYS_VERSION ;
+extern "C" const char intorobot_subsys_version[32] __attribute__((section(".subsys.version"))) = SUBSYS_VERSION;
 void init_done() {
     gdb_init();
     do_global_ctors();
@@ -239,6 +239,7 @@ void HAL_Core_Setup(void)
 {
     HAL_IWDG_Config(DISABLE);
     HAL_Core_Load_params();
+    HAL_SubSystem_Update_If_Needed();
     HAL_Bootloader_Update_If_Needed();
 }
 

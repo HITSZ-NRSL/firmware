@@ -138,7 +138,6 @@ void HAL_Core_Load_params(void)
     }
 }
 
-
 void HAL_Core_Setup(void)
 {
     HAL_IWDG_Config(DISABLE);

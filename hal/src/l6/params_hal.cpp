@@ -448,21 +448,6 @@ int HAL_PARAMS_Set_System_zone(float zone) {
 }
 
 /*
- * 读取sv_select标志
- * */
-SV_SELECT_FLAG_TypeDef HAL_PARAMS_Get_System_sv_select(void) {
-    return (SV_SELECT_FLAG_TypeDef)intorobot_system_params.sv_select;
-}
-
-/*
- * 保存sv_select标志
- * */
-int HAL_PARAMS_Set_System_sv_select(SV_SELECT_FLAG_TypeDef flag) {
-    intorobot_system_params.sv_select = flag;
-    return 0;
-}
-
-/*
  * 读取固件库版本号
  * */
 uint16_t HAL_PARAMS_Get_System_fwlib_ver(char* buffer, uint16_t len) {

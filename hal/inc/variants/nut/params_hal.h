@@ -111,8 +111,9 @@ int HAL_PARAMS_Get_System_sv_port(void);
 int HAL_PARAMS_Set_System_sv_port(int port);
 uint16_t HAL_PARAMS_Get_System_dw_domain(char* buffer, uint16_t len);
 int HAL_PARAMS_Set_System_dw_domain(const char* buffer);
-SV_SELECT_FLAG_TypeDef HAL_PARAMS_Get_System_sv_select(void);
-int HAL_PARAMS_Set_System_sv_select(SV_SELECT_FLAG_TypeDef flag);
+uint8_t HAL_PARAMS_Get_System_subsys_flag(void);
+int HAL_PARAMS_Set_System_subsys_flag(uint8_t flag);
+
 
 uint16_t HAL_PARAMS_Get_System_fwlib_ver(char* buffer, uint16_t len);
 int HAL_PARAMS_Set_System_fwlib_ver(const char* buffer);

@@ -241,17 +241,22 @@ bool Esp8266ConnClass::_socketFree(int socket)
             if(MDM_IPPROTO_UDP == _sockets[socket].ipproto) {
                 HALSOCKET_DEBUG("OK! udp free");
                 free(_sockets[socket].esp8266_conn_ptr->proto.udp);
+                _sockets[socket].esp8266_conn_ptr->proto.udp = NULL;
             }
             else {
                 HALSOCKET_DEBUG("OK! tcp free");
                 free(_sockets[socket].esp8266_conn_ptr->proto.tcp);
+                _sockets[socket].esp8266_conn_ptr->proto.tcp = NULL;
             }
             if (_sockets[socket].esp8266_conn_ptr) {
                 HALSOCKET_DEBUG("OK! esp8266 conn ptr free");
                 free(_sockets[socket].esp8266_conn_ptr);
+                _sockets[socket].esp8266_conn_ptr = NULL;
             }
-            if (_sockets[socket].pipe)
+            if (_sockets[socket].pipe) {
                 delete _sockets[socket].pipe;
+                _sockets[socket].pipe = NULL;
+            }
         }
         ok = true;
     }
@@ -456,19 +461,11 @@ void Esp8266ConnClass::_espconn_reconnect_callback(void *arg, sint8 errType) {
             }
         }
     }
+
     if (NUMSOCKETS != socket) {
-        if(_sockets[socket].ipproto) {
-            free(pespconn->proto.udp);
-            pespconn->proto.udp = NULL;
-        }
-        else {
-            free(pespconn->proto.tcp);
-            pespconn->proto.tcp = NULL;
-        }
-        free(pespconn);
-        pespconn = NULL;
+        _sockets[socket].connected = false;
     }
-    _socketFree(socket);
+
     _socketConnectConfirmed = 1;
 }
 

@@ -288,12 +288,9 @@ static void smartConfigCallback(uint32_t st, void* result)
     DEBUG("status = %d", status);
     if (status == SC_STATUS_LINK) {
         wifi_sta_config_t *sta_conf = reinterpret_cast<wifi_sta_config_t *>(result);
-
         DEBUG("ssid     = %s", sta_conf->ssid);
         DEBUG("password = %s", sta_conf->password);
-        //esp_wifi_set_config(WIFI_IF_STA, (wifi_config_t *)sta_conf);
-        esp_wifi_set_config(WIFI_IF_AP, (wifi_config_t *)sta_conf);
-        esp_wifi_disconnect();
+        esp_wifi_set_config(WIFI_IF_STA, (wifi_config_t *)sta_conf);
         esp_wifi_connect();
     } else if (status == SC_STATUS_LINK_OVER) {
         _smartConfigDone = true;
@@ -309,6 +306,8 @@ bool esp32_beginSmartConfig()
     if (!esp32_setMode(WIFI_MODE_STA)) {
         return false;
     }
+
+    esp_wifi_disconnect();
 
     esp_err_t err;
     err = esp_smartconfig_start(reinterpret_cast<sc_callback_t>(&smartConfigCallback), 1);

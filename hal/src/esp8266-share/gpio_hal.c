@@ -260,4 +260,3 @@ int32_t HAL_pinReadFast(pin_t pin)
     return 0;
 }
 
-

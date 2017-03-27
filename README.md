@@ -2,7 +2,7 @@
 IntoRobot 固件源代码工程, 支持intorobot创客模块和IntoRobot商业模组。
 
 ```
-创客核心板（包括三色灯、按键、usb接口等）：atom, neutron, nut, lora, fig, littlebee等。
+创客核心板（包括三色灯、按键、usb接口等）：atom, neutron, nut, ant, fig, fox等。
 商业模组（单纯模组，不包括其他附属器件）：w6, w7, w32, w33, l6等。
 ```
 ## 快速开始
@@ -33,8 +33,8 @@ make PLATFORM=neutron clean all APP=smartLight-default
 make PLATFORM=nut clean all APP=smartLight-default
 make PLATFORM=atom clean all APP=smartLight-default
 make PLATFORM=fig clean all APP=smartLight-default
-make PLATFORM=lora clean all APP=blink
-make PLATFORM=littlebee clean all APP=smartLight-default
+make PLATFORM=ant clean all APP=blink
+make PLATFORM=fox clean all APP=smartLight-default
 
 make PLATFORM=w67 clean all APP=smartLight-w67
 make PLATFORM=w323 clean all APP=blink
@@ -50,8 +50,8 @@ make PLATFORM=l6 clean all APP=blink
 | nut          | 888003      |
 | atom         | 888004      |
 | fig          | 888005      |
-| lora         | 888006      |
-| littlebee    | 888007      |
+| ant          | 888006      |
+| fox          | 888007      |
 
 | 商业模块     | PLATFORM_ID |
 |--------------|:-----------:|
@@ -75,11 +75,11 @@ make PLATFORM=atom clean all program-dfu
 make PLATFORM=neutron clean all st-flash
 make PLATFORM=neutron clean all program-dfu
 
-make PLATFORM=lora clean all DEBUG_BUILD=y USE_SWD=y st-flash
-make PLATFORM=lora clean all DEBUG_BUILD=y USE_SWD=y program-dfu
+make PLATFORM=ant clean all DEBUG_BUILD=y USE_SWD=y st-flash
+make PLATFORM=ant clean all DEBUG_BUILD=y USE_SWD=y program-dfu
 
-make PLATFORM=gprs clean all DEBUG_BUILD=y USE_SWD=y st-flash
-make PLATFORM=gprs clean all DEBUG_BUILD=y USE_SWD=y program-dfu
+make PLATFORM=fox clean all DEBUG_BUILD=y USE_SWD=y st-flash
+make PLATFORM=fox clean all DEBUG_BUILD=y USE_SWD=y program-dfu
 
 make PLATFORM=nut clean all DEBUG_BUILD=y USE_SWD=y esptool
 
@@ -124,7 +124,7 @@ DEBUG_BUILD=y打开调试， st-flash program-dfu esptool分别选择相应的�
 
 实现编译的主体:
 
-arm-xxx.mk实现包括atom, neutron, lora, gprs, l6等的编译。
+arm-xxx.mk实现包括atom, neutron, ant, fox, l6等的编译。
 
 xtensa-lx106-xxx.mk实现esp8266相关的编译，包括neutron-net,nut, w67等。
 

@@ -33,10 +33,6 @@ void system_lineCodingBitRateHandler(uint32_t bitrate);
 #define UPDATE_ERROR_STREAM             (6)
 #define UPDATE_ERROR_MD5                (7)
 
-#define U_APP_FLASH                     0
-#define U_BOOTLOADER_FLASH              100
-#define U_DEFAULT_APP_FLASH             200
-#define U_AUTH                          300
 
 #define UPDATE_SECTOR_SIZE              0x1000
 
@@ -49,7 +45,7 @@ public:
       Call this to check the space needed for the update
       Will return false if there is not enough space
     */
-    bool begin(size_t size, int command = U_APP_FLASH);
+    bool begin(size_t size, uint32_t startAddress, uint32_t maxSize);
 
     /*
       Writes a buffer to the flash and increments the address
@@ -169,7 +165,6 @@ private:
     size_t _size;
     uint32_t _startAddress;
     uint32_t _currentAddress;
-    uint32_t _command;
 
     String _target_md5;
     MD5Builder _md5;
@@ -206,12 +201,22 @@ public:
     t_httpUpdate_return update(const String& url, const String& currentVersion = "");
     t_httpUpdate_return update(const String& host, uint16_t port, const String& uri = "/", const String& currentVersion = "");
 
+    size_t size();
     int getLastError(void);
     String getLastErrorString(void);
 
+    bool setStoreStartAddress(uint32_t address);
+    bool setStoreMaxSize(uint32_t size);
+    bool setSendProgressCb(progressCb);
+
 protected:
     t_httpUpdate_return handleUpdate(HTTPClient& http, const String& currentVersion);
-    bool runUpdate(Stream& in, uint32_t size, String md5, int command = U_APP_FLASH);
+    bool runUpdate(Stream& in, uint32_t size, String md5);
+
+    uint32_t _startAddress;
+    uint32_t _maxSize;
+    uint32_t _size;
+    progressCb _progressCb;
 
     int _lastError;
     bool _rebootOnUpdate = true;

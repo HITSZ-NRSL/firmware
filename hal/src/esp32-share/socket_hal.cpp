@@ -21,6 +21,15 @@ extern "C" {
 #include <lwip/sockets.h>
 #include <lwip/netdb.h>
 }
+//#define HAL_SOCKET_DEBUG
+
+#ifdef HAL_SOCKET_DEBUG
+#define HALSOCKET_DEBUG(...)  do {DEBUG(__VA_ARGS__);}while(0)
+#define HALSOCKET_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
+#else
+#define HALSOCKET_DEBUG(...)
+#define HALSOCKET_DEBUG_D(...)
+#endif
 
 const sock_handle_t SOCKET_MAX = (sock_handle_t)5; // 5 total sockets, handle 0-4
 const sock_handle_t SOCKET_INVALID = (sock_handle_t)-1;
@@ -32,7 +41,7 @@ sock_handle_t socket_create(uint8_t family, uint8_t type, uint8_t protocol, uint
         int yes = 1;
         setsockopt(handle, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
 
-        //DEBUG("port = %d", port);
+        HALSOCKET_DEBUG("port = %d", port);
 
         struct sockaddr tSocketAddr;
         memset(&tSocketAddr, 0, sizeof(tSocketAddr));
@@ -45,6 +54,13 @@ sock_handle_t socket_create(uint8_t family, uint8_t type, uint8_t protocol, uint
         tSocketAddr.sa_data[5] = 0;
         bind(handle, &tSocketAddr, sizeof(tSocketAddr));
         fcntl(handle, F_SETFL, O_NONBLOCK);
+    } else if (socket_handle_valid(handle) && (protocol==IPPROTO_TCP)) {
+        /*  Unimplemented: connect timeout
+        struct timeval tv;
+        tv.tv_sec = 2;
+        tv.tv_usec = 0;
+        setsockopt(handle, SOL_SOCKET, SO_CONTIMEO, (char *)&tv, sizeof(struct timeval));
+        */
     }
     return handle;
 }
@@ -81,10 +97,10 @@ sock_result_t socket_receivefrom(sock_handle_t sock, void* buffer, socklen_t buf
     socklen_t slen = sizeof(si_other);
     sock_result_t result = recvfrom(sock, buffer, bufLen, MSG_DONTWAIT, &si_other, &slen);
     if (result > 0) {
-        //DEBUG("result = %d", result);
+        HALSOCKET_DEBUG("result = %d", result);
         addr->sa_family = si_other.sa_family;
         memcpy(addr->sa_data, si_other.sa_data, 14);
-        //DEBUG("%d %d   %d.%d.%d.%d", addr->sa_data[0], addr->sa_data[1], addr->sa_data[2],addr->sa_data[3],addr->sa_data[4],addr->sa_data[5]);
+        HALSOCKET_DEBUG("%d %d   %d.%d.%d.%d", addr->sa_data[0], addr->sa_data[1], addr->sa_data[2],addr->sa_data[3],addr->sa_data[4],addr->sa_data[5]);
     }
     return result;
 }

@@ -38,16 +38,12 @@ ifeq ("$(PLATFORM)","fig")
 PLATFORM_ID = 888005
 endif
 
-ifeq ("$(PLATFORM)","lora")
+ifeq ("$(PLATFORM)","ant")
 PLATFORM_ID = 888006
 endif
 
-ifeq ("$(PLATFORM)","littlebee")
+ifeq ("$(PLATFORM)","fox")
 PLATFORM_ID = 888007
-endif
-
-ifeq ("$(PLATFORM)","gprs")
-PLATFORM_ID = 888008
 endif
 
 #add 此处添加创客核心板
@@ -151,39 +147,29 @@ PLATFORM_BOOT_ADDR=0x1000
 PLATFORM_APP_ADDR=0x20000
 endif
 
-ifeq ("$(PLATFORM_ID)","888006") #lora
-PLATFORM=lora
+ifeq ("$(PLATFORM_ID)","888006") #ant
+PLATFORM=ant
 PLATFORM_DEVICE=STM32L151xB
-PLATFORM_NAME=lora
+PLATFORM_NAME=ant
 PLATFORM_MCU=STM32L1xx
 MCU_CORE=cortex-m3
-PRODUCT_DESC=IntoRobot lora, 128k flash, 16k sram
+PRODUCT_DESC=IntoRobot ant,  lora board, 128k flash, 16k sram
 PLATFORM_BOOT_ADDR = 0x08000000
 PLATFORM_APP_ADDR = 0x08006000
 endif
 
-ifeq ("$(PLATFORM_ID)","888007") #littlebee
-PLATFORM=littlebee
+ifeq ("$(PLATFORM_ID)","888007") #fox
+PLATFORM=fox
 PLATFORM_DEVICE=STM32F411xE
-PLATFORM_NAME=littlebee
+PLATFORM_NAME=fox
 PLATFORM_MCU=STM32F4xx
 MCU_CORE=cortex-m4
-PRODUCT_DESC=IntoRobot littlebee, 512k flash, 128k sram
+PRODUCT_DESC=IntoRobot fox, gprs board, 512k flash, 128k sram
 PLATFORM_BOOT_ADDR=0x08000000
 PLATFORM_APP_ADDR=0x08020000
 PLATFORM_THREADING=1
 endif
 
-ifeq ("$(PLATFORM_ID)","888008") #gprs
-PLATFORM=gprs
-PLATFORM_DEVICE=STM32L151xB
-PLATFORM_NAME=gprs
-PLATFORM_MCU=STM32L1xx
-MCU_CORE=cortex-m3
-PRODUCT_DESC=IntoRobot gprs, 128k flash, 16k sram
-PLATFORM_BOOT_ADDR=0x08000000
-PLATFORM_APP_ADDR=0x08008000
-endif
 
 # 此处新增创客核心板
 
@@ -216,7 +202,7 @@ PLATFORM_DEVICE=STM32L151xB
 PLATFORM_NAME=l6
 PLATFORM_MCU=STM32L1xx
 MCU_CORE=cortex-m3
-PRODUCT_DESC=IntoRobot lora, 128k flash, 16k sram
+PRODUCT_DESC=IntoRobot l6, 128k flash, 16k sram
 PLATFORM_BOOT_ADDR=0x08000000
 PLATFORM_APP_ADDR=0x08006000
 endif

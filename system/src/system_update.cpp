@@ -76,7 +76,6 @@ UpdaterClass::UpdaterClass()
     , _size(0)
     , _startAddress(0)
     , _currentAddress(0)
-    , _command(U_APP_FLASH)
     , _progress(0)
     , _progressCb(NULL)
 {
@@ -90,11 +89,10 @@ void UpdaterClass::_reset() {
     _startAddress = 0;
     _currentAddress = 0;
     _size = 0;
-    _command = U_APP_FLASH;
     _progress = 0;
 }
 
-bool UpdaterClass::begin(size_t size, int command) {
+bool UpdaterClass::begin(size_t size, uint32_t startAddress, uint32_t maxSize) {
     StreamString error;
 
     if(_size > 0){
@@ -113,14 +111,12 @@ bool UpdaterClass::begin(size_t size, int command) {
     _reset();
     _error = 0;
 
-    uint32_t updateStartAddress = 0;
-    if (command == U_APP_FLASH) {
-        updateStartAddress = HAL_OTA_FlashAddress();
+    if (startAddress) {
 
-        SUPDATE_DEBUG("[begin] updateStartAddress:  0x%08X (%d)", updateStartAddress, updateStartAddress);
+        SUPDATE_DEBUG("[begin] updateStartAddress:  0x%08X (%d)", _startAddress, _startAddress);
         SUPDATE_DEBUG("[begin] updateFileSize:      0x%08X (%d)", size, size);
 
-        if(!HAL_OTA_CheckValidAddressRange(updateStartAddress, size)) {
+        if(size >= maxSize) {
             _error = UPDATE_ERROR_SPACE;
             printError(error);
             error.trim(); // remove line ending
@@ -128,17 +124,15 @@ bool UpdaterClass::begin(size_t size, int command) {
             return false;
         }
     } else {
-        // unknown command
-        SUPDATE_DEBUG("[begin] Unknown update command.");
+        SUPDATE_DEBUG("[begin] startAddress = 0.");
         return false;
     }
 
     //initialize
-    _startAddress = updateStartAddress;
+    _startAddress = startAddress;
     _currentAddress = _startAddress;
     _size = size;
     _buffer = new uint8_t[UPDATE_SECTOR_SIZE];
-    _command = command;
 
     SUPDATE_DEBUG("[begin] _startAddress:       0x%08X (%d)", _startAddress, _startAddress);
     SUPDATE_DEBUG("[begin] _currentAddress:     0x%08X (%d)", _currentAddress, _currentAddress);
@@ -195,11 +189,9 @@ bool UpdaterClass::end(bool evenIfRemaining){
         }
     }
 
-    if (_command == U_APP_FLASH) {
-        SUPDATE_DEBUG("Staged: address:0x%08X, size:0x%08X", _startAddress, _size);
-    }
+    SUPDATE_DEBUG("Staged: address:0x%08X, size:0x%08X", _startAddress, _size);
 
-    //_reset();
+    _reset();
     return true;
 }
 
@@ -264,7 +256,7 @@ size_t UpdaterClass::writeStream(Stream &data) {
         return 0;
 
     if(NULL != _progressCb) {
-        _progressCb(0);
+        _progressCb(1);
     }
     while(remaining()) {
         if((_bufferLen + remaining()) <= UPDATE_SECTOR_SIZE) {
@@ -330,6 +322,10 @@ UpdaterClass Update;
 
 
 HTTPUpdate::HTTPUpdate(void)
+    : _startAddress(0)
+    , _maxSize(0)
+    , _size(0)
+    , _progressCb(NULL)
 {
 }
 
@@ -350,6 +346,11 @@ HTTPUpdateResult HTTPUpdate::update(const String& host, uint16_t port, const Str
     HTTPClient http;
     http.begin(host, port, uri);
     return handleUpdate(http, currentVersion);
+}
+
+size_t HTTPUpdate::size()
+{
+    return _size;
 }
 
 /**
@@ -406,6 +407,25 @@ String HTTPUpdate::getLastErrorString(void)
     return String();
 }
 
+bool HTTPUpdate::setStoreStartAddress(uint32_t address){
+    _startAddress = address;
+    return true;
+}
+
+bool HTTPUpdate::setStoreMaxSize(uint32_t size){
+    _maxSize = size;
+    return true;
+}
+
+bool HTTPUpdate::setSendProgressCb(progressCb Cb){
+    if(NULL == Cb) {
+        return false;
+    }
+    _progressCb = Cb;
+    return true;
+}
+
+
 /**
  *
  * @param http HTTPClient *
@@ -432,7 +452,7 @@ HTTPUpdateResult HTTPUpdate::handleUpdate(HTTPClient& http, const String& curren
     }
     */
 
-    const char * headerkeys[] = { "X-Intorobot-Firmware-Md5" };
+    const char * headerkeys[] = { "X-Md5" };
     size_t headerkeyssize = sizeof(headerkeys) / sizeof(char*);
 
     // track these headers
@@ -453,8 +473,8 @@ HTTPUpdateResult HTTPUpdate::handleUpdate(HTTPClient& http, const String& curren
     SUPDATE_DEBUG("[httpUpdate] - code: %d", code);
     SUPDATE_DEBUG("[httpUpdate] - len: %d", len);
 
-    if(http.hasHeader("X-Intorobot-Firmware-Md5")) {
-        SUPDATE_DEBUG("[httpUpdate] - MD5: %s", http.header("X-Intorobot-Firmware-Md5").c_str());
+    if(http.hasHeader("X-Md5")) {
+        SUPDATE_DEBUG("[httpUpdate] - MD5: %s", http.header("X-Md5").c_str());
     }
 
     /*
@@ -483,12 +503,9 @@ HTTPUpdateResult HTTPUpdate::handleUpdate(HTTPClient& http, const String& curren
 
                     delay(100);
 
-                    int command;
-
-                    command = U_APP_FLASH;
                     SUPDATE_DEBUG("[httpUpdate] runUpdate flash...");
 
-                    if(runUpdate(*tcp, len, http.header("X-Intorobot-Firmware-Md5"), command)) {
+                    if(runUpdate(*tcp, len, http.header("X-Md5"))) {
                         ret = HTTP_UPDATE_OK;
                         SUPDATE_DEBUG("[httpUpdate] Update ok");
                         http.end();
@@ -533,16 +550,20 @@ HTTPUpdateResult HTTPUpdate::handleUpdate(HTTPClient& http, const String& curren
  * @param md5 String
  * @return true if Update ok
  */
-bool HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int command)
+bool HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5)
 {
     StreamString error;
 
-    if(!Update.begin(size, command)) {
+    if(!Update.begin(size, _startAddress, _maxSize)) {
         _lastError = Update.getError();
         Update.printError(error);
         error.trim(); // remove line ending
         SUPDATE_DEBUG("[httpUpdate] Update.begin failed! (%s)", error.c_str());
         return false;
+    }
+
+    if(NULL != _progressCb) {
+        Update.setSendProgressCb(_progressCb);
     }
 
     if(md5.length()) {
@@ -561,7 +582,10 @@ bool HTTPUpdate::runUpdate(Stream& in, uint32_t size, String md5, int command)
         return false;
     }
 
+    _size = Update.size();
+
     if(!Update.end()) {
+        _size = 0;
         _lastError = Update.getError();
         Update.printError(error);
         error.trim(); // remove line ending

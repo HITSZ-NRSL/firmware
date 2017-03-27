@@ -43,18 +43,24 @@ typedef enum {
 
 
 bool HAL_Bootloader_Update_If_Needed(void);
+bool HAL_SubSystem_Update_If_Needed(void);
 down_status_t HAL_OTA_Download_App(const char *host, const char *param, const char * md5);
 down_status_t HAL_OTA_Get_App_Download_Status(void);
 void HAL_OTA_Update_App(uint32_t size);
 down_status_t HAL_OTA_Download_Subsys(const char *host, const char *param);
 down_status_t HAL_OTA_Get_Subsys_Download_Status(void);
-void HAL_OTA_Upadate_Subsys(void);
+void HAL_OTA_Upadate_Subsys(uint32_t defAppSize, uint32_t bootSize, bool flag);
 uint8_t HAL_OTA_Get_Download_Progress();
 
 bool HAL_OTA_CheckValidAddressRange(uint32_t startAddress, uint32_t length);
 uint32_t HAL_OTA_FlashAddress();
 uint32_t HAL_OTA_FlashLength();
 uint16_t HAL_OTA_ChunkSize();
+uint32_t HAL_DEF_APP_FlashAddress();
+uint32_t HAL_DEF_APP_FlashLength();
+uint32_t HAL_BOOT_FlashAddress();
+uint32_t HAL_BOOT_FlashLength();
+
 bool HAL_FLASH_Begin(uint32_t address, uint32_t length, void* reserved);
 int HAL_FLASH_Update(const uint8_t *pBuffer, uint32_t address, uint32_t length, void* reserved);
 
