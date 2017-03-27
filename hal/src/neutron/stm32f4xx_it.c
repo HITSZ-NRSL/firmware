@@ -115,6 +115,7 @@ __attribute__((externally_visible)) void prvGetRegistersFromStack( uint32_t *pul
 
 void HardFault_Handler(void)
 {
+    DEBUG("HardFault_Handler");
     __asm volatile
     (
         " tst lr, #4                                                \n"

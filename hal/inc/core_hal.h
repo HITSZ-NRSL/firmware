@@ -156,7 +156,7 @@ typedef struct runtime_info_t {
 uint32_t HAL_Core_Runtime_Info(runtime_info_t* info, void* reserved);
 
 extern void app_setup_and_loop(void);
-extern void app_setup_and_loop_initial(void);
+extern void app_setup_and_loop_initial(bool *threaded);
 extern void app_loop(bool threaded);
 
 typedef enum HAL_SystemClock

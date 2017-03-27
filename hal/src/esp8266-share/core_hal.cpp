@@ -121,9 +121,10 @@ extern "C" void optimistic_yield(uint32_t interval_us) {
 
 static uint8_t intorobot_app_initial_flag = 0;
 static void loop_wrapper() {
+    bool threaded;
     preloop_update_frequency();
     if(!intorobot_app_initial_flag) {
-        app_setup_and_loop_initial();
+        app_setup_and_loop_initial(&threaded);
         intorobot_app_initial_flag = 1;
     }
     system_loop_handler(100);

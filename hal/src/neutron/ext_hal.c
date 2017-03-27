@@ -19,12 +19,16 @@
 
 #include "hw_config.h"
 #include "ext_hal.h"
+#include "interrupts_hal.h"
 
 void disable_irq(void)
 {
-    __disable_irq();
+    HAL_Interrupts_Disable_All();
+    //__disable_irq();
 }
 void enable_irq(void)
 {
-    __enable_irq();
+    HAL_Interrupts_Enable_All();
+    //__enable_irq();
 }
+

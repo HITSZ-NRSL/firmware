@@ -309,8 +309,9 @@ extern "C" void HAL_SysTick_Handler(void)
 void app_loop(bool threaded)
 {
     DECLARE_SYS_HEALTH(ENTERED_WLAN_Loop);
-    if (!threaded)
+    if (!threaded) {
         intorobot_process();
+    }
 
     static uint8_t INTOROBOT_WIRING_APPLICATION = 0;
     if ((INTOROBOT_WIRING_APPLICATION != 1)) {
@@ -374,7 +375,7 @@ ActiveObjectCurrentThreadQueue ApplicationThread(ActiveObjectConfiguration(app_t
  * Output         : None.
  * Return         : None.
  *******************************************************************************/
-void app_setup_and_loop_initial(void)
+void app_setup_and_loop_initial(bool *threaded)
 {
     HAL_Core_Init();
     // We have running firmware, otherwise we wouldn't have gotten here
@@ -411,11 +412,11 @@ void app_setup_and_loop_initial(void)
     NEWORK_FN(Network_Setup(), (void)0);
 #endif
 
-    bool threaded = system_thread_get_state(NULL) != intorobot::feature::DISABLED &&
+    *threaded = system_thread_get_state(NULL) != intorobot::feature::DISABLED &&
       (system_mode()!=SAFE_MODE);
 
 #if PLATFORM_THREADING
-    if (threaded)
+    if (*threaded)
     {
         SystemThread.start();
         ApplicationThread.start();
@@ -425,7 +426,6 @@ void app_setup_and_loop_initial(void)
         SystemThread.setCurrentThread();
         ApplicationThread.setCurrentThread();
     }
-    //create_system_task();
 #else
     HAL_Core_Set_System_Loop_Handler(&system_process_loop);
 #endif
@@ -440,13 +440,16 @@ void app_setup_and_loop_initial(void)
  *******************************************************************************/
 void app_setup_and_loop(void)
 {
-    app_setup_and_loop_initial();
-#if !PLATFORM_THREADING
-    /* Main loop */
-    while (1) {
-        app_loop(false);
+    bool threaded;
+
+    app_setup_and_loop_initial(&threaded);
+
+    if(!threaded) {
+        /* Main loop */
+        while (1) {
+            app_loop(false);
+        }
     }
-#endif
 }
 
 #ifdef USE_FULL_ASSERT

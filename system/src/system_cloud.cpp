@@ -1409,6 +1409,7 @@ volatile uint8_t intorobot_process_flag = 0;
 void intorobot_process(void)
 {
     intorobot_process_flag = 1;
+
     // application thread will pump application messages
 #if PLATFORM_THREADING
     if (system_thread_get_state(NULL) && APPLICATION_THREAD_CURRENT()) {

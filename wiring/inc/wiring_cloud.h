@@ -335,15 +335,23 @@ class CloudClass: public Print{
             intorobot_sync_time();
         }
 
-        bool connected(void) { return intorobot_cloud_flag_connected(); }
-        bool disconnected(void) { return !connected(); }
-        void connect(void) { intorobot_cloud_flag_connect(); }
-        void disconnect(void) { intorobot_cloud_flag_disconnect(); }
-        void process(void) {
+        static bool connected(void) { return intorobot_cloud_flag_connected(); }
+        static bool disconnected(void) { return !connected(); }
+        static void connect(void) {
+            intorobot_cloud_flag_connect();
+            if (system_thread_get_state(nullptr)==intorobot::feature::DISABLED &&
+                    SystemClass::mode() == SEMI_AUTOMATIC)
+            {
+                // IntoRobot.connect() should be blocking in SEMI_AUTOMATIC mode when threading is disabled
+                waitUntil(connected);
+            }
+        }
+        static void disconnect(void) { intorobot_cloud_flag_disconnect(); }
+        static void process(void) {
             //application_checkin();
             intorobot_process();
         }
-        String deviceID(void) { return intorobot_deviceID(); }
+        static String deviceID(void) { return intorobot_deviceID(); }
 
         int read(void)
         {
