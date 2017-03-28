@@ -104,8 +104,8 @@ EESP32_Pin_Info* HAL_Pin_Map(void);
 
 #define LIGHT_SENSOR_UC 40
 //Serial pins
-#define TX  8
-#define RX  9
+#define TX  1
+#define RX  3
 
 // Serial1 pin
 #define TX1  D3
@@ -114,20 +114,20 @@ EESP32_Pin_Info* HAL_Pin_Map(void);
 // SPI pins
 #define SS   D5
 #define SCK  D2
-#define MISO D0
-#define MOSI D1
+#define MISO D3
+#define MOSI D4
 
-// SPI_1 pins
-#define SS1   A4
+// SPI1 pins
+#define SS1   A7
 #define SCK1  A5
 #define MISO1 A6
 #define MOSI1 A8
 
-// I2C pins
-#define SDA  D0
-#define SCL  D1
+// Wire pins
+#define SDA  D1
+#define SCL  D0
 
-// I2C_1 pins
+// Wire1 pins
 #define SDA1  A2
 #define SCL1  A3
 

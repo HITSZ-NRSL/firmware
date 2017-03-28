@@ -71,21 +71,25 @@ class TwoWire : public Stream
         void reset();
 };
 
-#ifdef configWIRING_WIRE_ENABLE
 
-#define Wire __fetch_global_Wire()
-TwoWire& __fetch_global_Wire();
+// 不要改成类 为了保证类构造函数使用时，已经初始化
+#ifdef configWIRING_WIRE_ENABLE
+#ifdef Wire
+#undef Wire
+#endif
+
+#define Wire __fetch_global_wire()
+TwoWire& __fetch_global_wire();
 
 #ifdef configWIRING_WIRE1_ENABLE
 #ifdef Wire1
 #undef Wire1
-#endif  // Wire1
-
-#define Wire1 __fetch_global_Wire1()
-TwoWire& __fetch_global_Wire1();
-#endif  // Wiring_Wire1
-
 #endif
+#define Wire1 __fetch_global_wire1()
+TwoWire& __fetch_global_wire1();
+#endif  // configWIRING_WIRE1_ENABLE
+
+#endif  // configWIRING_WIRE_ENABLE
 
 #endif
 

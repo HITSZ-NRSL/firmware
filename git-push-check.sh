@@ -37,7 +37,7 @@ cecho "---->atom" $yellow
 make $VERBOSE PLATFORM=atom clean all COMPILE_LTO=n APP=smartLight-default
 
 cecho "---->fig" $yellow
-make $VERBOSE PLATFORM=fig clean all COMPILE_LTO=n APP=blink
+make $VERBOSE PLATFORM=fig clean all COMPILE_LTO=n APP=smartLight-default
 
 cecho "---->ant" $yellow
 make $VERBOSE PLATFORM=ant clean all COMPILE_LTO=n APP=blink
@@ -47,10 +47,10 @@ make $VERBOSE PLATFORM=fox clean all COMPILE_LTO=n APP=smartLight-default
 
 cecho "------------------------商业模块-------------------------" $yellow
 cecho "---->w67" $yellow
-make $VERBOSE PLATFORM=w67 clean all COMPILE_LTO=n APP=smartLight-w67
+make $VERBOSE PLATFORM=w67 clean all COMPILE_LTO=n APP=smartLight-module
 
 cecho "---->w323" $yellow
-make $VERBOSE PLATFORM=w323 clean all COMPILE_LTO=n APP=blank
+make $VERBOSE PLATFORM=w323 clean all COMPILE_LTO=n APP=smartLight-module
 
 cecho "---->l6" $yellow
 make $VERBOSE PLATFORM=l6 clean all COMPILE_LTO=n APP=blink

@@ -169,8 +169,7 @@ extern "C" void HAL_SysTick_Handler(void)
     }
 #elif PLATFORM_ID == PLATFORM_FIG
 
-#define TIMING_MODE_CONFIG_IMLINK_SERIAL                2000   //进入ImLink配置模式判断时间
-#define TIMING_MODE_CONFIG_AP_SERIAL                    5000   //进入Ap配置模式判断时间
+#define TIMING_MODE_CONFIG_IMLINK_SERIAL                3000   //进入ImLink配置模式判断时间
 #define TIMING_MODE_DEFAULT_RESTORE                     7000   //进入默认固件灯程序升级判断时间
 #define TIMING_MODE_FACTORY_RESET                       13000  //恢复出厂程序判断时间 不清除密钥
 #define TIMING_MODE_NC                                  20000  //无操作判断时间
@@ -198,11 +197,6 @@ extern "C" void HAL_SysTick_Handler(void)
                 BUTTON_Mode=BUTTON_MODE_DEFFW; //恢复默认出厂程序
                 HAL_UI_RGB_Color(RGB_COLOR_GREEN);//绿灯打开
             }
-        } else if( BUTTON_press_time > TIMING_MODE_CONFIG_AP_SERIAL ) {
-            if(BUTTON_Mode!=BUTTON_MODE_CONFIG_AP_SERIAL) {
-                BUTTON_Mode=BUTTON_MODE_CONFIG_AP_SERIAL; //wifi ap配置模式
-                HAL_UI_RGB_Color(RGB_COLOR_MAGENTA);//粉红打开
-            }
         } else if( BUTTON_press_time > TIMING_MODE_CONFIG_IMLINK_SERIAL ) {
             if(BUTTON_Mode!=BUTTON_MODE_CONFIG_IMLINK_SERIAL) {
                 BUTTON_Mode=BUTTON_MODE_CONFIG_IMLINK_SERIAL; //wifi imlink配置模式
@@ -214,14 +208,6 @@ extern "C" void HAL_SysTick_Handler(void)
             case BUTTON_MODE_CONFIG_IMLINK_SERIAL:
                 if(SYSTEM_CONFIG_TYPE_IMLINK_SERIAL != System.configStatus()) {
                     System.configBegin(SYSTEM_CONFIG_TYPE_IMLINK_SERIAL);
-                } else {
-                    System.configEnd();
-                }
-                break;
-
-            case BUTTON_MODE_CONFIG_AP_SERIAL:
-                if(SYSTEM_CONFIG_TYPE_AP_SERIAL != System.configStatus()) {
-                    System.configBegin(SYSTEM_CONFIG_TYPE_AP_SERIAL);
                 } else {
                     System.configEnd();
                 }

@@ -159,17 +159,29 @@ bool SPIClass::isEnabled()
   return HAL_SPI_Is_Enabled(_spi);
 }
 
+// 不要改成类 为了保证类构造函数使用时，已经初始化
 #ifdef configWIRING_SPI_ENABLE
-SPIClass SPI(HAL_SPI_INTERFACE1);
+SPIClass &__fetch_global_spi()
+{
+    static SPIClass spi(HAL_SPI_INTERFACE1);
+    return spi;
+}
 
 #ifdef configWIRING_SPI1_ENABLE
-SPIClass SPI1(HAL_SPI_INTERFACE2);
+SPIClass &__fetch_global_spi1()
+{
+    static SPIClass spi1(HAL_SPI_INTERFACE2);
+    return spi1;
+}
 #endif
 
 #ifdef configWIRING_SPI2_ENABLE
-SPIClass SPI2(HAL_SPI_INTERFACE3);
+SPIClass &__fetch_global_spi2()
+{
+    static SPIClass spi2(HAL_SPI_INTERFACE3);
+    return spi2;
+}
 #endif
 
-#endif  //configWIRING_SPI_ENABLE
-
+#endif
 

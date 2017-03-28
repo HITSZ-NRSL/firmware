@@ -84,7 +84,9 @@ EESP82666_Pin_Info* HAL_Pin_Map(void);
 #define GPIO14 8
 #define GPIO15 9
 #define GPIO16 10
+
 #define ADC    30
+
 #define TXD  GPIO1
 #define RXD  GPIO3
 

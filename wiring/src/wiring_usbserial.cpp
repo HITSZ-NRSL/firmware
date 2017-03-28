@@ -84,7 +84,7 @@ int USBSerial::peek()
     return USB_USART_Receive_Data(true);
 }
 
-// Preinstantiate Objects //////////////////////////////////////////////////////
+// 不要改成类 为了保证类构造函数使用时，已经初始化
 USBSerial& _fetch_global_usbserial()
 {
     static USBSerial _globalUSBSerial;

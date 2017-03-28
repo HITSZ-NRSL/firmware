@@ -48,6 +48,11 @@
 //#define configWIRING_WIRE1_ENABLE
 //#define configWIRING_WIRE2_ENABLE
 
+/* config wring I2S */
+//#define configWIRING_I2S_ENABLE
+//#define configWIRING_I2S1_ENABLE
+//#define configWIRING_SPI2_ENABLE
+
 /* config wring spi */
 #define configWIRING_SPI_ENABLE
 #define configWIRING_SPI1_ENABLE

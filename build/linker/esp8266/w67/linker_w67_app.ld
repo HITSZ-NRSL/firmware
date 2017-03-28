@@ -167,6 +167,14 @@ SECTIONS
     *libgcc.a:_umoddi3.o(.literal .text)
     *libgcc.a:_udivdi3.o(.literal .text)
     *libsmartconfig.a:(.literal .text .literal.* .text.*)
+    *libstdc++.a:(.literal .text .literal.* .text.*)
+    *liblwip_gcc.a:(.literal .text .literal.* .text.*)
+    /* *libhal.a:(.literal .text .literal.* .text.*) */
+    *libplatform.a:(.literal .text .literal.* .text.*)
+    *libservices.a:(.literal .text .literal.* .text.*)
+    *libsystem.a:(.literal .text .literal.* .text.*)
+    *libwiring.a:(.literal .text .literal.* .text.*)
+    *libwiring_ex.a:(.literal .text .literal.* .text.*)
     *(.irom0.literal .irom.literal .irom.text.literal .irom0.text .irom.text .irom.text.*)
     _irom0_text_end = ABSOLUTE(.);
     _flash_code_end = ABSOLUTE(.);

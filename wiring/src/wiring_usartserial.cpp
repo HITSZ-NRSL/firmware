@@ -105,32 +105,31 @@ bool USARTSerial::isEnabled() {
     return HAL_USART_Is_Enabled(_serial);
 }
 
-#ifdef configWIRING_USARTSERIAL_ENABLE
-// Preinstantiate Objects //////////////////////////////////////////////////////
 
-USARTSerial& __fetch_global_Serial1()
+
+// 不要改成类 为了保证类构造函数使用时，已经初始化
+#ifdef configWIRING_USARTSERIAL_ENABLE
+USARTSerial &__fetch_global_serial()
 {
-    static USARTSerial serial1(HAL_USART_SERIAL1);
-    return serial1;
+    static USARTSerial serial(HAL_USART_SERIAL1);
+    return serial;
 }
 
 #ifdef configWIRING_USARTSERIAL1_ENABLE
-USARTSerial& __fetch_global_Serial2()
+USARTSerial &__fetch_global_serial1()
 {
-    static USARTSerial serial2(HAL_USART_SERIAL2);
+    static USARTSerial serial1(HAL_USART_SERIAL2);
+    return serial1;
+}
+#endif
+
+#ifdef configWIRING_USARTSERIAL2_ENABLE
+USARTSerial &__fetch_global_serial2()
+{
+    static USARTSerial serial2(HAL_USART_SERIAL3);
     return serial2;
 }
 #endif
-// optional Serial2 is instantiated from libraries/Serial2/Serial2.h
-
-#ifdef configWIRING_USARTSERIAL2_ENABLE  //Wiring_Serial3
-
-USARTSerial& __fetch_global_Serial3()
-{
-    static USARTSerial serial3(HAL_USART_SERIAL3);
-    return serial3;
-}
-#endif
-
 
 #endif
+

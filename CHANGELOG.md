@@ -1,3 +1,20 @@
+## v1.5.1-rc.1
+
+### FEATURES(功能)
+- [[PR #45]](https://github.com/HITSZ-NRSL/firmware/pull/45) [w67/w323] 发布w67/w322
+
+
+### ENHANCEMENTS(优化)
+
+
+### BUG FIXES(漏洞修复)
+- [[PR #45]](https://github.com/HITSZ-NRSL/firmware/pull/45) [fig] 修正fig管教映射
+
+
+### INTERNAL(内部)
+- [[PR #45]](https://github.com/HITSZ-NRSL/firmware/pull/45) [all] i2c i2s spi usartserial usbserial 为了防止其他类构造函数调用，统一采取函数方式实现
+
+
 ## v1.5.0-rc.2
 
 ### FEATURES(功能)

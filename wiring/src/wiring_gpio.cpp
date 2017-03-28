@@ -1,21 +1,21 @@
 /**
  ******************************************************************************
-  Copyright (c) 2013-2014 IntoRobot Team.  All right reserved.
+ Copyright (c) 2013-2014 IntoRobot Team.  All right reserved.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation, either
-  version 3 of the License, or (at your option) any later version.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation, either
+ version 3 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  ******************************************************************************
-*/
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************
+ */
 
 /* Includes ------------------------------------------------------------------*/
 #include "wiring.h"
@@ -35,17 +35,17 @@
 void pinMode(uint16_t pin, PinMode setMode)
 {
 
-  if(pin >= TOTAL_PINS || setMode == PIN_MODE_NONE )
-  {
-    return;
-  }
+    if(pin >= TOTAL_PINS || setMode == PIN_MODE_NONE )
+    {
+        return;
+    }
 
-  // Safety check
-  if( !pinAvailable(pin) ) {
-    return;
-  }
+    // Safety check
+    if( !pinAvailable(pin) ) {
+        return;
+    }
 
-  HAL_Pin_Mode(pin, setMode);
+    HAL_Pin_Mode(pin, setMode);
 }
 
 /*
@@ -63,7 +63,7 @@ void pinMode(uint16_t pin, PinMode setMode)
  */
 PinMode getPinMode(uint16_t pin)
 {
-  return HAL_Get_Pin_Mode(pin);
+    return HAL_Get_Pin_Mode(pin);
 }
 
 /*
@@ -72,39 +72,39 @@ PinMode getPinMode(uint16_t pin)
  */
 bool pinAvailable(uint16_t pin) {
 
-  // SPI safety check
-#ifndef WIRING_NO_SPI
-  if(SPI.isEnabled() == true && (pin == SCK || pin == MOSI || pin == MISO))
-  {
-    return 0; // 'pin' is used
-  }
+    // SPI safety check
+#ifdef configWIRING_SPI_ENABLE
+    if(SPI.isEnabled() == true && (pin == SCK || pin == MOSI || pin == MISO))
+    {
+        return 0; // 'pin' is used
+    }
 #endif
-  // I2C safety check
-#ifndef WIRING_NO_I2C
-  if(Wire.isEnabled() == true && (pin == SCL || pin == SDA))
-  {
-    return 0; // 'pin' is used
-  }
+    // I2C safety check
+#ifdef configWIRING_WIRE_ENABLE
+    if(Wire.isEnabled() == true && (pin == SCL || pin == SDA))
+    {
+        return 0; // 'pin' is used
+    }
 #endif
-#ifndef WIRING_NO_USART_SERIAL
-  // Serial safety check
-  if(Serial.isEnabled() == true && (pin == RX || pin == TX))
-  {
-    return 0; // 'pin' is used
-  }
+    // Serial safety check
+#ifdef configWIRING_USARTSERIAL_ENABLE
+    if(Serial.isEnabled() == true && (pin == RX || pin == TX))
+    {
+        return 0; // 'pin' is used
+    }
 #endif
 
-  if (pin >= TOTAL_PINS)
-    return 0;
-  else
-    return 1; // 'pin' is available
+    if (pin >= TOTAL_PINS)
+        return 0;
+    else
+        return 1; // 'pin' is available
 }
 
 inline bool is_input_mode(PinMode mode) {
     return  mode == INPUT ||
-            mode == INPUT_PULLUP ||
-            mode == INPUT_PULLDOWN ||
-            mode == AN_INPUT;
+        mode == INPUT_PULLUP ||
+        mode == INPUT_PULLDOWN ||
+        mode == AN_INPUT;
 }
 
 /*
@@ -125,7 +125,7 @@ void digitalWrite(pin_t pin, uint8_t value)
 
 inline bool is_af_output_mode(PinMode mode) {
     return mode == AF_OUTPUT_PUSHPULL ||
-           mode == AF_OUTPUT_DRAIN;
+        mode == AF_OUTPUT_DRAIN;
 }
 
 /*
@@ -139,7 +139,7 @@ int32_t digitalRead(pin_t pin)
 
     // Safety check
     if( !pinAvailable(pin) ) {
-      return LOW;
+        return LOW;
     }
 
     return HAL_GPIO_Read(pin);
@@ -152,23 +152,23 @@ int32_t digitalRead(pin_t pin)
  */
 int32_t analogRead(pin_t pin)
 {
-  // Allow people to use 0-7 to define analog pins by checking to see if the values are too low.
-  if(pin < FIRST_ANALOG_PIN)
-  {
-    pin = pin + FIRST_ANALOG_PIN;
-  }
+    // Allow people to use 0-7 to define analog pins by checking to see if the values are too low.
+    if(pin < FIRST_ANALOG_PIN)
+    {
+        pin = pin + FIRST_ANALOG_PIN;
+    }
 
-  // Safety check
-  if( !pinAvailable(pin) ) {
-    return LOW;
-  }
+    // Safety check
+    if( !pinAvailable(pin) ) {
+        return LOW;
+    }
 
-  if(HAL_Validate_Pin_Function(pin, PF_ADC)!=PF_ADC)
-  {
-    return LOW;
-  }
+    if(HAL_Validate_Pin_Function(pin, PF_ADC)!=PF_ADC)
+    {
+        return LOW;
+    }
 
-  return HAL_ADC_Read(pin);
+    return HAL_ADC_Read(pin);
 }
 
 /*
@@ -226,86 +226,86 @@ void analogWrite(pin_t pin, uint16_t value, uint16_t pwm_frequency)
 
 uint8_t analogWriteResolution(pin_t pin, uint8_t value)
 {
-  // Safety check
-  if (!pinAvailable(pin))
-  {
-      return 0;
-  }
+    // Safety check
+    if (!pinAvailable(pin))
+    {
+        return 0;
+    }
 
-  if (HAL_Validate_Pin_Function(pin, PF_DAC) == PF_DAC)
-  {
-    HAL_DAC_Set_Resolution(pin, value);
-    return HAL_DAC_Get_Resolution(pin);
-  }
-  else if (HAL_Validate_Pin_Function(pin, PF_TIMER) == PF_TIMER)
-  {
-    HAL_PWM_Set_Resolution(pin, value);
-    return HAL_PWM_Get_Resolution(pin);
-  }
+    if (HAL_Validate_Pin_Function(pin, PF_DAC) == PF_DAC)
+    {
+        HAL_DAC_Set_Resolution(pin, value);
+        return HAL_DAC_Get_Resolution(pin);
+    }
+    else if (HAL_Validate_Pin_Function(pin, PF_TIMER) == PF_TIMER)
+    {
+        HAL_PWM_Set_Resolution(pin, value);
+        return HAL_PWM_Get_Resolution(pin);
+    }
 
 
-  return 0;
+    return 0;
 }
 
 uint8_t analogWriteResolution(pin_t pin)
 {
-  // Safety check
-  if (!pinAvailable(pin))
-  {
-      return 0;
-  }
+    // Safety check
+    if (!pinAvailable(pin))
+    {
+        return 0;
+    }
 
-  if (HAL_Validate_Pin_Function(pin, PF_DAC) == PF_DAC)
-  {
-    return HAL_DAC_Get_Resolution(pin);
-  }
-  else if (HAL_Validate_Pin_Function(pin, PF_TIMER) == PF_TIMER)
-  {
-    return HAL_PWM_Get_Resolution(pin);
-  }
+    if (HAL_Validate_Pin_Function(pin, PF_DAC) == PF_DAC)
+    {
+        return HAL_DAC_Get_Resolution(pin);
+    }
+    else if (HAL_Validate_Pin_Function(pin, PF_TIMER) == PF_TIMER)
+    {
+        return HAL_PWM_Get_Resolution(pin);
+    }
 
-  return 0;
+    return 0;
 }
 
 uint32_t analogWriteMaxFrequency(pin_t pin)
 {
-  // Safety check
-  if (!pinAvailable(pin))
-  {
-      return 0;
-  }
+    // Safety check
+    if (!pinAvailable(pin))
+    {
+        return 0;
+    }
 
-  return HAL_PWM_Get_Max_Frequency(pin);
+    return HAL_PWM_Get_Max_Frequency(pin);
 }
 
 uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder) {
-  uint8_t value = 0;
-  uint8_t i;
+    uint8_t value = 0;
+    uint8_t i;
 
-  for (i = 0; i < 8; ++i) {
-    digitalWrite(clockPin, HIGH);
-    if (bitOrder == LSBFIRST)
-      value |= digitalRead(dataPin) << i;
-    else
-      value |= digitalRead(dataPin) << (7 - i);
-    digitalWrite(clockPin, LOW);
-  }
-  return value;
+    for (i = 0; i < 8; ++i) {
+        digitalWrite(clockPin, HIGH);
+        if (bitOrder == LSBFIRST)
+            value |= digitalRead(dataPin) << i;
+        else
+            value |= digitalRead(dataPin) << (7 - i);
+        digitalWrite(clockPin, LOW);
+    }
+    return value;
 }
 
 void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val)
 {
-  uint8_t i;
+    uint8_t i;
 
-  for (i = 0; i < 8; i++)  {
-    if (bitOrder == LSBFIRST)
-      digitalWrite(dataPin, !!(val & (1 << i)));
-    else
-      digitalWrite(dataPin, !!(val & (1 << (7 - i))));
+    for (i = 0; i < 8; i++)  {
+        if (bitOrder == LSBFIRST)
+            digitalWrite(dataPin, !!(val & (1 << i)));
+        else
+            digitalWrite(dataPin, !!(val & (1 << (7 - i))));
 
-    digitalWrite(clockPin, HIGH);
-    digitalWrite(clockPin, LOW);
-  }
+        digitalWrite(clockPin, HIGH);
+        digitalWrite(clockPin, LOW);
+    }
 }
 
 /*
@@ -321,5 +321,5 @@ uint32_t pulseIn(pin_t pin, uint16_t value) {
 }
 
 void setDACBufferred(pin_t pin, uint8_t state) {
-  HAL_DAC_Enable_Buffer(pin, state);
+    HAL_DAC_Enable_Buffer(pin, state);
 }

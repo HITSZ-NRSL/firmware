@@ -53,12 +53,22 @@ bool I2SClass::isEnabled()
     return HAL_I2S_Is_Enabled(_i2s);
 }
 
-#ifndef INTOROBOT_WIRING_NO_I2S
-I2SClass I2S(HAL_I2S_INTERFACE1);
-#if Wiring_I2S1
-I2SClass I2S1(HAL_I2S_INTERFACE2);
-#endif
 
-#endif  // INTOROBOT_WIRING_NO_I2S
+// 不要改成类 为了保证类构造函数使用时，已经初始化
+#ifdef configWIRING_I2S_ENABLE
+I2SClass& __fetch_global_i2s()
+{
+    static I2SClass i2s(HAL_I2S_INTERFACE1);
+    return i2s;
+}
 
+#ifdef configWIRING_I2S1_ENABLE
+I2SClass& __fetch_global_i2s1()
+{
+    static I2SClass i2s1(HAL_I2S_INTERFACE2);
+    return i2s1;
+}
+#endif  // configWIRING_I2S1_ENABLE
+
+#endif  // configWIRING_I2S_ENABLE
 

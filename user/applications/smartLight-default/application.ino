@@ -2,7 +2,7 @@
  * 智能灯程序
  */
 
-//SerialDebugOutput debugOutput(115200, ALL_LEVEL);
+SerialDebugOutput debugOutput(115200, ALL_LEVEL);
 
 #define SMARTLIGHT_CMD_SWITCH    "channel/smartLight_0/cmd/switch"   //开关命令
 #define SMARTLIGHT_DATA_STATUS   "channel/smartLight_0/data/status"  //开关状态

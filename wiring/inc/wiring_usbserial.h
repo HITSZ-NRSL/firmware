@@ -89,7 +89,6 @@ class USBSerial : public Stream
 };
 
 extern USBSerial& _fetch_global_usbserial();
-
 #define SerialUSB _fetch_global_usbserial()
 
 #endif

@@ -75,36 +75,40 @@ EESP32_Pin_Info* HAL_Pin_Map(void);
 /*
 * Pin mapping. Borrowed from Wiring
 */
+#define TOTAL_PINS           44
+#define TOTAL_DIGITAL_PINS   10
+#define FIRST_DIGITAL_PIN    0
+#define TOTAL_ANALOG_PINS    14
+#define FIRST_ANALOG_PIN     30
 
-#define TOTAL_PINS           36 //26
-#define TOTAL_ANALOG_PINS    10
-#define TOTAL_DIGITAL_PINS   11 // include KEY, TXD0, RXD0 RST, and D7 is D6
-#define FIRST_ANALOG_PIN     14
 
-#define GPIO0 0
-#define GPIO1 1
-#define GPIO2 2
-#define GPIO3 3
-#define GPIO4 4
-#define GPIO5 5
-#define GPIO12 12
-#define GPIO13 13
-#define GPIO14 14
-#define GPIO15 15
-#define GPIO16 16
-#define GPIO17 17
-#define GPIO18 18
-#define GPIO19 19
-#define GPIO21 21
-#define GPIO22 22
-#define GPIO23 23
-#define GPIO25 25
-#define GPIO26 26
-#define GPIO27 27
-#define GPIO32 32
-#define GPIO33 33
-#define GPIO34 34
-#define GPIO35 35
+// digital pin
+#define GPIO1          0
+#define GPIO3          1
+#define GPIO5          2
+#define GPIO16         3
+#define GPIO17         4
+#define GPIO18         5
+#define GPIO19         6
+#define GPIO21         7
+#define GPIO22         8
+#define GPIO23         9
+
+// analog pin
+#define GPIO0          30
+#define GPIO2          31
+#define GPIO4          32
+#define GPIO12         33
+#define GPIO13         34
+#define GPIO14         35
+#define GPIO15         36
+#define GPIO25         37
+#define GPIO26         38
+#define GPIO27         39
+#define GPIO34         40
+#define GPIO35         41
+#define GPIO36         42
+#define GPIO39         43
 
 // Serial pins
 #define TX  GPIO1
@@ -112,9 +116,6 @@ EESP32_Pin_Info* HAL_Pin_Map(void);
 
 #define TX1  GPIO17
 #define RX1  GPIO16
-
-#define TX2  GPIO25
-#define RX2  GPIO26
 
 // SPI pins
 #define SS   GPIO5  //D5
