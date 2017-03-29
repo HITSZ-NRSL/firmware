@@ -70,6 +70,7 @@ typedef struct EESP32_Pin_Info  EESP32_Pin_Info;
 
 EESP32_Pin_Info* HAL_Pin_Map(void);
 
+
 /* Exported macros -----------------------------------------------------------*/
 
 /*

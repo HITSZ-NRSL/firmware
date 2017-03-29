@@ -21,6 +21,8 @@
 #include "soc/rtc_io_reg.h"
 #include "soc/rtc_cntl_reg.h"
 #include "soc/sens_reg.h"
+#include "pinmap_impl.h"
+
 
 static uint8_t __analogAttenuation = 3;//11db
 static uint8_t __analogWidth = 3;//12 bits
@@ -256,18 +258,3 @@ int __hallRead()    //hall sensor without LNA
     CLEAR_PERI_REG_MASK(SENS_SAR_TOUCH_CTRL1_REG, SENS_HALL_PHASE_FORCE);
     return (Sens_Vp1 - Sens_Vp0) - (Sens_Vn1 - Sens_Vn0);
 }
-
-extern uint16_t analogRead(uint8_t pin) __attribute__ ((weak, alias("__analogRead")));
-extern void analogReadResolution(uint8_t bits) __attribute__ ((weak, alias("__analogReadResolution")));
-extern void analogSetWidth(uint8_t bits) __attribute__ ((weak, alias("__analogSetWidth")));
-extern void analogSetCycles(uint8_t cycles) __attribute__ ((weak, alias("__analogSetCycles")));
-extern void analogSetSamples(uint8_t samples) __attribute__ ((weak, alias("__analogSetSamples")));
-extern void analogSetClockDiv(uint8_t clockDiv) __attribute__ ((weak, alias("__analogSetClockDiv")));
-extern void analogSetAttenuation(adc_attenuation_t attenuation) __attribute__ ((weak, alias("__analogSetAttenuation")));
-extern void analogSetPinAttenuation(uint8_t pin, adc_attenuation_t attenuation) __attribute__ ((weak, alias("__analogSetPinAttenuation")));
-extern int hallRead() __attribute__ ((weak, alias("__hallRead")));
-
-extern bool adcAttachPin(uint8_t pin) __attribute__ ((weak, alias("__adcAttachPin")));
-extern bool adcStart(uint8_t pin) __attribute__ ((weak, alias("__adcStart")));
-extern bool adcBusy(uint8_t pin) __attribute__ ((weak, alias("__adcBusy")));
-extern uint16_t adcEnd(uint8_t pin) __attribute__ ((weak, alias("__adcEnd")));

@@ -65,27 +65,8 @@
 #define GPIO38                     38 /* input mode only */
 #define GPIO39                     39 /* input mode only */
 
-/* #define GPIO_PinSource0            ((uint8_t)0x00) */
-/* #define GPIO_PinSource1            ((uint8_t)0x01) */
-/* #define GPIO_PinSource2            ((uint8_t)0x02) */
-/* #define GPIO_PinSource3            ((uint8_t)0x03) */
-/* #define GPIO_PinSource4            ((uint8_t)0x04) */
-/* #define GPIO_PinSource5            ((uint8_t)0x05) */
-/* #define GPIO_PinSource6            ((uint8_t)0x06) */
-/* #define GPIO_PinSource7            ((uint8_t)0x07) */
-/* #define GPIO_PinSource8            ((uint8_t)0x08) */
-/* #define GPIO_PinSource9            ((uint8_t)0x09) */
-/* #define GPIO_PinSource10           ((uint8_t)0x0A) */
-/* #define GPIO_PinSource11           ((uint8_t)0x0B) */
-/* #define GPIO_PinSource12           ((uint8_t)0x0C) */
-/* #define GPIO_PinSource13           ((uint8_t)0x0D) */
-/* #define GPIO_PinSource14           ((uint8_t)0x0E) */
-/* #define GPIO_PinSource15           ((uint8_t)0x0F) */
-/* #define GPIO_PinSource16           ((uint8_t)0x10) */
 
-
-/* #define ADC_Channel_0  ((uint8_t)0x00) */
-/* #define TIM1           ((uint8_t)0x00) */
+#define ADC_CHANNEL  ((uint8_t)0x01)
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -131,19 +112,64 @@ ESP32_Pin_Info __PIN_MAP[TOTAL_PINS] =
 /* NOT USED         - 27 */ { NONE, NONE, NONE, NONE, PIN_MODE_NONE },
 /* NOT USED         - 28 */ { NONE, NONE, NONE, NONE, PIN_MODE_NONE },
 /* NOT USED         - 29 */ { NONE, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A0               - 30 */ { GPIO36, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A1               - 31 */ { GPIO39, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A2               - 32 */ { GPIO35, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A3               - 33 */ { GPIO25, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A4               - 34 */ { GPIO26, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A5               - 35 */ { GPIO14, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A6               - 36 */ { GPIO12, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A7               - 37 */ { GPIO15, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A8               - 38 */ { GPIO13, NONE, NONE, NONE, PIN_MODE_NONE },
-/* A9               - 39 */ { GPIO2,  NONE, NONE, NONE, PIN_MODE_NONE },
-/* LIGHT_SENSOR_UC  - 40 */ { GPIO34, NONE, NONE, NONE, PIN_MODE_NONE },
+/* A0               - 30 */ { GPIO36, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* A1               - 31 */ { GPIO39, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* A2               - 32 */ { GPIO35, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* A3               - 33 */ { GPIO25, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* A4               - 34 */ { GPIO26, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* A5               - 35 */ { GPIO14, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* A6               - 36 */ { GPIO12, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* A7               - 37 */ { GPIO15, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* A8               - 38 */ { GPIO13, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* A9               - 39 */ { GPIO2,  NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
+/* LIGHT_SENSOR_UC  - 40 */ { GPIO34, NONE, ADC_CHANNEL, NONE, PIN_MODE_NONE },
 };
 
 ESP32_Pin_Info* HAL_Pin_Map() {
     return __PIN_MAP;
 }
+
+const int8_t esp32_adc2gpio[20] = {36, -1, -1, 39, 32, 33, 34, 35, -1, -1, 4, 0, 2, 15, 13, 12, 14, 27, 25, 26};
+
+const DRAM_ATTR esp32_gpioMux_t esp32_gpioMux[40]={
+    {0x44, 11, 11, 1},
+    {0x88, -1, -1, -1},
+    {0x40, 12, 12, 2},
+    {0x84, -1, -1, -1},
+    {0x48, 10, 10, 0},
+    {0x6c, -1, -1, -1},
+    {0x60, -1, -1, -1},
+    {0x64, -1, -1, -1},
+    {0x68, -1, -1, -1},
+    {0x54, -1, -1, -1},
+    {0x58, -1, -1, -1},
+    {0x5c, -1, -1, -1},
+    {0x34, 15, 15, 5},
+    {0x38, 14, 14, 4},
+    {0x30, 16, 16, 6},
+    {0x3c, 13, 13, 3},
+    {0x4c, -1, -1, -1},
+    {0x50, -1, -1, -1},
+    {0x70, -1, -1, -1},
+    {0x74, -1, -1, -1},
+    {0x78, -1, -1, -1},
+    {0x7c, -1, -1, -1},
+    {0x80, -1, -1, -1},
+    {0x8c, -1, -1, -1},
+    {0, -1, -1, -1},
+    {0x24, 6, 18, -1}, //DAC1
+    {0x28, 7, 19, -1}, //DAC2
+    {0x2c, 17, 17, 7},
+    {0, -1, -1, -1},
+    {0, -1, -1, -1},
+    {0, -1, -1, -1},
+    {0, -1, -1, -1},
+    {0x1c, 9, 4, 9},
+    {0x20, 8, 5, 8},
+    {0x14, 4, 6, -1},
+    {0x18, 5, 7, -1},
+    {0x04, 0, 0, -1},
+    {0x08, 1, -1, -1},
+    {0x0c, 2, -1, -1},
+    {0x10, 3, 3, -1}
+};

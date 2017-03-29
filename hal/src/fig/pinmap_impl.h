@@ -45,6 +45,26 @@ extern PinMode HAL_GPIO_Recall_Pin_Mode();
 #define ADC_CHANNEL_NONE CHANNEL_NONE
 #define DAC_CHANNEL_NONE CHANNEL_NONE
 
+typedef struct {
+    uint8_t reg;      /*!< GPIO register offset from DR_REG_IO_MUX_BASE */
+    int8_t rtc;       /*!< RTC GPIO number (-1 if not RTC GPIO pin) */
+    int8_t adc;       /*!< ADC Channel number (-1 if not ADC pin) */
+    int8_t touch;     /*!< Touch Channel number (-1 if not Touch pin) */
+} esp32_gpioMux_t;
+
+
+extern const esp32_gpioMux_t esp32_gpioMux[40];
+extern const int8_t esp32_adc2gpio[20];
+
+#define digitalPinIsValid(pin)          ((pin) < 40 && esp32_gpioMux[(pin)].reg)
+#define digitalPinCanOutput(pin)        ((pin) < 34 && esp32_gpioMux[(pin)].reg)
+#define digitalPinToRtcPin(pin)         (((pin) < 40)?esp32_gpioMux[(pin)].rtc:-1)
+#define digitalPinToAnalogChannel(pin)  (((pin) < 40)?esp32_gpioMux[(pin)].adc:-1)
+#define digitalPinToTouchChannel(pin)   (((pin) < 40)?esp32_gpioMux[(pin)].touch:-1)
+#define digitalPinToDacChannel(pin)     (((pin) == 25)?0:((pin) == 26)?1:-1)
+
+
+
 #ifdef __cplusplus
 }
 #endif
