@@ -9,6 +9,7 @@
 
 ### BUG FIXES(漏洞修复)
 - [[PR #45]](https://github.com/HITSZ-NRSL/firmware/pull/45) [fig] 修正fig管教映射
+- [[PR #47]](https://github.com/HITSZ-NRSL/firmware/pull/47) [neutron] 修正neutron 运行过程中死机问题, 该问题与freeRtos中断优先级设置有关系.
 
 
 ### INTERNAL(内部)
