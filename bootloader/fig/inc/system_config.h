@@ -24,6 +24,7 @@ extern "C" {
 #define SWRST do { (*((volatile uint32_t*) 0x60000700)) |= 0x80000000; } while(0);
 
 void Set_System(void);
+void SysTick_Handler(void);
 void delay(uint32_t ms);
 void System_Reset(void);
 

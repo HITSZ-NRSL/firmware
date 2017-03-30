@@ -100,13 +100,8 @@ typedef struct ESP32_I2C_Info {
  */
 ESP32_I2C_Info I2C_MAP[TOTAL_I2CS] =
 {
-        /*
-         * scl pin
-         * sda pin
-         * <i2c enabled> used internally and does not appear below
-         */
-        { SCL, SDA},           // I2C 0  D1, D0
-        { SCL1, SDA1}           //  I2C 1  A3, A2
+        { SCL, SDA},    // I2C0  D0, D1
+        { SCL1, SDA1}   // I2C1  A3, A4
 };
 
 /* static ESP32_I2C_Info *i2cMap[TOTAL_I2CS]; // pointer to I2C_MAP[] containing I2C peripheral register locations (etc) */
@@ -150,48 +145,6 @@ void HAL_I2C_Stretch_Clock(HAL_I2C_Interface i2c, bool stretch, void* reserved)
 
 void HAL_I2C_Begin(HAL_I2C_Interface i2c, I2C_Mode mode, uint8_t address, void* reserved)
 {
-    #if 0
-    if(i2c > 1){
-        return;
-    }
-
-    i2cMap[i2c]->i2c = &_i2c_bus_array[i2c];
-
-    if(i2cMap[i2c]->i2c->lock == NULL){
-        i2cMap[i2c]->i2c->lock = xSemaphoreCreateMutex();
-        if(i2cMap[i2c]->i2c->lock == NULL) {
-            return;
-        }
-    }
-
-    if(i2c == 0) {
-        SET_PERI_REG_MASK(DPORT_PERIP_CLK_EN_REG,DPORT_I2C_EXT0_CLK_EN);
-        CLEAR_PERI_REG_MASK(DPORT_PERIP_RST_EN_REG,DPORT_I2C_EXT0_RST);
-    } else {
-        SET_PERI_REG_MASK(DPORT_PERIP_CLK_EN_REG,DPORT_I2C_EXT1_CLK_EN);
-        CLEAR_PERI_REG_MASK(DPORT_PERIP_RST_EN_REG,DPORT_I2C_EXT1_RST);
-    }
-
-    I2C_MUTEX_LOCK();
-    i2cMap[i2c]->i2c->dev->ctr.val = 0;
-    i2cMap[i2c]->i2c->dev->ctr.ms_mode = (address == 0);
-    i2cMap[i2c]->i2c->dev->ctr.sda_force_out = 1 ;
-    i2cMap[i2c]->i2c->dev->ctr.scl_force_out = 1 ;
-    i2cMap[i2c]->i2c->dev->ctr.clk_en = 1;
-
-    i2cMap[i2c]->i2c->dev->timeout.tout = 2000;
-    i2cMap[i2c]->i2c->dev->fifo_conf.nonfifo_en = 0;
-
-    i2cMap[i2c]->i2c->dev->slave_addr.val = 0;
-    if (address) {
-        i2cMap[i2c]->i2c->dev->slave_addr.addr = address;
-        i2cMap[i2c]->i2c->dev->slave_addr.en_10bit = false;
-    }
-    I2C_MUTEX_UNLOCK();
-    #endif
-
-    /* i2cMap[i2c]->i2c = &_i2c_bus_array[i2c]; */
-
     i2cMap[i2c]->i2c = i2cInit(i2c, 0, false);
 
     i2cMap[i2c]->i2c->num = i2c;
@@ -202,20 +155,10 @@ void HAL_I2C_Begin(HAL_I2C_Interface i2c, I2C_Mode mode, uint8_t address, void* 
     pin_t scl_pin = PIN_MAP[i2cMap[i2c]->I2C_SCL_Pin].gpio_pin;
     pin_t sda_pin = PIN_MAP[i2cMap[i2c]->I2C_SDA_Pin].gpio_pin;
 
-    /* printf("i2c scl pin: %d \n",scl_pin); */
-    /* printf("i2c sda pin: %d \n",sda_pin); */
-
-    /* HAL_Pin_Mode(i2cMap[i2c]->I2C_SCL_Pin,OPEN_DRAIN); */
-    /* pinMatrixOutAttach(scl_pin, I2C_SCL_IDX(i2cMap[i2c]->i2c->num), false, false); */
-    /* pinMatrixInAttach(scl_pin, I2C_SCL_IDX(i2cMap[i2c]->i2c->num), false); */
-
-    /* HAL_Pin_Mode(i2cMap[i2c]->I2C_SDA_Pin,OPEN_DRAIN); */
-    /* pinMatrixOutAttach(sda_pin, I2C_SDA_IDX(i2cMap[i2c]->i2c->num), false, false); */
-    /* pinMatrixInAttach(sda_pin, I2C_SDA_IDX(i2cMap[i2c]->i2c->num), false); */
-
     i2cAttachSCL(i2cMap[i2c]->i2c, scl_pin);
     i2cAttachSDA(i2cMap[i2c]->i2c, sda_pin);
     HAL_I2C_Flush_Data(i2c, NULL);
+    i2cInitFix(i2cMap[i2c]->i2c);
 }
 
 void HAL_I2C_End(HAL_I2C_Interface i2c,void* reserved)

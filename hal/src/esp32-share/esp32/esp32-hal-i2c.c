@@ -21,6 +21,8 @@
 #include "soc/i2c_reg.h"
 #include "soc/i2c_struct.h"
 #include "soc/dport_reg.h"
+#include "esp32-hal-gpio.h"
+#include "timer_hal.h"
 
 //#define I2C_DEV(i)   (volatile i2c_dev_t *)((i)?DR_REG_I2C1_EXT_BASE:DR_REG_I2C_EXT_BASE)
 //#define I2C_DEV(i)   ((i2c_dev_t *)(REG_I2C_BASE(i)))
@@ -62,13 +64,13 @@ static i2c_t _i2c_bus_array[2] = {
 };
 #endif
 
-#if 0
+#if 1
 i2c_err_t i2cAttachSCL(i2c_t * i2c, int8_t scl)
 {
     if(i2c == NULL){
         return I2C_ERROR_DEV;
     }
-    pinMode(scl, OUTPUT_OPEN_DRAIN | PULLUP);
+    __pinMode(scl, ESP32_OUTPUT_OPEN_DRAIN | ESP32_PULLUP);
     pinMatrixOutAttach(scl, I2C_SCL_IDX(i2c->num), false, false);
     pinMatrixInAttach(scl, I2C_SCL_IDX(i2c->num), false);
     return I2C_ERROR_OK;
@@ -81,7 +83,7 @@ i2c_err_t i2cDetachSCL(i2c_t * i2c, int8_t scl)
     }
     pinMatrixOutDetach(scl, false, false);
     pinMatrixInDetach(I2C_SCL_IDX(i2c->num), false, false);
-    pinMode(scl, INPUT);
+    __pinMode(scl, ESP32_INPUT);
     return I2C_ERROR_OK;
 }
 
@@ -90,7 +92,7 @@ i2c_err_t i2cAttachSDA(i2c_t * i2c, int8_t sda)
     if(i2c == NULL){
         return I2C_ERROR_DEV;
     }
-    pinMode(sda, OUTPUT_OPEN_DRAIN | PULLUP);
+    __pinMode(sda, ESP32_OUTPUT_OPEN_DRAIN | ESP32_PULLUP);
     pinMatrixOutAttach(sda, I2C_SDA_IDX(i2c->num), false, false);
     pinMatrixInAttach(sda, I2C_SDA_IDX(i2c->num), false);
     return I2C_ERROR_OK;
@@ -103,7 +105,7 @@ i2c_err_t i2cDetachSDA(i2c_t * i2c, int8_t sda)
     }
     pinMatrixOutDetach(sda, false, false);
     pinMatrixInDetach(I2C_SDA_IDX(i2c->num), false, false);
-    pinMode(sda, INPUT);
+    __pinMode(sda, ESP32_INPUT);
     return I2C_ERROR_OK;
 }
 
@@ -194,10 +196,12 @@ i2c_err_t i2cWrite(i2c_t * i2c, uint16_t address, bool addr_10bit, uint8_t * dat
         i2c->dev->ctr.trans_start = 1;
 
         //WAIT Transmission
-        uint32_t startAt = millis();
+        /* uint32_t startAt = millis(); */
+        uint32_t startAt = HAL_Timer_Get_Milli_Seconds();
         while(1) {
             //have been looping for too long
-            if((millis() - startAt)>50){
+            /* if((millis() - startAt)>50){ */
+            if((HAL_Timer_Get_Milli_Seconds() - startAt)>50){
                 //log_e("Timeout! Addr: %x", address >> 1);
                 I2C_MUTEX_UNLOCK();
                 return I2C_ERROR_BUS;
@@ -290,10 +294,12 @@ i2c_err_t i2cRead(i2c_t * i2c, uint16_t address, bool addr_10bit, uint8_t * data
         i2c->dev->ctr.trans_start = 1;
 
         //WAIT Transmission
-        uint32_t startAt = millis();
+        /* uint32_t startAt = millis(); */
+        uint32_t startAt = HAL_Timer_Get_Milli_Seconds();
         while(1) {
             //have been looping for too long
-            if((millis() - startAt)>50){
+            /* if((millis() - startAt)>50){ */
+            if((HAL_Timer_Get_Milli_Seconds() - startAt)>50){
                 //log_e("Timeout! Addr: %x", address >> 1);
                 I2C_MUTEX_UNLOCK();
                 return I2C_ERROR_BUS;
@@ -409,7 +415,7 @@ i2c_t * i2cInit(uint8_t i2c_num, uint16_t slave_addr, bool addr_10bit_en)
         SET_PERI_REG_MASK(DPORT_PERIP_CLK_EN_REG,DPORT_I2C_EXT1_CLK_EN);
         CLEAR_PERI_REG_MASK(DPORT_PERIP_RST_EN_REG,DPORT_I2C_EXT1_RST);
     }
-    
+
     I2C_MUTEX_LOCK();
     i2c->dev->ctr.val = 0;
     i2c->dev->ctr.ms_mode = (slave_addr == 0);

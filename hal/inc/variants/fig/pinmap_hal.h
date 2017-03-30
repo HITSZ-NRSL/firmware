@@ -39,15 +39,6 @@ typedef enum PinMode {
     INPUT_PULLUP,
     INPUT_PULLDOWN,
     //Used internally begin
-    OPEN_DRAIN,
-    OUTPUT_OPEN_DRAIN,
-    SPECIAL,
-    FUNCTION_1,
-    FUNCTION_2,
-    FUNCTION_3,
-    FUNCTION_4,
-    FUNCTION_5,
-    FUNCTION_6,
     AF_OUTPUT_PUSHPULL, //Used internally for Alternate Function Output PushPull(TIM, UART, SPI etc)
     AF_OUTPUT_DRAIN,    //Used internally for Alternate Function Output Drain(I2C etc). External pullup resistors required.
     AN_INPUT,           //Used internally for ADC Input
@@ -105,8 +96,8 @@ EESP32_Pin_Info* HAL_Pin_Map(void);
 
 #define LIGHT_SENSOR_UC 40
 //Serial pins
-#define TX  1
-#define RX  3
+#define TX  8
+#define RX  9
 
 // Serial1 pin
 #define TX1  D3
@@ -129,7 +120,7 @@ EESP32_Pin_Info* HAL_Pin_Map(void);
 #define SCL  D0
 
 // Wire1 pins
-#define SDA1  A2
+#define SDA1  A4
 #define SCL1  A3
 
 // The following pins are only defined for easy access during development.

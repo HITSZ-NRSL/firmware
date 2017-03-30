@@ -21,7 +21,7 @@
 #include "soc/rtc_io_reg.h"
 #include "soc/rtc_cntl_reg.h"
 #include "soc/sens_reg.h"
-#include "pinmap_impl.h"
+#include "esp32-hal-gpio.h"
 
 
 static uint8_t __analogAttenuation = 3;//11db

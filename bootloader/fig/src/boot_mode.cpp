@@ -172,28 +172,23 @@ bool copy_raw(const uint32_t src_addr, const uint32_t dst_addr, const uint32_t s
     uint32_t left = ((size+buffer_size-1) & ~(buffer_size-1));
     uint32_t saddr = src_addr;
     uint32_t daddr = dst_addr;
-    bool flag = true;
 
     while (left){
+        RGB_Color_Toggle();
         if (SPIEraseSector(daddr/buffer_size)){
             return false;
         }
+        RGB_Color_Toggle();
         if (SPIRead(saddr, (uint32_t*)buffer, buffer_size)){
             return false;
         }
+        RGB_Color_Toggle();
         if (SPIWrite(daddr, (uint32_t*)buffer, buffer_size)){
             return false;
         }
         saddr += buffer_size;
         daddr += buffer_size;
         left  -= buffer_size;
-
-        if(flag) {
-            HAL_UI_RGB_Color(RGB_COLOR_YELLOW);
-        } else {
-            HAL_UI_RGB_Color(RGB_COLOR_BLACK);
-        }
-        flag = !flag;
     }
 
     return true;
@@ -215,9 +210,7 @@ bool FLASH_Restore(Firmware_TypeDef FmType)
             size = DEFAULT_APP_SEC_NUM*SPI_FLASH_SEC_SIZE;
         }
         result = copy_raw(DEFAULT_APP_ADDR, APP_ADDR, size);
-    }
-    else
-    {
+    } else {
         size = HAL_PARAMS_Get_Boot_ota_app_size();
         if(0 == size) {
             return true;
@@ -240,13 +233,10 @@ bool OTA_Flash_Reset(void)
 void Enter_Default_RESTORE_Mode(void)
 {
     HAL_UI_RGB_Blink(RGB_COLOR_YELLOW, UPDATE_BLINK_PERIOD);
-    if(DEFAULT_Flash_Reset())
-    {
+    if(DEFAULT_Flash_Reset()) {
         HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_NORMAL);
         HAL_PARAMS_Save_Params();
-    }
-    else
-    {
+    } else {
         System_Reset();
     }
 }
@@ -261,14 +251,11 @@ void Enter_Serail_Com_Mode(void)
 void Enter_Factory_RESTORE_Mode(void)
 {
     HAL_UI_RGB_Blink(RGB_COLOR_YELLOW, UPDATE_BLINK_PERIOD);
-    if(DEFAULT_Flash_Reset())
-    {
+    if(DEFAULT_Flash_Reset()) {
         HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_FACTORY_RESET);
         HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_NORMAL);
         HAL_PARAMS_Save_Params();
-    }
-    else
-    {
+    } else {
         System_Reset();
     }
 }
@@ -285,13 +272,10 @@ void Enter_Factory_ALL_RESTORE_Mode(void)
 void Enter_OTA_Update_Mode(void)
 {
     HAL_UI_RGB_Blink(RGB_COLOR_YELLOW, UPDATE_BLINK_PERIOD);
-    if(OTA_Flash_Reset())
-    {
+    if(OTA_Flash_Reset()) {
         HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_NORMAL);
         HAL_PARAMS_Save_Params();
-    }
-    else
-    {
+    } else {
         System_Reset();
     }
 }

@@ -60,14 +60,6 @@ static spi_t _spi_bus_array[4] = {
 };
 
 
-// default pin
-// The pin definition can be changed to any pin
-//               VSPI                 HSPI
-// SCK          GPIO18(D2)         GPIO14(A5)
-// MISO         GPIO19(D0)         GPIO12(A6)
-// MOSI         GPIO23(D1)         GPIO13(A7)
-// SS           GPIO5 (D5)         GPIO15(A4)
-
 typedef enum SPI_Num_Def {
     SPI_0 = 0,
     SPI_1 = 1
@@ -80,13 +72,13 @@ typedef struct ESP32_SPI_Info {
     uint16_t SPI_SS_Pin;
 
     uint32_t SPI_Clock_Div;
+    uint8_t SPI_Data_Mode;
+    uint8_t SPI_Bit_Order;
 
-    /* uint8_t SPI_Data_Mode; */
-    /* uint8_t SPI_Bit_Order; */
+    bool SPI_Bit_Order_Set;
+    bool SPI_Data_Mode_Set;
+    bool SPI_Clock_Divider_Set;
 
-    /* bool SPI_Bit_Order_Set; */
-    /* bool SPI_Data_Mode_Set; */
-    /* bool SPI_Clock_Divider_Set; */
     bool SPI_Enabled;
     bool SPI_USE_HW_SS;
 
@@ -98,6 +90,12 @@ typedef struct ESP32_SPI_Info {
  */
 ESP32_SPI_Info SPI_MAP[TOTAL_SPIS] =
 {
+    // The pin definition can be changed to any pin
+    //               VSPI                 HSPI
+    // SCK          GPIO18(D2)         GPIO14(A5)
+    // MISO         GPIO17(D3)         GPIO12(A6)
+    // MOSI         GPIO16(D4)         GPIO13(A8)
+    // SS           GPIO5 (D5)         GPIO15(A7)
     {SCK, MISO, MOSI, SS},  // VSPI SCK MISO MOSI SS
     {SCK1, MISO1, MOSI1, SS1}   // HSPI SCK MISO MOSI SS
 };
@@ -110,9 +108,11 @@ void HAL_SPI_Initial(HAL_SPI_Interface spi)
     /*     return; */
     /* } */
     spiMap[spi] = &SPI_MAP[spi];
-    /* spiMap[spi]->SPI_Bit_Order_Set     = false; */
-    /* spiMap[spi]->SPI_Data_Mode_Set     = false; */
-    /* spiMap[spi]->SPI_Clock_Divider_Set = false; */
+
+    spiMap[spi]->SPI_Bit_Order_Set     = false;
+    spiMap[spi]->SPI_Data_Mode_Set     = false;
+    spiMap[spi]->SPI_Clock_Divider_Set = false;
+
     spiMap[spi]->SPI_Enabled           = false;
     spiMap[spi]->SPI_USE_HW_SS         = false;
     spiMap[spi]->spi                   = NULL;
@@ -123,13 +123,11 @@ void HAL_SPI_Begin(HAL_SPI_Interface spi, uint16_t pin)
     uint32_t clockDiv = spiFrequencyToClockDiv(1000000);
 
     if (spi == 0) {
-        spiMap[spi]->spi = &_spi_bus_array[3]; // default VSPI
+        spiMap[spi]->spi = &_spi_bus_array[3]; // VSPI
     }
     else if (spi == 1) {
         spiMap[spi]->spi = &_spi_bus_array[2]; // HSPI
     }
-
-    /* spiMap[spi]->spi = &_spi_bus_array[spi]; */
 
     if(spiMap[spi]->spi->lock == NULL){
         spiMap[spi]->spi->lock = xSemaphoreCreateMutex();
@@ -138,26 +136,36 @@ void HAL_SPI_Begin(HAL_SPI_Interface spi, uint16_t pin)
         }
     }
 
-    if(spi == 0) { // VSPI (3)
+    if(spi == 0) {
         SET_PERI_REG_MASK(DPORT_PERIP_CLK_EN_REG, DPORT_SPI_CLK_EN_2);
         CLEAR_PERI_REG_MASK(DPORT_PERIP_RST_EN_REG, DPORT_SPI_RST_2);
-        spiMap[spi]->spi->num = 3;
+        spiMap[spi]->spi->num = 3; // VSPI (3)
 
-    } else if(spi == 1) { // HSPI (2)
+    } else if(spi == 1) {
         SET_PERI_REG_MASK(DPORT_PERIP_CLK_EN_REG, DPORT_SPI_CLK_EN_1);
         CLEAR_PERI_REG_MASK(DPORT_PERIP_RST_EN_REG, DPORT_SPI_RST_1);
-        spiMap[spi]->spi->num = 2;
+        spiMap[spi]->spi->num = 2; // HSPI (2)
 
     } else {
         return;
-        /* SET_PERI_REG_MASK(DPORT_PERIP_CLK_EN_REG, DPORT_SPI_CLK_EN); */
-        /* CLEAR_PERI_REG_MASK(DPORT_PERIP_RST_EN_REG, DPORT_SPI_RST); */
     }
 
     spiStopBus(spiMap[spi]->spi);
-    spiSetDataMode(spiMap[spi]->spi, SPI_MODE0);
-    spiSetBitOrder(spiMap[spi]->spi, SPI_MSBFIRST);
-    spiSetClockDiv(spiMap[spi]->spi, clockDiv);
+
+    if(!spiMap[spi]->SPI_Data_Mode_Set)
+        spiSetDataMode(spiMap[spi]->spi, SPI_MODE0);
+    else
+        spiSetDataMode(spiMap[spi]->spi, spiMap[spi]->SPI_Data_Mode);
+
+    if(!spiMap[spi]->SPI_Bit_Order_Set)
+        spiSetBitOrder(spiMap[spi]->spi, SPI_MSBFIRST);
+    else
+        spiSetBitOrder(spiMap[spi]->spi, spiMap[spi]->SPI_Bit_Order);
+
+    if(!spiMap[spi]->SPI_Clock_Divider_Set)
+        spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV8);
+    else
+        spiSetClockDiv(spiMap[spi]->spi, spiMap[spi]->SPI_Clock_Div);
 
     SPI_MUTEX_LOCK();
     spiMap[spi]->spi->dev->user.usr_mosi = 1;
@@ -213,69 +221,83 @@ void HAL_SPI_End(HAL_SPI_Interface spi)
     setHwCs(spi, false);
     spiStopBus(spiMap[spi]->spi);
     spiMap[spi]->spi = NULL;
+    spiMap[spi]->SPI_Bit_Order_Set     = false;
+    spiMap[spi]->SPI_Data_Mode_Set     = false;
+    spiMap[spi]->SPI_Clock_Divider_Set = false;
+    spiMap[spi]->SPI_Enabled           = false;
+    spiMap[spi]->SPI_USE_HW_SS         = false;
 }
 
 void HAL_SPI_Set_Bit_Order(HAL_SPI_Interface spi, uint8_t order)
 {
-  spiSetBitOrder(spiMap[spi]->spi, order);
-  #if 0
-  if (order == SPI_MSBFIRST){
-    spiSetBitOrder(spiMap[spi]->spi, SPI_MSBFIRST);
-  }
-  else if (order == SPI_LSBFIRST) {
-    spiSetBitOrder(spiMap[spi]->spi, SPI_LSBFIRST);
-  }
-  #endif
+    /* spiSetBitOrder(spiMap[spi]->spi, order); */
+    if(!spiMap[spi]->SPI_Bit_Order_Set)
+    {
+        spiMap[spi]->SPI_Bit_Order_Set = true;
+        spiMap[spi]->SPI_Bit_Order = order;
+    }
 }
 
 void HAL_SPI_Set_Data_Mode(HAL_SPI_Interface spi, uint8_t mode)
 {
-    spiSetDataMode(spiMap[spi]->spi, mode);
+    if(!spiMap[spi]->SPI_Data_Mode_Set)
+    {
+        spiMap[spi]->SPI_Data_Mode_Set = true;
+        spiMap[spi]->SPI_Data_Mode = mode;
+    }
+    /* spiSetDataMode(spiMap[spi]->spi, mode); */
 }
 
 void HAL_SPI_Set_Clock_Divider(HAL_SPI_Interface spi, uint8_t rate)
 {
-    switch (rate) {
-    case 0x00: { // SPI_CLOCK_DIV2
-      spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV2);
-      break;
-    }
-    case 0x08: { // SPI_CLOCK_DIV4
-      spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV4);
-      break;
-    }
-    case 0x10: {
-      spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV8);
-      break;
-    }
-    case 0x18: {
-      spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV16);
-      break;
-    }
-    case 0x20: {
-      spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV32);
-      break;
-    }
-    case 0x28: {
-      spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV64);
-      break;
-    }
-    case 0x30: {
-      spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV128);
-      break;
-    }
-    default:
-      break;
+    if(!spiMap[spi]->SPI_Clock_Divider_Set)
+    {
+        spiMap[spi]->SPI_Clock_Divider_Set = true;
+        switch (rate){
+        case 0x00: { // SPI_CLOCK_DIV2
+                /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV2); */
+                spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV2;
+                break;
+            }
+        case 0x08: { // SPI_CLOCK_DIV4
+            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV4); */
+            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV4;
+            break;
+        }
+        case 0x10: {
+            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV8); */
+            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV8;
+            break;
+        }
+        case 0x18: {
+            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV16); */
+            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV16;
+            break;
+        }
+        case 0x20: {
+            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV32); */
+            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV32;
+            break;
+        }
+        case 0x28: {
+            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV64); */
+            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV64;
+            break;
+        }
+        case 0x30: {
+            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV128); */
+            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV128;
+            break;
+        }
+        default:
+            break;
+        }
     }
 }
 
 uint16_t HAL_SPI_Send_Receive_Data(HAL_SPI_Interface spi, uint16_t data)
 {
-    /* HAL_USART_Write_Data(0, 'a'); */
-    /* HAL_USART_Write_Data(0, (uint8_t) data); */
-    printf("spi data : %d \n",data);
-    spiWriteByte(spiMap[spi]->spi, (uint8_t)data);
-    return spiReadByte(spiMap[spi]->spi);
+    return spiTransferByte(spiMap[spi]->spi,data);
 }
 
 bool HAL_SPI_Is_Enabled(HAL_SPI_Interface spi)

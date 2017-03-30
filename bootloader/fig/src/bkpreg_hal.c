@@ -19,7 +19,7 @@
 #define RTC_BKP_DR9                       ((uint32_t)0x00000009U)
 #define RTC_BKP_DR10                      ((uint32_t)0x0000000AU)
 
-#define RTC_MEM ((volatile uint32_t*)0x400C0000)
+#define RTC_MEM ((volatile uint32_t*)0x50000000)
 
 int32_t HAL_Core_Backup_Register(uint32_t BKP_DR)
 {

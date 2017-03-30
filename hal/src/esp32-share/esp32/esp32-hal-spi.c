@@ -26,8 +26,8 @@
 #include "soc/io_mux_reg.h"
 #include "soc/gpio_sig_map.h"
 #include "soc/dport_reg.h"
+#include "esp32-hal-gpio.h"
 
-#if 0
 #define SPI_CLK_IDX(p)  ((p==0)?SPICLK_OUT_IDX:((p==1)?SPICLK_OUT_IDX:((p==2)?HSPICLK_OUT_IDX:((p==3)?VSPICLK_OUT_IDX:0))))
 #define SPI_MISO_IDX(p) ((p==0)?SPIQ_OUT_IDX:((p==1)?SPIQ_OUT_IDX:((p==2)?HSPIQ_OUT_IDX:((p==3)?VSPIQ_OUT_IDX:0))))
 #define SPI_MOSI_IDX(p) ((p==0)?SPID_IN_IDX:((p==1)?SPID_IN_IDX:((p==2)?HSPID_IN_IDX:((p==3)?VSPID_IN_IDX:0))))
@@ -84,7 +84,7 @@ void spiAttachSCK(spi_t * spi, int8_t sck)
             sck = 6;
         }
     }
-    pinMode(sck, OUTPUT);
+    __pinMode(sck, ESP32_OUTPUT);
     pinMatrixOutAttach(sck, SPI_CLK_IDX(spi->num), false, false);
 }
 
@@ -103,7 +103,7 @@ void spiAttachMISO(spi_t * spi, int8_t miso)
         }
     }
     SPI_MUTEX_LOCK();
-    pinMode(miso, INPUT);
+    __pinMode(miso, ESP32_INPUT);
     pinMatrixInAttach(miso, SPI_MISO_IDX(spi->num), false);
     SPI_MUTEX_UNLOCK();
 }
@@ -122,7 +122,7 @@ void spiAttachMOSI(spi_t * spi, int8_t mosi)
             mosi = 8;
         }
     }
-    pinMode(mosi, OUTPUT);
+    __pinMode(mosi, ESP32_OUTPUT);
     pinMatrixOutAttach(mosi, SPI_MOSI_IDX(spi->num), false, false);
 }
 
@@ -141,7 +141,7 @@ void spiDetachSCK(spi_t * spi, int8_t sck)
         }
     }
     pinMatrixOutDetach(sck, false, false);
-    pinMode(sck, INPUT);
+    __pinMode(sck, ESP32_INPUT);
 }
 
 void spiDetachMISO(spi_t * spi, int8_t miso)
@@ -159,7 +159,7 @@ void spiDetachMISO(spi_t * spi, int8_t miso)
         }
     }
     pinMatrixInDetach(SPI_MISO_IDX(spi->num), false, false);
-    pinMode(miso, INPUT);
+    __pinMode(miso, ESP32_INPUT);
 }
 
 void spiDetachMOSI(spi_t * spi, int8_t mosi)
@@ -177,7 +177,7 @@ void spiDetachMOSI(spi_t * spi, int8_t mosi)
         }
     }
     pinMatrixOutDetach(mosi, false, false);
-    pinMode(mosi, INPUT);
+    __pinMode(mosi, ESP32_INPUT);
 }
 
 void spiAttachSS(spi_t * spi, uint8_t cs_num, int8_t ss)
@@ -198,7 +198,7 @@ void spiAttachSS(spi_t * spi, uint8_t cs_num, int8_t ss)
             ss = 11;
         }
     }
-    pinMode(ss, OUTPUT);
+    __pinMode(ss, ESP32_OUTPUT);
     pinMatrixOutAttach(ss, SPI_SS_IDX(spi->num, cs_num), false, false);
     spiEnableSSPins(spi, (1 << cs_num));
 }
@@ -218,7 +218,7 @@ void spiDetachSS(spi_t * spi, int8_t ss)
         }
     }
     pinMatrixOutDetach(ss, false, false);
-    pinMode(ss, INPUT);
+    __pinMode(ss, ESP32_INPUT);
 }
 
 void spiEnableSSPins(spi_t * spi, uint8_t cs_mask)
@@ -1068,6 +1068,3 @@ uint32_t spiFrequencyToClockDiv(uint32_t freq)
     }
     return bestReg.regValue;
 }
-#endif
-
-

@@ -101,6 +101,8 @@ int main()
 #define TIMING_ALL_RESET_MODE        30000  //完全恢复出厂判断时间 清空密钥
         while (!HAL_UI_Mode_BUTTON_GetState(BUTTON1))
         {
+            SysTick_Handler();
+            delay(1);
             BUTTON_press_time = HAL_UI_Mode_Button_Pressed();
             if(BUTTON_press_time > TIMING_ALL_RESET_MODE)
             {
