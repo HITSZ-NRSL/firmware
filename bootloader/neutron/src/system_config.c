@@ -162,3 +162,8 @@ void System_Reset(void)
     NVIC_SystemReset();
 }
 
+void System_LineCodingBitRateHandler(uint32_t bitrate)
+{
+    usart_esp8266_initial(bitrate);
+}
+

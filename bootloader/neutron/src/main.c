@@ -36,11 +36,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define BOOTLOADER_VERSION  1
-/*
- * 1. 修正在线升级和默认程序恢复过程中可能出现错误的bug
- */
-//#define BOOTLOADER_VERSION  2
+//#define BOOTLOADER_VERSION  1
+#define BOOTLOADER_VERSION  2   // 1.修正flash烧写失败处理,保证烧写成功  2. esp8266升级模式，波特率可以通过usb设置
 
 
 

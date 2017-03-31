@@ -220,9 +220,8 @@ void Enter_DFU_Mode(void)
 
 void Enter_ESP8266_Update_Mode(void)
 {
-    usart_esp8266_initial(230400);  //esp8266升级 采取230400波特率  460800 和 921600还是不稳定
-
     HAL_UI_RGB_Color(RGB_COLOR_RED);
+    SetLineCodingBitRateHandler(System_LineCodingBitRateHandler); //只有升级模式才能根据usb波特率设置esp8266串口通讯波特率
     Esp8266_Enter_UpdateMode();
     USBD_CDC_Init();
     while (1)

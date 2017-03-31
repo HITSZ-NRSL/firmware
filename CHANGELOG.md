@@ -12,11 +12,16 @@
 ### BUG FIXES(漏洞修复)
 - [[PR #45]](https://github.com/HITSZ-NRSL/firmware/pull/45) [fig] 修正fig管教映射
 - [[PR #47]](https://github.com/HITSZ-NRSL/firmware/pull/47) [neutron] 修正neutron 运行过程中死机问题, 该问题与freeRtos中断优先级设置有关系.
+- [[PR #50]](https://github.com/HITSZ-NRSL/firmware/pull/50) [neutron] neutron bootloader 版本升级至v2版本 修正esp8266在不同操作系统升级失败问题。通过USB选择波特率来置esp8266串口通讯波特率。
 
 
 ### INTERNAL(内部)
 - [[PR #45]](https://github.com/HITSZ-NRSL/firmware/pull/45) [all] i2c i2s spi usartserial usbserial 为了防止其他类构造函数调用，统一采取函数方式实现
 - [[PR #46]](https://github.com/HITSZ-NRSL/firmware/pull/46) [fig] fig AD功能调试OK，引脚读写功能OK
+- [[PR #50]](https://github.com/HITSZ-NRSL/firmware/pull/50) [neutron] 更新neutron子系统版本至2.0.0.2
+- [[PR #50]](https://github.com/HITSZ-NRSL/firmware/pull/50) [neutron] 修改neutron的USB中断优先级为2，防止插拔USB阻止esp8266串口接收数据
+
+
 
 ## v1.5.0-rc.2
 

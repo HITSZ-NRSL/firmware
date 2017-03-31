@@ -11,6 +11,9 @@ include $(COMMON_BUILD)/common-tools.mk
 #
 # 默认参数
 #
+ifeq ("$(MODULE)","bootloader")
+CDEFINES += -DBOOTLOADER_BUILD=1
+endif
 
 # C 编译参数
 CFLAGS += -mcpu=$(MCU_CORE)

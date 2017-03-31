@@ -16,6 +16,7 @@ ifneq ("$(MODULE)","bootloader")
 CFLAGS += -Os
 else
 CFLAGS += -O0
+CDEFINES += -DBOOTLOADER_BUILD=1
 endif
 
 CFLAGS += -g -w -mlongcalls -mtext-section-literals -Wfatal-errors -falign-functions=4 -MMD -ffunction-sections -fdata-sections

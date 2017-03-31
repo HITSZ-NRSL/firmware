@@ -29,6 +29,7 @@ void HAL_System_Config(void);
 system_tick_t millis(void);
 void delay(uint32_t ms);
 void System_Reset(void);
+void System_LineCodingBitRateHandler(uint32_t bitrate);
 
 #ifdef __cplusplus
 }

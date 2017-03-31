@@ -120,7 +120,7 @@
 //NVIC Priorities based on NVIC_PriorityGroup_4
 #define USART1_IRQ_PRIORITY                 0       //modem(esp8266) USART1 Interrupt
 #ifdef USE_USB_OTG_FS
-#define OTG_FS_IRQ_PRIORITY                 0       //USB OTG FS Interrupt
+#define OTG_FS_IRQ_PRIORITY                 2       //USB OTG FS Interrupt
 #define OTG_FS_WKUP_IRQ_PRIORITY            2       //USB OTG FS Wakeup Interrupt
 #elif defined USE_USB_OTG_HS
 #define OTG_HS_EP1_IN_IRQ_PRIORITY          2       //USB OTG HS EP1 IN Interrupt
