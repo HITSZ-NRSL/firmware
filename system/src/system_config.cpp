@@ -42,7 +42,7 @@
 #include "system_version.h"
 
 /*debug switch*/
-#define SYSTEM_CONFIG_DEBUG
+// #define SYSTEM_CONFIG_DEBUG
 
 #ifdef SYSTEM_CONFIG_DEBUG
 #define SCONFIG_DEBUG(...)  do {DEBUG(__VA_ARGS__);}while(0)

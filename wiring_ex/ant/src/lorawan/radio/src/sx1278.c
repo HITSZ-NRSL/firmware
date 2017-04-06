@@ -1713,7 +1713,7 @@ void SX1278OnDio1Irq( void )
 void SX1278OnDio2Irq( void )
 {
 
-    DEBUG("DIO2 interrupt");
+    /* DEBUG("DIO2 interrupt"); */
     switch( SX1278.Settings.State )
     {
         case RF_RX_RUNNING:
@@ -1779,7 +1779,7 @@ void SX1278OnDio2Irq( void )
 void SX1278OnDio3Irq( void )
 {
 
-    DEBUG("DIO3 interrupt");
+    /* DEBUG("DIO3 interrupt"); */
     switch( SX1278.Settings.Modem )
     {
     case MODEM_FSK:
@@ -1811,7 +1811,7 @@ void SX1278OnDio3Irq( void )
 
 void SX1278OnDio4Irq( void )
 {
-    DEBUG("DIO4 interrupt");
+    /* DEBUG("DIO4 interrupt"); */
     switch( SX1278.Settings.Modem )
     {
     case MODEM_FSK:

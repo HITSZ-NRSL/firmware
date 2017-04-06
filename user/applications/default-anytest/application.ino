@@ -2,7 +2,7 @@
  * anytest 默认程序
  */
 // 测试板程序
-#if     0
+#if    1
 #include "Adafruit_SSD1306.h"
 #include "ajson.h"
 
@@ -55,7 +55,7 @@ const uint8_t L6PinMapping[L6_TOTAL_TEST_PIN] = {A13,A14,A15,D15,D14,D13,D12,A2,
 const char *L6PinName[] = {"PB2","PB10","PB11","PB12","PB13","PB14","PB15","PA0","PA1","NONE","NONE","PA4","PA5","PA6","PA7","PA9","PA10","PA11","PA12"};
 
 //ANT PA9(TXD) PA10(RXD) is serial PA13 PA14 is SWDIO SWCLK
-const uint8_t antPinMapping[L6_TOTAL_TEST_PIN] = {D4,D5,D6,D7,D8,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,A2,A3,A4,A5,A6,A7};
+const uint8_t antPinMapping[ANT_TOTAL_TEST_PIN] = {D4,D5,D6,D7,D8,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,A2,A3,A4,A5,A6,A7};
 const char *antPinName[] = {"D0","D1","D2","D3","D4","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","A0","A1","A2","A3","A4","A5"};
 
 
@@ -320,7 +320,7 @@ void JudgeBoardType(void)
         case ANT:
             display.clearDisplay();
             display.setCursor(0,0);
-            display.println("Lora Test");
+            display.println("Ant Test");
             display.display();
             delay(500);
             step = STEP_DIGITAL_WRITE_HIGH;
@@ -1429,7 +1429,7 @@ void loop()
 }
 #endif
 
-#if  1 
+#if   0
 //L7 test code
 #include "Adafruit_SSD1306.h"
 #include "lora.h"
