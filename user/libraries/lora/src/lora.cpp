@@ -1,6 +1,6 @@
 
 #include "lora.h"
-//lora 测试板程序
+//L7 测试板程序
 #include "platforms.h"
 
 #if PLATFORM_ID == PLATFORM_ANYTEST

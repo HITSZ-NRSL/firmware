@@ -1,14 +1,15 @@
 #include "wiring_ex_lorawan.h"
 #include "wiring.h"
 
-// #define TEST_SX1278
+#define TEST_SX1278
 
 #ifdef TEST_SX1278
 
 #define USE_BAND_433
 #define USE_MODEM_LORA
 
-#define RF_FREQUENCY                                470600000 // Hz
+// #define RF_FREQUENCY                                470600000 // Hz
+#define RF_FREQUENCY                                434665000 // Hz
 
 #define TX_OUTPUT_POWER                            20        // dBm
 

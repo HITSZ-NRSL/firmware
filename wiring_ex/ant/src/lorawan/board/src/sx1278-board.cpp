@@ -112,7 +112,7 @@ void SX1278IoIrqInit( DioIrqHandler **irqHandlers )
     attachInterrupt(DIO2, irqHandlers[2], RISING, 1, 0);
     attachInterrupt(DIO3, irqHandlers[3], RISING, 1, 0);
     attachInterrupt(DIO4, irqHandlers[4], RISING, 1, 0);
-    attachInterrupt(DIO5, irqHandlers[5], RISING, 1, 0);
+    // attachInterrupt(DIO5, irqHandlers[5], RISING, 1, 0);
 }
 
 void SX1278IoDeInit( void )
