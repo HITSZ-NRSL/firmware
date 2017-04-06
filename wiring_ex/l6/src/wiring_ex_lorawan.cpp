@@ -1,7 +1,7 @@
 #include "wiring_ex_lorawan.h"
 #include "wiring.h"
 
-#define TEST_SX1278
+// #define TEST_SX1278
 
 #ifdef TEST_SX1278
 

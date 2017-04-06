@@ -2,7 +2,7 @@
  * anytest 默认程序
  */
 // 测试板程序
-#if     1
+#if     0
 #include "Adafruit_SSD1306.h"
 #include "ajson.h"
 
@@ -16,6 +16,7 @@
 #define FIG_TOTAL_TEST_PIN    40
 #define W67_TOTAL_TEST_PIN    11
 #define L6_TOTAL_TEST_PIN     19
+#define ANT_TOTAL_TEST_PIN    36
 
 //测试板与 被测板 引脚接法 前面是测试板引脚，后面是被测板引脚
 /****W323
@@ -53,6 +54,11 @@ const char *W67PinName[] = {"NONE","NONE","GPIO2","NONE","GPIO4","GPIO5","GPIO12
 const uint8_t L6PinMapping[L6_TOTAL_TEST_PIN] = {A13,A14,A15,D15,D14,D13,D12,A2,A3,0xff,0xff,A6,A7,A8,A9,D11,D10,D9,D8};
 const char *L6PinName[] = {"PB2","PB10","PB11","PB12","PB13","PB14","PB15","PA0","PA1","NONE","NONE","PA4","PA5","PA6","PA7","PA9","PA10","PA11","PA12"};
 
+//ANT PA9(TXD) PA10(RXD) is serial PA13 PA14 is SWDIO SWCLK
+const uint8_t antPinMapping[L6_TOTAL_TEST_PIN] = {D4,D5,D6,D7,D8,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,0xff,A2,A3,A4,A5,A6,A7};
+const char *antPinName[] = {"D0","D1","D2","D3","D4","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","NONE","A0","A1","A2","A3","A4","A5"};
+
+
 Adafruit_SSD1306 display(OLED_DC, OLED_RESET, OLED_CS);  // Hareware SPI
 
 aJsonClass aJson;
@@ -87,8 +93,9 @@ enum BoardType
     W67,
     FIG,
     W323,
-    LORA,
-    L6,
+    ANT, //L6+底板
+    L6, //LORA 模块
+    FOX,//GPRS模块
     UNKOWN_BOARD_TYPE = 0xfe,
     ERROR_COMMAND = 0xff
 };
@@ -202,7 +209,8 @@ uint8_t getBoardType(void)
             else if(strcmp(boardPtr,"888002") == 0 || strcmp(boardPtr,"887002") == 0) {aJson.deleteItem(root);return NEUTRON;}//neutron
             else if(strcmp(boardPtr,"888003") == 0 || strcmp(boardPtr,"887003") == 0) {aJson.deleteItem(root);return NUT;}   //nut
             else if(strcmp(boardPtr,"888005") == 0 || strcmp(boardPtr,"887005") == 0) {aJson.deleteItem(root);return FIG;}   //fig
-            else if(strcmp(boardPtr,"888006") == 0 || strcmp(boardPtr,"887006") == 0) {aJson.deleteItem(root);return LORA;} //lora
+            else if(strcmp(boardPtr,"888006") == 0 || strcmp(boardPtr,"887006") == 0) {aJson.deleteItem(root);return ANT;} //lora
+            else if(strcmp(boardPtr,"888007") == 0 || strcmp(boardPtr,"887007") == 0) {aJson.deleteItem(root);return FOX;} //gprs
             else if(strcmp(boardPtr,"888101") == 0 || strcmp(boardPtr,"887101") == 0) {aJson.deleteItem(root);return W67;}   //w6/7
             else if(strcmp(boardPtr,"888102") == 0 || strcmp(boardPtr,"887102") == 0) {aJson.deleteItem(root);return W323;} //w32/33
             else if(strcmp(boardPtr,"888103") == 0 || strcmp(boardPtr,"887103") == 0) {aJson.deleteItem(root);return L6;}   //l6
@@ -309,7 +317,7 @@ void JudgeBoardType(void)
             step = STEP_DIGITAL_WRITE_HIGH;
             break;
 
-        case LORA:
+        case ANT:
             display.clearDisplay();
             display.setCursor(0,0);
             display.println("Lora Test");
@@ -473,7 +481,21 @@ bool ReadBoardPinLevel(uint16_t gpio,uint8_t val)
             }
             break;
 
-        case LORA:
+        case ANT:
+            for(pin = 0;  pin < ANT_TOTAL_TEST_PIN; pin++)
+            {
+                pinMode(antPinMapping[pin],INPUT_PULLUP);
+            }
+            delay(1);
+            if(gpio == 255)
+            {
+                return readAllPinLevel(ANT_TOTAL_TEST_PIN,antPinMapping,val);
+            }
+            else
+            {
+                return readSinglePinLevel(gpio,ANT_TOTAL_TEST_PIN,antPinMapping,val);
+            }
+
             break;
 
         case L6:
@@ -593,7 +615,7 @@ bool ReceiveTestResult(testItem_t testItem, uint16_t gpio)
                             }
                             break;
 
-                        case LORA:
+                        case ANT:
                         case L6:
                             if(statusObject->valueint == 200)
                                 {
@@ -705,7 +727,7 @@ bool ReceiveTestResult(testItem_t testItem, uint16_t gpio)
                         testResult = false;
                     }
                 }
-                else if((boardType == LORA) || (boardType == L6))
+                else if((boardType == ANT) || (boardType == L6))
                 {
                     uint8_t statusVal = statusObject->valueint;
                     aJsonObject* snrObject = aJson.getObjectItem(root, "snr");
@@ -1010,6 +1032,45 @@ void W67PinLoopTestHandle(testItem_t itemCommand, bool testHighLevel,bool testEn
     }
 }
 
+void AntPinLoopTestHandle(testItem_t itemCommand, bool testHighLevel,bool testEnd)
+{
+    if(pinNo < ANT_TOTAL_TEST_PIN)
+    {
+        if(ReceiveTestResult(itemCommand,pinNo))
+        {
+            // delay(10);
+            pinNo++;
+            if(pinNo == ANT_TOTAL_TEST_PIN)
+            {
+                pinNo = 0;
+                if(testEnd)
+                {
+                    step = STEP_TEST_END;
+                }
+                else
+                {
+                    if(testHighLevel)
+                        step = STEP_SINGLE_DIGITAL_WRITE_LOW;
+                    else
+                        step = STEP_ANALOG_READ;
+                }
+            }
+            else
+            {
+                if(pinNo == 5) pinNo = 30;
+                if(testHighLevel)
+                {
+                    step = STEP_SINGLE_DIGITAL_WRITE_HIGH;
+                }
+                else
+                {
+                    step = STEP_SINGLE_DIGITAL_WRITE_LOW;
+                }
+            }
+        }
+    }
+}
+
 
 String  strError = "GPIO Error:";
 
@@ -1120,6 +1181,10 @@ void loop()
             {
                 L6PinLoopTestHandle(TEST_DIGITAL_WRITE_HIGH,true,false);
             }
+            else if(boardType == ANT)
+            {
+                AntPinLoopTestHandle(TEST_DIGITAL_WRITE_HIGH,true,false);
+            }
             break;
 
         case STEP_SINGLE_DIGITAL_WRITE_LOW:
@@ -1160,11 +1225,16 @@ void loop()
             {
                 L6PinLoopTestHandle(TEST_DIGITAL_WRITE_LOW,false,false);
             }
+            else if(boardType == ANT)
+            {
+                AntPinLoopTestHandle(TEST_DIGITAL_WRITE_LOW,false,false);
+            }
+
             break;
 
         case STEP_ANALOG_READ:
             OLEDDisplay("test 5:","analogRead");
-            if(boardType == L6 || boardType == LORA)
+            if(boardType == L6)
             {
                 SendTestCommand(TEST_ANALOG_READ,14);
             }
@@ -1178,7 +1248,7 @@ void loop()
         case STEP_CONFIRM_ANALOG_READ_RESULT:
             {
                 uint8_t analogPin = 30;
-                if(boardType == L6 || boardType == LORA)
+                if(boardType == L6)
                 {
                     analogPin = 14;
                 }
@@ -1252,7 +1322,7 @@ void loop()
             {
                 if(testResult)
                 {
-                    if(boardType == L6 || boardType == LORA)
+                    if(boardType == L6 || boardType == ANT)
                     {
                         String p;
                         p = p+"snr:";
@@ -1298,6 +1368,10 @@ void loop()
                                 {
                                     SearchErrorPin(L6_TOTAL_TEST_PIN,L6PinMapping,L6PinName);
                                 }
+                                else if(boardType == ANT)
+                                {
+                                    SearchErrorPin(ANT_TOTAL_TEST_PIN,antPinMapping,antPinName);
+                                }
 
                                 OLEDDisplay("FAIL", strError);
                             }
@@ -1306,7 +1380,7 @@ void loop()
                             OLEDDisplay("FAIL","analogRead Fail");
                             break;
                         case ERROR_SELF_TEST:
-                            if(boardType == L6 || boardType == LORA)
+                            if(boardType == L6 || boardType == ANT)
                             {
                                 OLEDDisplay("FAIL","selfTest Fail:32.768KHz Fial");
                             }
@@ -1316,7 +1390,7 @@ void loop()
                             }
                             break;
                         case ERROR_RF_CHECK:
-                            if(boardType == L6 || boardType == LORA)
+                            if(boardType == L6 || boardType == ANT)
                             {
                                 String p = "RFCheck Fail";
                                 p = p+"\r\n";
@@ -1355,7 +1429,7 @@ void loop()
 }
 #endif
 
-#if  0
+#if  1 
 //L7 test code
 #include "Adafruit_SSD1306.h"
 #include "lora.h"

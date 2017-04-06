@@ -27,7 +27,7 @@
 #include "platforms.h"
 #include "rtc_hal.h"
 
-#if PLATFORM_ID == PLATFORM_LORA || PLATFORM_ID == PLATFORM_L6
+#if PLATFORM_ID == PLATFORM_ANT || PLATFORM_ID == PLATFORM_L6
 #include "wiring_ex_lorawan.h"
 #endif
 
@@ -143,7 +143,35 @@ void testDigitalWrite(uint16_t pin, uint16_t value, void* cookie)
     aJson.deleteItem(root);
 
 
-#elif PLATFORM_ID == PLATFORM_LORA
+#elif PLATFORM_ID == PLATFORM_ANT
+    aJsonObject* root = aJson.createObject();
+    char* strPtr = nullptr;
+    if(pin == 0xff)
+    {
+        uint8_t pinNumber;
+        for(pinNumber = 0; pinNumber < 5; pinNumber++)
+        {
+            pinMode(pinNumber,OUTPUT);
+            digitalWrite(pinNumber,value);
+        }
+
+        for(pinNumber = 30; pinNumber < 36; pinNumber++)
+        {
+            pinMode(pinNumber,OUTPUT);
+            digitalWrite(pinNumber,value);
+        }
+    }
+    else
+    {
+        pinMode(pin,OUTPUT);
+        digitalWrite(pin,value);
+    }
+
+    aJson.addNumberToObject(root, "status", 200);
+    strPtr = aJson.print(root);
+    ((DeviceConfig*)cookie)->write((unsigned char *)strPtr, strlen(strPtr));
+    free(strPtr);
+    aJson.deleteItem(root);
 
 #elif PLATFORM_ID == PLATFORM_L6
     aJsonObject* root = aJson.createObject();
@@ -176,7 +204,7 @@ void testDigitalWrite(uint16_t pin, uint16_t value, void* cookie)
     free(strPtr);
     aJson.deleteItem(root);
 
-#elif PLATFORM_ID == PLATFORM_GPRS
+#elif PLATFORM_ID == PLATFORM_FOX
 #endif
 }
 
@@ -202,7 +230,15 @@ void testAnalogRead(uint16_t pin, void* cookie)
 
 #elif PLATFORM_ID == PLATFORM_W323
 
-#elif PLATFORM_ID == PLATFORM_LORA
+#elif PLATFORM_ID == PLATFORM_ANT
+    aJsonObject* root = aJson.createObject();
+    char* strPtr = nullptr;
+    aJson.addNumberToObject(root, "status", 200);
+    aJson.addNumberToObject(root, "value", (int)analogRead(pin));
+    strPtr = aJson.print(root);
+    ((DeviceConfig*)cookie)->write((unsigned char *)strPtr, strlen(strPtr));
+    free(strPtr);
+    aJson.deleteItem(root);
 
 #elif PLATFORM_ID == PLATFORM_L6
 
@@ -215,7 +251,7 @@ void testAnalogRead(uint16_t pin, void* cookie)
     free(strPtr);
     aJson.deleteItem(root);
 
-#elif PLATFORM_ID == PLATFORM_GPRS
+#elif PLATFORM_ID == PLATFORM_FOX
 
 #endif
 }
@@ -240,7 +276,21 @@ void testSelfTest(void* cookie)
 
 #elif PLATFORM_ID == PLATFORM_W323
 
-#elif PLATFORM_ID == PLATFORM_LORA
+#elif PLATFORM_ID == PLATFORM_ANT
+    aJsonObject* root = aJson.createObject();
+    char* strPtr = nullptr;
+    if(GetRTCSatus())
+    {
+        aJson.addNumberToObject(root, "status", 200);
+    }
+    else
+    {
+        aJson.addNumberToObject(root, "status", 201);
+    }
+    strPtr = aJson.print(root);
+    ((DeviceConfig*)cookie)->write((unsigned char *)strPtr, strlen(strPtr));
+    free(strPtr);
+    aJson.deleteItem(root);
 
 #elif PLATFORM_ID == PLATFORM_L6
     aJsonObject* root = aJson.createObject();
@@ -258,7 +308,7 @@ void testSelfTest(void* cookie)
     free(strPtr);
     aJson.deleteItem(root);
 
-#elif PLATFORM_ID == PLATFORM_GPRS
+#elif PLATFORM_ID == PLATFORM_FOX
 
 #endif
 }
@@ -270,7 +320,7 @@ void testRfCheck(void* cookie)
 
     ((DeviceConfig*)cookie)->dealGetWifiList();
 
-#elif (PLATFORM_ID == PLATFORM_LORA) || (PLATFORM_ID == PLATFORM_L6)
+#elif (PLATFORM_ID == PLATFORM_ANT) || (PLATFORM_ID == PLATFORM_L6)
 
     aJsonClass aJson;
     aJsonObject* root = aJson.createObject();

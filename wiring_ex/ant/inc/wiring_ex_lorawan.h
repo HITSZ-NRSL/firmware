@@ -11,6 +11,7 @@
 
 #include "../src/lorawan/board/inc/utilities.h"
 
+bool SX1278Test(int8_t &snr, int8_t &rssi, int8_t &txRssi);
 
 #endif /* WIRING_LORAWAN_H_ */
 

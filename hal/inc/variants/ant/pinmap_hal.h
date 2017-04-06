@@ -66,9 +66,9 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 /*
 * Pin mapping. Borrowed from Wiring
 */
-#define TOTAL_PINS             49
+#define TOTAL_PINS             47
 #define TOTAL_ANALOG_PINS      6
-#define TOTAL_DIGITAL_PINS     8
+#define TOTAL_DIGITAL_PINS     7
 #define FIRST_ANALOG_PIN       30
 
 #define D0 0
@@ -78,7 +78,7 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 #define D4 4
 #define D5 5
 #define D6 6
-#define D7 7
+#define D7 6
 
 #define A0 30
 #define A1 31
@@ -88,27 +88,34 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 #define A5 35
 
 // lora pins
-#define RESET_EN    36
-#define NSS_SPI1    37
-#define DIO0        38
-#define DIO1        39
-#define DIO2        40
-#define DIO3        41
-#define DIO4        42
-#define DIO5        43
-#define RX_EN       44
-#define TX_EN       45
-//#define A6 36
-//#define A7 37
+#define RESET_EN    38
+#define NSS_SPI1    39
+#define DIO0        40
+#define DIO1        41
+#define DIO2        42
+#define DIO3        43
+#define DIO4        44
+#define DIO5        45
+#define RX_EN       46
 
 // Uart pins
-#define TX A0
-#define RX A1
+#define TX 36
+#define RX 37
 
-#define SS   D7
-#define SCK  D4
-#define MISO D5
-#define MOSI D6
+
+// Uart pins
+#define TX1 A0
+#define RX1 A1
+
+// Uart pins
+#define TX2 D0
+#define RX2 D1
+
+//SPI pins
+#define SS   D5
+#define SCK  D2
+#define MISO D3
+#define MOSI D4
 
 // I2C pins
 #define SDA  D1

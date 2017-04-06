@@ -31,8 +31,8 @@
 #define TOTAL_SPI 2
 
 typedef enum SPI_Num_Def {
-    SPI2_D4_D5_D6 = 0,//user 
-    SPI1_B3_B4_B5 = 1 //sx1278 use
+    SPI2_GROUP = 0,//user 
+    SPI1_GROUP = 1 //sx1278 use
 } SPI_Num_Def;
 
 typedef struct STM32_SPI_Info {
@@ -234,11 +234,11 @@ void HAL_SPI_Initial(HAL_SPI_Interface spi)
     /* DEBUG("Enter HAL_SPI_Initial..."); */
     if(spi == HAL_SPI_INTERFACE1)
     {
-        spiMap[spi] = &SPI_MAP[SPI2_D4_D5_D6];
+        spiMap[spi] = &SPI_MAP[SPI2_GROUP];
     }
     else if(spi == HAL_SPI_INTERFACE2)
     {
-        spiMap[spi] = &SPI_MAP[SPI1_B3_B4_B5];
+        spiMap[spi] = &SPI_MAP[SPI1_GROUP];
     }
     spiMap[spi]->SPI_Bit_Order_Set     = false;
     spiMap[spi]->SPI_Data_Mode_Set     = false;

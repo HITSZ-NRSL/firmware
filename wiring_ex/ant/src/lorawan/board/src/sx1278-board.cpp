@@ -179,8 +179,8 @@ void SX1278AntSwInit( void )
     */
     pinMode(RX_EN,OUTPUT);
     digitalWrite(RX_EN,1);
-    pinMode(TX_EN,OUTPUT);
-    digitalWrite(TX_EN,0);
+    // pinMode(TX_EN,OUTPUT);
+    // digitalWrite(TX_EN,0);
 }
 
 void SX1278AntSwDeInit( void )
@@ -191,8 +191,8 @@ void SX1278AntSwDeInit( void )
     */
     pinMode(RX_EN,OUTPUT);
     digitalWrite(RX_EN,0);
-    pinMode(TX_EN,OUTPUT);
-    digitalWrite(TX_EN,0);
+    // pinMode(TX_EN,OUTPUT);
+    // digitalWrite(TX_EN,0);
 }
 
 void SX1278SetAntSw( uint8_t rxTx )
@@ -212,11 +212,11 @@ void SX1278SetAntSw( uint8_t rxTx )
     if( rxTx != 0 ) // 1: TX, 0: RX
         {
             digitalWrite(RX_EN,0);
-            digitalWrite(TX_EN,1);
+            // digitalWrite(TX_EN,1);
         }
     else
         {
-            digitalWrite(TX_EN,0);
+            // digitalWrite(TX_EN,0);
             digitalWrite(RX_EN,1);
         }
 }

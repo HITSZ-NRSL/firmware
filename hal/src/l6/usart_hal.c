@@ -78,8 +78,8 @@ STM32_USART_Info USART_MAP[TOTAL_USARTS] =
      * <usart transmitting> used internally and does not appear below
      */
     { USART2, GPIO_AF7_USART2, USART2_IRQn, TX, RX },      // USART2
-    { USART1, GPIO_AF7_USART1, USART1_IRQn, TX1, RX1 },        // USART1
-    { USART3, GPIO_AF7_USART3, USART3_IRQn, TX2, RX2 }       // USART3
+    { USART1, GPIO_AF7_USART1, USART1_IRQn, TX1, RX1 },    // USART1
+    { USART3, GPIO_AF7_USART3, USART3_IRQn, TX2, RX2 }     // USART3
 };
 
 static STM32_USART_Info *usartMap[TOTAL_USARTS]; // pointer to USART_MAP[] containing USART peripheral register locations (etc)

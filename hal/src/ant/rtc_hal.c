@@ -32,6 +32,7 @@
 #include "service_debug.h"
 
 RTC_HandleTypeDef RtcHandle;
+static bool rtcFailFlag = true;
 
 void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
 {
@@ -48,14 +49,18 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
     //RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
     if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
-        DEBUG("RCC_OscConfg Error");
+        rtcFailFlag = false;
+        return;
+        /* DEBUG("RCC_OscConfg Error"); */
     }
 
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
     if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
     {
-        DEBUG("RCCEx_PeriphCLKConfig Error");
+        rtcFailFlag = false;
+        return;
+        /* DEBUG("RCCEx_PeriphCLKConfig Error"); */
     }
     /*##-2- Enable RTC peripheral Clocks #######################################*/
     /* Enable RTC Clock */
@@ -64,6 +69,12 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
     /* HAL_NVIC_SetPriority(RTC_Alarm_IRQn, 0x0F, 0); */
     /* HAL_NVIC_EnableIRQ(RTC_Alarm_IRQn); */
 }
+
+bool GetRTCSatus(void)
+{
+    return rtcFailFlag;
+}
+
 /**
  * @brief RTC MSP De-Initialization
  *        This function frees the hardware resources
