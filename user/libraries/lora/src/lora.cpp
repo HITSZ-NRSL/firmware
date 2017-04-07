@@ -3,6 +3,10 @@
 //L7 测试板程序
 #include "platforms.h"
 
+// #define  ANYTEST_SX1278
+
+#ifdef ANYTEST_SX1278
+
 #if PLATFORM_ID == PLATFORM_ANYTEST
 
 #include "application.h"
@@ -292,4 +296,5 @@ void OnRxError( void )
     // TimerStart( &RxWindowTimer1 );
 }
 
+#endif
 #endif
