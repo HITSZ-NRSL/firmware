@@ -21,9 +21,13 @@
 #define WIRING_SPI_H_
 
 #include "wiring.h"
+#include "wiring_thread.h"
 #include "spi_hal.h"
 
+class SPIClass;
+
 typedef void (*wiring_spi_dma_transfercomplete_callback_t)(void);
+typedef void (*wiring_spi_select_callback_t)(uint8_t);
 
 enum FrequencyScale
 {
@@ -36,6 +40,93 @@ enum FrequencyScale
     SPI_CLK_PHOTON = 60*MHZ
 };
 
+class SPISettings : public Printable {
+    public:
+        SPISettings(uint32_t clock, uint8_t bitOrder, uint8_t dataMode)
+            : default_{false},
+            clock_{clock},
+            bitOrder_{bitOrder},
+            dataMode_{dataMode}
+        {
+        }
+
+        SPISettings()
+        {
+        }
+
+        bool operator==(const SPISettings& other) const
+        {
+            if (default_ && other.default_)
+                return true;
+
+            if (default_ == other.default_ &&
+                    clock_ == other.clock_ &&
+                    bitOrder_ == other.bitOrder_ &&
+                    dataMode_ == other.dataMode_)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        bool operator>=(const SPISettings& other) const
+        {
+            if (default_ && other.default_)
+                return true;
+
+            if (default_ == other.default_ &&
+                    clock_ >= other.clock_ &&
+                    bitOrder_ == other.bitOrder_ &&
+                    dataMode_ == other.dataMode_)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        bool operator<=(const SPISettings& other) const
+        {
+            if (default_ && other.default_)
+                return true;
+
+            if (default_ == other.default_ &&
+                    clock_ <= other.clock_ &&
+                    bitOrder_ == other.bitOrder_ &&
+                    dataMode_ == other.dataMode_)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        bool operator!=(const SPISettings& other) const
+        {
+            return !(other == *this);
+        }
+
+        virtual size_t printTo(Print& p) const
+        {
+            if (default_ && clock_ == 0)
+                return p.print("<SPISettings default>");
+            else
+                return p.printf("<SPISettings %s%lu %s MODE%d>", default_ ? "default " : "", clock_, bitOrder_ == MSBFIRST ? "MSB" : "LSB", dataMode_);
+        }
+
+        uint32_t getClock() const {
+            return clock_;
+        }
+
+    private:
+        friend class SPIClass;
+        bool default_ = true;
+        uint32_t clock_ = 0;
+        uint8_t bitOrder_ = 0;
+        uint8_t dataMode_ = 0;
+};
+
 class SPIClass {
     private:
         HAL_SPI_Interface _spi;
@@ -46,16 +137,25 @@ class SPIClass {
          */
         unsigned dividerReference;
 
+#if PLATFORM_THREADING
+        Mutex mutex_;
+#endif
+
     public:
         SPIClass(HAL_SPI_Interface spi);
         virtual ~SPIClass() {};
 
         void begin();
         void begin(uint16_t);
+        void begin(SPI_Mode mode, uint16_t);
         void end();
 
         void setBitOrder(uint8_t);
         void setDataMode(uint8_t);
+
+        int32_t beginTransaction();
+        int32_t beginTransaction(const SPISettings& settings);
+        void endTransaction();
 
         /**
          * Sets the clock speed that the divider is relative to. This does not change
@@ -100,6 +200,33 @@ class SPIClass {
         void detachInterrupt();
 
         bool isEnabled(void);
+
+        void onSelect(wiring_spi_select_callback_t user_callback);
+        void transferCancel();
+        int32_t available();
+
+        bool trylock()
+        {
+#if PLATFORM_THREADING
+            return mutex_.trylock();
+#else
+            return true;
+#endif
+        }
+
+        void lock()
+        {
+#if PLATFORM_THREADING
+            mutex_.lock();
+#endif
+        }
+
+        void unlock()
+        {
+#if PLATFORM_THREADING
+            mutex_.unlock();
+#endif
+        }
 };
 
 // 不要改成类 为了保证类构造函数使用时，已经初始化

@@ -75,6 +75,9 @@
 /* config cloud */
 //#define configNO_CLOUD
 
+/* config cloud */
+#define configNO_LORAWAN
+
 /* config rgb ui */
 //#define configNO_RGB_UI
 

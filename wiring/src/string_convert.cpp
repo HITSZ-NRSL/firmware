@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <ctype.h>
 #include <math.h>
+#include "service_debug.h"
 
 //------------------------------------------------------------------------------------------
 
@@ -224,6 +225,74 @@ int mac_str_to_bin( char *str, unsigned char *mac)
            s = (*e) ? e + 1 : e;
     }
     return 0;
+}
+
+static inline char ascii_nibble(uint8_t nibble)
+{
+    char hex_digit = nibble + 48;
+    if (57 < hex_digit)
+        hex_digit += 7;
+    return hex_digit;
+}
+
+static inline uint8_t hex_nibble(uint8_t nibble)
+{
+    if(('0' <= nibble) && (nibble <= '9')) {
+        nibble -= '0';
+    } else if(('a' <= nibble) && (nibble <= 'f')) {
+        nibble -= 'a';
+        nibble += 10;
+    } else if(('A' <= nibble) && (nibble <= 'F')) {
+        nibble -= 'A';
+        nibble += 10;
+    } else {
+        nibble = 0;
+    }
+    return nibble;
+}
+
+uint16_t string2hex(char *src, uint8_t *dest, uint16_t destlen, bool reverse)
+{
+    uint16_t srclen = strlen(src);
+    int index = 0, n = 0;
+
+    if(srclen%2) {
+        srclen += 1;
+    }
+
+    if(false == reverse) {
+        for(index = 0, n = 0; (index < srclen)&&(n <= destlen); index += 2)
+        {
+            dest[n++] = hex_nibble(src[index]) << 4 | hex_nibble(src[index+1]);
+        }
+    } else {
+        for(index = srclen-2, n = 0; (index >= 0)&&(n <= destlen); index -= 2)
+        {
+            dest[n++] = hex_nibble(src[index]) << 4 | hex_nibble(src[index+1]);
+        }
+    }
+    return n;
+}
+
+char *hex2string(uint8_t *src, uint16_t srclen, char *dest, bool reverse)
+{
+    int index = 0, n = 0;
+
+    char* result = dest;
+    if(false == reverse) {
+        for(index = 0, n = 0; index < srclen; index++)
+        {
+            dest[n++] = ascii_nibble(src[index] >> 4);
+            dest[n++] = ascii_nibble(src[index] & 0xF);
+        }
+    } else {
+        for(index = srclen-1, n = 0; index >= 0; index--)
+        {
+            dest[n++] = ascii_nibble(src[index] >> 4);
+            dest[n++] = ascii_nibble(src[index] & 0xF);
+        }
+    }
+    return result;
 }
 
 //------------------------------------------------------------------------------------------

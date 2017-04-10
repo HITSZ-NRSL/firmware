@@ -35,27 +35,18 @@
  *******************************************************************************/
 void USB_USART_Initial(uint32_t baudRate)
 {
-    if (LineCoding.bitrate != baudRate)
-    {
-        if (!baudRate && LineCoding.bitrate)
-        {
-            DEBUG("USBD_Stop");
+    if (LineCoding.bitrate != baudRate) {
+        if (!baudRate && LineCoding.bitrate) {
             USBD_Stop(&USBD_Device);
             USBD_DeInit(&USBD_Device);
-        }
-        else if (!LineCoding.bitrate)
-        {
+        } else if (!LineCoding.bitrate) {
             /* Init Device Library */
-            DEBUG("USBD_Init");
             USBD_Init(&USBD_Device, &VCP_Desc, 0);
             /* Add Supported Class */
-            DEBUG("USBD_RegisterClass");
             USBD_RegisterClass(&USBD_Device, USBD_CDC_CLASS);
             /* Add CDC Interface Class */
-            DEBUG("USBD_CDC_RegisterInterface");
             USBD_CDC_RegisterInterface(&USBD_Device, &USBD_CDC_fops);
             /* Start Device Process */
-            DEBUG("USBD_Start");
             USBD_Start(&USBD_Device);
         }
         //LineCoding.bitrate will be overwritten by USB Host
@@ -102,14 +93,10 @@ int32_t USB_USART_Receive_Data(uint8_t peek)
 {
     uint8_t data;
 
-    if(USB_USART_Available_Data())
-    {
-        if(peek)
-        {
+    if(USB_USART_Available_Data()) {
+        if(peek) {
             sdkTryQueueData(&USB_Rx_Queue, sdkGetQueueHead(&USB_Rx_Queue) , &data);
-        }
-        else
-        {
+        } else {
             sdkGetQueueData(&USB_Rx_Queue, &data);
         }
         return data;
@@ -125,8 +112,7 @@ int32_t USB_USART_Receive_Data(uint8_t peek)
  *******************************************************************************/
 int32_t USB_USART_Available_Data_For_Write(void)
 {
-    if (USB_USART_Connected())
-    {
+    if (USB_USART_Connected()) {
         return 1;
     }
     return -1;
@@ -140,12 +126,11 @@ int32_t USB_USART_Available_Data_For_Write(void)
  *******************************************************************************/
 void USB_USART_Send_Data(uint8_t Data)
 {
-    if (USBD_STATE_CONFIGURED == USBD_Device.dev_state)
-    {
+    if (USBD_STATE_CONFIGURED == USBD_Device.dev_state) {
         USBD_CDC_SetTxBuffer(&USBD_Device, &Data, 1);
-        //while(USBD_CDC_TransmitPacket(&USBD_Device)!=USBD_OK);//如果没有连接 将卡在这里
-        USBD_CDC_TransmitPacket(&USBD_Device);
-        HAL_Delay_Microseconds(1000);
+        while(USBD_CDC_TransmitPacket(&USBD_Device)!=USBD_OK);//如果没有连接 将卡在这里
+        //USBD_CDC_TransmitPacket(&USBD_Device);
+        //HAL_Delay_Microseconds(1000);
     }
 }
 

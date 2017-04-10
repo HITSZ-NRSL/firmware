@@ -22,14 +22,17 @@
 
 #define INTOROBOT_OTA_UPDATE_URL       "/v1/bin/"
 
-/*
+#if 1
 #define INTOROBOT_SERVER_DOMAIN        "iot.intorobot.com"
 #define INTOROBOT_SERVER_PORT          1883
 #define INTOROBOT_SERVER_TLS_PORT      8883
-#define INTOROBOT_UPDATE_DOMAIN        "www.intorobot.com"
-#define INTOROBOT_HTTP_DOMAIN          "www.intorobot.com"
-*/
 
+#define INTOROBOT_UPDATE_DOMAIN        "www.intorobot.com"
+
+#define INTOROBOT_HTTP_DOMAIN          "www.intorobot.com"
+#define INTOROBOT_HTTP_PORT            8088
+
+#else
 #define INTOROBOT_SERVER_DOMAIN        "ghgyldebugiot.intoyun.com"
 #define INTOROBOT_SERVER_PORT          1885
 #define INTOROBOT_SERVER_TLS_PORT      8883
@@ -38,6 +41,7 @@
 
 #define INTOROBOT_HTTP_DOMAIN          "www.ghgyldebugwww.intoyun.com"
 #define INTOROBOT_HTTP_PORT            8088
+#endif
 
 #define NTP_TIMESERVER                 "202.120.2.101"  //上海交通大学网络中心NTP服务器地址
 

@@ -214,7 +214,9 @@ void HAL_I2C_Initial(HAL_I2C_Interface i2c, void* reserved)
     {
         return;
     }
+
     i2cMap[i2c]->I2C_ClockSpeed       = CLOCK_SPEED_100KHZ;
+
     i2cMap[i2c]->I2C_Enabled          = false;
     i2cMap[i2c]->rxBufferIndex        = 0;
     i2cMap[i2c]->rxBufferLength       = 0;

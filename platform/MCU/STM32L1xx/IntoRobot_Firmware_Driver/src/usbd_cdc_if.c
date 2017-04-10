@@ -35,8 +35,8 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
-#define USER_RX_BUFFER_SIZE  2048
-
+#define USER_RX_BUFFER_SIZE  128
+#define USB_RX_QUEUE_SIZE    512
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -85,7 +85,7 @@ void SetLineCodingBitRateHandler(linecoding_bitrate_handler handler)
  */
 static int8_t CDC_Itf_Init(void)
 {
-    sdkInitialQueue(&USB_Rx_Queue, SDK_MAX_QUEUE_SIZE);
+    sdkInitialQueue(&USB_Rx_Queue, USB_RX_QUEUE_SIZE);
     /*##-5- Set Application Buffers ############################################*/
     USBD_CDC_SetRxBuffer(&USBD_Device, UserRxBuffer);
     USBD_CDC_ReceivePacket(&USBD_Device);

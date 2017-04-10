@@ -29,6 +29,7 @@
 #include "stm32l1xx_hal.h"
 #include "usbd_cdc.h"
 #include "usbd_core.h"
+#include "platform_config.h"
 #include "service_debug.h"
 
 /* Private typedef -----------------------------------------------------------*/
@@ -59,9 +60,7 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef *hpcd)
        For the STM32L products there is no need to configure the PA12/PA11 pins couple
        as Alternate Function */
     GPIO_InitStruct.Pin = (GPIO_PIN_11 | GPIO_PIN_12);
-    //GPIO_InitStruct.Mode = GPIO_MODE_AF_OD;//GPIO_MODE_INPUT;
     GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-    /* GPIO_InitStruct.Pull = GPIO_PULLUP; */
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
@@ -73,7 +72,7 @@ void HAL_PCD_MspInit(PCD_HandleTypeDef *hpcd)
     __HAL_RCC_SYSCFG_CLK_ENABLE();
 
     /* Set USB FS Interrupt priority */
-    HAL_NVIC_SetPriority(USB_LP_IRQn, 5, 0);
+    HAL_NVIC_SetPriority(USB_LP_IRQn, OTG_LP_IRQ_PRIORITY, 0);
 
     /* Enable USB Interrupt */
     HAL_NVIC_EnableIRQ(USB_LP_IRQn);

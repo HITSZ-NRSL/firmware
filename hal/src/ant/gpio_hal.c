@@ -18,10 +18,10 @@
 */
 
 /* Includes -----------------------------------------------------------------*/
+#include <stddef.h>
 #include "hw_config.h"
 #include "gpio_hal.h"
 #include "pinmap_impl.h"
-#include <stddef.h>
 #include "dac_hal.h"
 
 /* Private typedef ----------------------------------------------------------*/

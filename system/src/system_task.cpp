@@ -39,9 +39,11 @@
 #include "service_debug.h"
 #include "wiring_network.h"
 #include "wiring_constants.h"
-#include "wiring_cloud.h"
+#include "wiring_intorobot.h"
 #include "system_threading.h"
 #include "system_product.h"
+#include "system_lorawan.h"
+#include "string_convert.h"
 
 /*debug switch*/
 #define SYSTEM_TASK_DEBUG
@@ -292,6 +294,68 @@ void manage_cloud_connection(void)
 }
 #endif
 
+#ifndef configNO_LORAWAN
+void LoraWAN_Setup(void)
+{
+    STASK_DEBUG("LoraWAN_Setup");
+    // LMIC init
+    os_init();
+    // Reset the MAC state. Session and pending data transfers will be discarded.
+    LMIC_reset();
+
+    AT_MODE_FLAG_TypeDef at_mode = HAL_PARAMS_Get_System_at_mode();
+    //AT_MODE_FLAG_TypeDef at_mode = AT_MODE_FLAG_OTAA_INACTIVE;
+    switch(at_mode)
+    {
+        case AT_MODE_FLAG_ABP:            //已经灌好密钥
+            STASK_DEBUG("AT_MODE_FLAG_ABP");
+        case AT_MODE_FLAG_OTAA_ACTIVE:    //灌装激活码 已激活
+            {
+                STASK_DEBUG("AT_MODE_FLAG_OTAA_ACTIVE");
+                char devaddr[16] = {0}, nwkskey[36] = {0}, appskey[36] = {0};
+                HAL_PARAMS_Get_System_devaddr(devaddr, sizeof(devaddr));
+                HAL_PARAMS_Get_System_nwkskey(nwkskey, sizeof(nwkskey));
+                HAL_PARAMS_Get_System_appskey(appskey, sizeof(appskey));
+                STASK_DEBUG("devaddr = %s", devaddr);
+                STASK_DEBUG("nwkskey = %s", nwkskey);
+                STASK_DEBUG("appskey = %s", appskey);
+
+                uint32_t addr = 0;
+                uint8_t nwkskeyBuf[16] = {0}, appskeyBuf[16] = {0};
+                string2hex(devaddr, (uint8_t *)&addr, 4, true);
+                string2hex(nwkskey, nwkskeyBuf, 16, false);
+                string2hex(appskey, appskeyBuf, 16, false);
+                LMIC_setSession (0x1, addr, nwkskeyBuf, appskeyBuf);
+                LMIC_setLinkCheckMode(0);
+                LMIC.dn2Dr = DR_SF9;
+                LMIC_setDrTxpow(DR_SF7,14);
+                g_intorobot_lorawan_joined = 1;
+                system_rgb_blink(RGB_COLOR_WHITE, 2000); //白灯闪烁
+            }
+            break;
+        case AT_MODE_FLAG_OTAA_INACTIVE:  //灌装激活码  未激活
+            STASK_DEBUG("AT_MODE_FLAG_OTAA_INACTIVE");
+            system_rgb_blink(RGB_COLOR_GREEN, 1000);//绿灯闪烁
+            LMIC_startJoining();
+            break;
+        default:                          //没有密钥信息
+            STASK_DEBUG("default");
+            system_rgb_blink(RGB_COLOR_GREEN, 1000);//绿灯闪烁
+            break;
+    }
+}
+
+void manage_lorawan_connection(void)
+{
+    if(g_intorobot_lorawan_joined && !g_intorobot_lorawan_connected) {
+        intorobot_lorawan_send_terminal_info();
+        g_intorobot_lorawan_connected = 1;
+    }
+    os_runloop_once();
+}
+
+#endif
+
 void system_process_loop(void)
 {
     intorobot_loop_total_millis = 0;
@@ -302,6 +366,7 @@ void system_process_loop(void)
         NEWORK_FN(manage_ip_config(), (void)0);
         CLOUD_FN(manage_cloud_connection(), (void)0);
         CLOUD_FN(manage_app_auto_update(), (void)0);
+        LORAWAN_FN(manage_lorawan_connection(), (void)0);
 #ifdef configSETUP_ENABLE
     }
 #endif
@@ -310,6 +375,27 @@ void system_process_loop(void)
 /*
  * @brief This should block for a certain number of milliseconds and also execute system_process_loop
  */
+#ifndef configNO_LORAWAN
+static void system_delay_pump(unsigned long ms, bool force_no_background_loop=false)
+{
+    if (ms==0) return;
+    system_tick_t intorobot_loop_elapsed_millis = INTOROBOT_LOOP_DELAY_MILLIS;
+    intorobot_loop_total_millis += ms;
+
+    system_tick_t start_millis = HAL_Timer_Get_Milli_Seconds();
+    system_tick_t end_micros = HAL_Timer_Get_Micro_Seconds() + (1000*ms);
+
+    while (1) {
+        system_tick_t elapsed_millis = HAL_Timer_Get_Milli_Seconds() - start_millis;
+        if (elapsed_millis > ms) {
+            break;
+        }
+        if(!intorobot_process_flag) {
+            intorobot_process();
+        }
+    }
+}
+#else
 static void system_delay_pump(unsigned long ms, bool force_no_background_loop=false)
 {
     if (ms==0) return;
@@ -350,6 +436,7 @@ static void system_delay_pump(unsigned long ms, bool force_no_background_loop=fa
         }
     }
 }
+#endif
 
 /**
  * On a non threaded platform, or when called from the application thread, then

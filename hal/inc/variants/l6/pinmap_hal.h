@@ -123,16 +123,15 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 #define PA13 D19
 #define PA14 D20
 
-// lora pins
-#define RESET_EN   21
-#define NSS_SPI1   22
-#define DIO0       23
-#define DIO1       24
-#define DIO2       25
-#define DIO3       26
-#define DIO4       27
-#define DIO5       28
-#define RX_EN      29
+#define SX1278_RESET    21
+#define SX1278_NSS      22
+#define SX1278_DIO0     23
+#define SX1278_DIO1     24
+#define SX1278_DIO2     25
+#define SX1278_DIO3     26
+#define SX1278_DIO4     27
+#define SX1278_DIO5     28
+#define SX1278_RXTX     29
 
 //#define A6 36
 //#define A7 37

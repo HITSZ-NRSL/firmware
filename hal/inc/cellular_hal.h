@@ -50,6 +50,7 @@ cellular_result_t  cellular_on(void* reserved);
 
 cellular_result_t  cellular_init(void* reserved);
 
+cellular_result_t cellular_status(void* reserved);
 /**
  * Power off the cellular module.
  */

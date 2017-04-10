@@ -7,10 +7,7 @@
 
 TARGET_WIRING_EX_SRC_PATH = $(WIRING_EX_MODULE_PATH)/$(PLATFORM_NAME)/src
 
-INCLUDE_DIRS += $(TARGET_WIRING_EX_SRC_PATH)/lorawan/crypto/inc
-INCLUDE_DIRS += $(TARGET_WIRING_EX_SRC_PATH)/lorawan/mac/inc
-INCLUDE_DIRS += $(TARGET_WIRING_EX_SRC_PATH)/lorawan/radio/inc
-INCLUDE_DIRS += $(TARGET_WIRING_EX_SRC_PATH)/lorawan/board/inc
+INCLUDE_DIRS += $(TARGET_WIRING_EX_SRC_PATH)
 
 # C source files included in this build.
 CSRC += $(call target_files,$(TARGET_WIRING_EX_SRC_PATH)/,*.c)

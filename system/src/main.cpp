@@ -53,6 +53,7 @@
 #include "system_config.h"
 #include "service_debug.h"
 #include "platforms.h"
+#include "system_lorawan.h"
 
 using namespace intorobot;
 
@@ -393,9 +394,11 @@ void app_setup_and_loop_initial(bool *threaded)
     if( SYSTEM_CONFIG_TYPE_NONE == get_system_config_type() )
     {
         NEWORK_FN(Network_Setup(), (void)0);
+        LORAWAN_FN(LoraWAN_Setup(), (void)0);
     }
 #else
     NEWORK_FN(Network_Setup(), (void)0);
+    LORAWAN_FN(LoraWAN_Setup(), (void)0);
 #endif
 
     *threaded = system_thread_get_state(NULL) != intorobot::feature::DISABLED &&

@@ -20,19 +20,23 @@
 #ifndef STRING_CONVERT_H_
 #define STRING_CONVERT_H_
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
+#include <stdint.h>
 
 char* itoa (int val, char *s, int radix);
 char* ltoa (long val, char *s, int radix);
 char* utoa (unsigned int val, char *s, int radix);
 char* ultoa (unsigned long val, char *s, int radix);
 char* dtostrf (double val, signed char width, unsigned char prec, char *s);
-int mac_str_to_bin( char *str, unsigned char *mac);
+int mac_str_to_bin(char *str, unsigned char *mac);
 
-#ifdef	__cplusplus
+uint16_t string2hex(char *src, uint8_t *dest, uint16_t destlen, bool reverse);
+char *hex2string(uint8_t *src, uint16_t srclen, char *dest, bool reverse);
+
+#ifdef __cplusplus
 }
 #endif
 

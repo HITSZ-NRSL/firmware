@@ -15,11 +15,15 @@ void ui_process_loop(void);
 
 uint32_t HAL_NET_SetNetWatchDog(uint32_t timeOutInuS);
 void Network_Setup();
-
+void LoraWAN_Setup(void);
 
 extern volatile uint8_t g_intorobot_network_connected;
 extern volatile uint8_t g_intorobot_cloud_pregrocessed;
 extern volatile uint8_t g_intorobot_cloud_connected;
+
+extern volatile uint8_t g_intorobot_lorawan_joined;
+extern volatile uint8_t g_intorobot_lorawan_connected;
+
 extern volatile uint8_t INTOROBOT_WLAN_SLEEP;
 extern volatile uint8_t INTOROBOT_WLAN_STARTED;
 

@@ -35,7 +35,7 @@
 #include "platforms.h"
 
 #include "wiring.h"
-#include "wiring_cloud.h"
+#include "wiring_intorobot.h"
 #include "wiring_interrupts.h"
 #include "wiring_string.h"
 //#include "wiring_power.h"

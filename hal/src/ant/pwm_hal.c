@@ -26,8 +26,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "pwm_hal.h"
 #include "pinmap_impl.h"
-#include "service_debug.h"
-
+#include "hw_config.h"
 
 
 void HAL_PWM_Write(uint16_t pin, uint8_t value)

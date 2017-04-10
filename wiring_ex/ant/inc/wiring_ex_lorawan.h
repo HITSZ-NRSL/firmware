@@ -1,6 +1,7 @@
 #ifndef  WIRING_EX_LORAWAN_H_
 #define  WIRING_EX_LORAWAN_H_
 
+<<<<<<< HEAD
 
 #include "../src/lorawan/radio/inc/radio.h"
 #include "../src/lorawan/board/inc/sx1278-board.h"
@@ -12,6 +13,10 @@
 #include "../src/lorawan/board/inc/utilities.h"
 
 bool SX1278Test(int8_t &snr, int8_t &rssi, int8_t &txRssi);
+=======
+#include "lmic.h"
+#include "hal/hal.h"
+>>>>>>> develop
 
 #endif /* WIRING_LORAWAN_H_ */
 

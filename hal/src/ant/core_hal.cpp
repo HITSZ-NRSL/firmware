@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
-//#include <stdatomic.h>
 #include <string.h>
 #include "core_hal.h"
 #include "watchdog_hal.h"
@@ -32,7 +31,6 @@
 #include "syshealth_hal.h"
 #include "rtc_hal.h"
 #include "stm32l1xx_it.h"
-#include "service_debug.h"
 #include "params_hal.h"
 #include "bkpreg_hal.h"
 

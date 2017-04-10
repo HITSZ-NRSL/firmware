@@ -723,7 +723,6 @@ long String::toInt(void) const
     return 0;
 }
 
-
 float String::toFloat(void) const
 {
     if (buffer) return float(atof(buffer));

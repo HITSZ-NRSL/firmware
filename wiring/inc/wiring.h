@@ -40,7 +40,7 @@
 #include "wiring_character.h"
 #include "wiring_random.h"
 #include "wiring_system.h"
-#include "wiring_cloud.h"
+#include "wiring_intorobot.h"
 #include "wiring_rgb.h"
 #include "wiring_ticks.h"
 

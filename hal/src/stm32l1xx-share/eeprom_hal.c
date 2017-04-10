@@ -25,8 +25,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "eeprom_hal.h"
-#include "stm32l1xx.h"
-#include "service_debug.h"
+#include "hw_config.h"
 
 
 //L151 EEPROM固定起始地址

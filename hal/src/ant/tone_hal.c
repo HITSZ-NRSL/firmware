@@ -24,10 +24,10 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
+#include "hw_config.h"
 #include "tone_hal.h"
 #include "pinmap_impl.h"
-#include "stm32l1xx.h"
-#include "service_debug.h"
+
 
 #define TONE_TIM_COUNTER_CLOCK_FREQ 1000000 ////TIM Counter clock = 1MHz
 

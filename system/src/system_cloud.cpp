@@ -33,7 +33,7 @@
 #include "wiring_cellular.h"
 #include "system_mqttclient.h"
 #include "system_cloud_def.h"
-#include "system_clouddata.h"
+#include "system_datapoint.h"
 #include "system_cloud.h"
 #include "system_mode.h"
 #include "system_task.h"
@@ -733,7 +733,7 @@ finish:
 void cloud_datapoint_receive_callback(uint8_t *payload, uint32_t len)
 {
     SCLOUD_DEBUG("Ok! receive datapoint form cloud!");
-    intorobotReceiveDataProcessJson(payload, len);
+    intorobotParseReceiveDataJson(payload, len);
 }
 
 void cloud_debug_callback(uint8_t *payload, uint32_t len)
@@ -784,8 +784,8 @@ void intorobot_cloud_init(void)
 #endif
 
     // 添加默认数据点
-    intorobotAddDataPointBool(0xFF80, UP_DOWN, false, "", 0);//reboot
-    intorobotAddDataPointBool(0xFF81, UP_DOWN, false, "", 0);//write all datapoint
+    intorobotDefineDataPointBool(0xFF80, UP_DOWN, false, "", 0);//reboot
+    intorobotDefineDataPointBool(0xFF81, UP_DOWN, false, "", 0);//write all datapoint
 }
 
 bool intorobot_publish(api_version_t version, const char* topic, uint8_t* payload, unsigned int plength, uint8_t qos, uint8_t retained)
@@ -1177,7 +1177,7 @@ int intorobot_cloud_handle(void)
         }
         //write all datepoint
         if(RESULT_DATAPOINT_NEW == intorobotReadDataPointBool(0xFF81, all_datapoint_flag)) {
-            intorobotWriteDataPointAll();
+            intorobotSendDataPointAll();
         }
         //发送IntoRobot.printf打印到平台
         mqtt_send_debug_info();

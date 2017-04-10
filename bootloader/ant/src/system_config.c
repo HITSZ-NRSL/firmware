@@ -16,18 +16,18 @@ void log_output(const char* msg)
 void usart_debug_initial(uint32_t baud)
 {
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_USART2_CLK_ENABLE();
+    __HAL_RCC_USART1_CLK_ENABLE();
 
     GPIO_InitTypeDef  GPIO_InitStruct;
     /* UART TX GPIO pin configuration  */
-    GPIO_InitStruct.Pin       = GPIO_PIN_2 | GPIO_PIN_3;
+    GPIO_InitStruct.Pin       = GPIO_PIN_9 | GPIO_PIN_10;
     GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull      = GPIO_NOPULL;
     GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;//GPIO_SPEED_FAST;
-    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    UartHandleDebug.Instance          = USART2;
+    UartHandleDebug.Instance          = USART1;
     UartHandleDebug.Init.BaudRate     = baud;
     UartHandleDebug.Init.WordLength   = UART_WORDLENGTH_8B;
     UartHandleDebug.Init.StopBits     = UART_STOPBITS_1;

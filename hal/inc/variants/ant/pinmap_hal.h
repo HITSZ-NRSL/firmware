@@ -87,31 +87,27 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 #define A4 34
 #define A5 35
 
-// lora pins
-#define RESET_EN    38
-#define NSS_SPI1    39
-#define DIO0        40
-#define DIO1        41
-#define DIO2        42
-#define DIO3        43
-#define DIO4        44
-#define DIO5        45
-#define RX_EN       46
+// lora sx1278 pins
+#define SX1278_RESET    36
+#define SX1278_NSS      37
+#define SX1278_DIO0     38
+#define SX1278_DIO1     39
+#define SX1278_DIO2     40
+#define SX1278_DIO3     41
+#define SX1278_DIO4     42
+#define SX1278_DIO5     43
+#define SX1278_RXTX     44
 
 // Uart pins
-#define TX 36
-#define RX 37
+#define TX 8
+#define RX 9
 
-
-// Uart pins
 #define TX1 A0
 #define RX1 A1
 
-// Uart pins
 #define TX2 D0
 #define RX2 D1
 
-//SPI pins
 #define SS   D5
 #define SCK  D2
 #define MISO D3
@@ -123,7 +119,7 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 
 #define LED_USER  D7
 
-#define TOTAL_USARTS    2
+#define TOTAL_USARTS    3
 #define TOTAL_SPIS      1
 #define TOTAL_I2CS      1
 

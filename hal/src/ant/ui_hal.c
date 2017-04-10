@@ -42,28 +42,30 @@ void Set_RGB_Color(uint32_t color) {
     red = color>>16 & 0xFF;
     green = color>>8 & 0xFF;
     blue = color & 0xFF;
-    if(red)
+    if(red) {
         HAL_GPIO_WritePin(RGB_R_GPIO_PORT, RGB_R_GPIO_PIN, GPIO_PIN_RESET);
-    else
+    } else {
         HAL_GPIO_WritePin(RGB_R_GPIO_PORT, RGB_R_GPIO_PIN, GPIO_PIN_SET);
+    }
 
-    if(green)
+    if(green) {
         HAL_GPIO_WritePin(RGB_G_GPIO_PORT, RGB_G_GPIO_PIN, GPIO_PIN_RESET);
-    else
+    } else {
         HAL_GPIO_WritePin(RGB_G_GPIO_PORT, RGB_G_GPIO_PIN, GPIO_PIN_SET);
+    }
 
-    if(blue)
+    if(blue) {
         HAL_GPIO_WritePin(RGB_B_GPIO_PORT, RGB_B_GPIO_PIN, GPIO_PIN_RESET);
-    else
+    } else {
         HAL_GPIO_WritePin(RGB_B_GPIO_PORT, RGB_B_GPIO_PIN, GPIO_PIN_SET);
+    }
 }
 
 void RGB_Color_Toggle(void) {
     if(rgb_info.rgb_last_color) {
         Set_RGB_Color(0);
         rgb_info.rgb_last_color = 0;
-    }
-    else {
+    } else {
         Set_RGB_Color(rgb_info.rgb_color);
         rgb_info.rgb_last_color = rgb_info.rgb_color;
     }
@@ -160,8 +162,7 @@ void HAL_UI_SysTick_Handler(void)
         if(!BUTTON_last_state) {
             TimingBUTTON = 0;
             BUTTON_last_state = 1;
-        }
-        else {
+        } else {
             TimingBUTTON++;
         }
     } else {

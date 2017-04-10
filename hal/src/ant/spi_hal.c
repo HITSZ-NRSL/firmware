@@ -6,27 +6,26 @@
  * @date    12-Sept-2014
  * @brief
  ******************************************************************************
-  Copyright (c) 2013-2015 IntoRobot Industries, Inc.  All rights reserved.
+ Copyright (c) 2013-2015 IntoRobot Industries, Inc.  All rights reserved.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation, either
-  version 3 of the License, or (at your option) any later version.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation, either
+ version 3 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************
  */
 
 /* Includes ------------------------------------------------------------------*/
 #include "spi_hal.h"
-#include "stm32l1xx.h"
-#include "service_debug.h"
+#include "hw_config.h"
 
 #define TOTAL_SPI 2
 
@@ -99,10 +98,10 @@ void HAL_SPI_GPIO_DMA_Init(HAL_SPI_Interface spi)
         __HAL_RCC_SPI1_CLK_ENABLE();
         __HAL_RCC_GPIOA_CLK_ENABLE();
         __HAL_RCC_GPIOB_CLK_ENABLE();
-/* #ifdef useDMASPI */
-/*         // DMA2 clock */
-/*         __HAL_RCC_DMA1_CLK_ENABLE(); */
-/* #endif */
+        /* #ifdef useDMASPI */
+        /*         // DMA2 clock */
+        /*         __HAL_RCC_DMA1_CLK_ENABLE(); */
+        /* #endif */
     }
     else if(spiMap[spi]->SPI_Peripheral == SPI2)
     {
@@ -275,11 +274,11 @@ void HAL_SPI_Begin_Ext(HAL_SPI_Interface spi, SPI_Mode mode, uint16_t pin, void*
     spiMap[spi]->SpiHandle.Init.Mode           = SPI_MODE_MASTER;
     spiMap[spi]->SpiHandle.Init.Direction      = SPI_DIRECTION_2LINES;
     spiMap[spi]->SpiHandle.Init.DataSize       = SPI_DATASIZE_8BIT; // SPI_DATASIZE_8BIT; // SPI_DATASIZE_16BIT
-   //spiMap[spi]->SpiHandle.Init.CLKPolarity    =  ;
-   //spiMap[spi]->SpiHandle.Init.CLKPhase       =  ;
+    //spiMap[spi]->SpiHandle.Init.CLKPolarity    =  ;
+    //spiMap[spi]->SpiHandle.Init.CLKPhase       =  ;
     spiMap[spi]->SpiHandle.Init.NSS            = SPI_NSS_SOFT;
-   //spiMap[spi]->SpiHandle.Init.BaudRatePrescaler       =  ;
-   // spiMap[spi]->SpiHandle.Init.FirstBit      =  ;
+    //spiMap[spi]->SpiHandle.Init.BaudRatePrescaler       =  ;
+    // spiMap[spi]->SpiHandle.Init.FirstBit      =  ;
     spiMap[spi]->SpiHandle.Init.TIMode         = SPI_TIMODE_DISABLE;
     spiMap[spi]->SpiHandle.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
     spiMap[spi]->SpiHandle.Init.CRCPolynomial  = 7;
@@ -393,6 +392,32 @@ void HAL_SPI_Set_Clock_Divider(HAL_SPI_Interface spi, uint8_t rate)
 
 }
 
+int32_t HAL_SPI_Set_Settings(HAL_SPI_Interface spi, uint8_t set_default, uint8_t clockdiv, uint8_t order, uint8_t mode, void* reserved)
+{
+    /*
+    if (!set_default)
+    {
+        HAL_SPI_Set_Clock_Divider_Impl(spi, clockdiv);
+        HAL_SPI_Set_Bit_Order_Impl(spi, order);
+        HAL_SPI_Set_Data_Mode_Impl(spi, mode);
+    }
+
+    spiState[spi].SPI_Clock_Divider_Set = !set_default;
+    spiState[spi].SPI_Data_Mode_Set = !set_default;
+    spiState[spi].SPI_Bit_Order_Set = !set_default;
+
+    if (set_default) {
+        // HAL_SPI_End(spi);
+        HAL_SPI_Begin_Ext(spi, spiState[spi].mode, spiState[spi].SPI_SS_Pin, NULL);
+    } else if (spiState[spi].SPI_Enabled != false) {
+        SPI_Cmd(spiMap[spi].SPI_Peripheral, DISABLE);
+        SPI_Init(spiMap[spi].SPI_Peripheral, &spiState[spi].SPI_InitStructure);
+        SPI_Cmd(spiMap[spi].SPI_Peripheral, ENABLE);
+    }
+*/
+    return 0;
+}
+
 /*
  * @brief SPI send and recieve data.
  * @param spi: spi number chosed.
@@ -462,43 +487,43 @@ int32_t HAL_SPI_DMA_Transfer_Status(HAL_SPI_Interface spi, HAL_SPI_TransferStatu
 #if 0
 #ifdef useDMASPI
 /**
-  * @brief  This function handles SPI1 DMA Rx interrupt request.
-  * @param  None
-  * @retval None
-  */
+ * @brief  This function handles SPI1 DMA Rx interrupt request.
+ * @param  None
+ * @retval None
+ */
 void DMA2_Stream0_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(spiMap[SPI2_D4_D5_D6]->SpiHandle.hdmarx);
+    HAL_DMA_IRQHandler(spiMap[SPI2_D4_D5_D6]->SpiHandle.hdmarx);
 }
 
 /**
-  * @brief  This function handles SPI1 DMA Tx interrupt request.
-  * @param  None
-  * @retval None
-  */
+ * @brief  This function handles SPI1 DMA Tx interrupt request.
+ * @param  None
+ * @retval None
+ */
 void DMA2_Stream5_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(spiMap[SPI1_A5_A6_A7]->SpiHandle.hdmatx);
+    HAL_DMA_IRQHandler(spiMap[SPI1_A5_A6_A7]->SpiHandle.hdmatx);
 }
 
 /**
-  * @brief  This function handles SPI2 DMA Rx interrupt request.
-  * @param  None
-  * @retval None
-  */
+ * @brief  This function handles SPI2 DMA Rx interrupt request.
+ * @param  None
+ * @retval None
+ */
 void DMA1_Stream0_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(spiMap[SPI3_D3_D2_D1]->SpiHandle.hdmarx);
+    HAL_DMA_IRQHandler(spiMap[SPI3_D3_D2_D1]->SpiHandle.hdmarx);
 }
 
 /**
-  * @brief  This function handles SPI2 DMA Tx interrupt request.
-  * @param  None
-  * @retval None
-  */
+ * @brief  This function handles SPI2 DMA Tx interrupt request.
+ * @param  None
+ * @retval None
+ */
 void DMA1_Stream5_IRQHandler(void)
 {
-  HAL_DMA_IRQHandler(spiMap[SPI3_D3_D2_D1]->SpiHandle.hdmatx);
+    HAL_DMA_IRQHandler(spiMap[SPI3_D3_D2_D1]->SpiHandle.hdmatx);
 }
 #endif
 #endif

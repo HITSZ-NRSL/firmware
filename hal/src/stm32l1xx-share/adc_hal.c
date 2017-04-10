@@ -23,11 +23,11 @@
  ******************************************************************************
  */
 
+#include "hw_config.h"
 #include "adc_hal.h"
 #include "gpio_hal.h"
 #include "pinmap_hal.h"
 #include "pinmap_impl.h"
-#include "service_debug.h"
 
 #define ADC_DMA_BUFFERSIZE    10
 #define ADC_SAMPLING_TIME     ADC_SAMPLETIME_4CYCLES
