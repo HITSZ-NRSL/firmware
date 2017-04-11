@@ -35,274 +35,274 @@
 #include <functional>
 #include "service_debug.h"
 
-class IntoRobotDatePointClass {
+class IntoRobotDatepointClass {
 
     public:
         //添加通用数据收发接口
         // 添加数据点
-        static void defineDataPointBool(const uint16_t dpID, const char *permission)
+        static void defineDatapointBool(const uint16_t dpID, const char *permission)
         {
-            defineDataPointBool(dpID, permission, false, "", 0);
+            defineDatapointBool(dpID, permission, false, "", 0);
         }
 
-        static void defineDataPointBool(const uint16_t dpID, const char *permission, const bool value)
+        static void defineDatapointBool(const uint16_t dpID, const char *permission, const bool value)
         {
-            defineDataPointBool(dpID, permission, value, "", 0);
+            defineDatapointBool(dpID, permission, value, "", 0);
         }
 
-        static void defineDataPointBool(const uint16_t dpID, const char *permission, const bool value, const char *policy)
+        static void defineDatapointBool(const uint16_t dpID, const char *permission, const bool value, const char *policy)
         {
-            defineDataPointBool(dpID, permission, value, policy, 0);
+            defineDatapointBool(dpID, permission, value, policy, 0);
         }
         // lapse 单位为秒
-        static void defineDataPointBool(const uint16_t dpID, const char *permission, const bool value, const char *policy, const int lapse)
+        static void defineDatapointBool(const uint16_t dpID, const char *permission, const bool value, const char *policy, const int lapse)
         {
-            intorobotDefineDataPointBool(dpID, permission, (bool)value, policy, lapse);
+            intorobotDefineDatapointBool(dpID, permission, (bool)value, policy, lapse);
         }
 
-        static void defineDataPointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution)
+        static void defineDatapointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution)
         {
-            defineDataPointNumber(dpID, permission, minValue, maxValue, resolution, minValue, "", 0);
+            defineDatapointNumber(dpID, permission, minValue, maxValue, resolution, minValue, "", 0);
         }
 
-        static void defineDataPointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value)
+        static void defineDatapointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value)
         {
-            defineDataPointNumber(dpID, permission, minValue, maxValue, resolution, value, "", 0);
+            defineDatapointNumber(dpID, permission, minValue, maxValue, resolution, value, "", 0);
         }
 
-        static void defineDataPointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value, const char *policy)
+        static void defineDatapointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value, const char *policy)
         {
-            defineDataPointNumber(dpID, permission, minValue, maxValue, resolution, value, policy, 0);
+            defineDatapointNumber(dpID, permission, minValue, maxValue, resolution, value, policy, 0);
         }
 
-        static void defineDataPointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value, const char *policy, const int lapse)
+        static void defineDatapointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value, const char *policy, const int lapse)
         {
-            intorobotDefineDataPointNumber(dpID, permission, minValue, maxValue, resolution, value, policy, lapse);
+            intorobotDefineDatapointNumber(dpID, permission, minValue, maxValue, resolution, value, policy, lapse);
         }
 
-        static void defineDataPointEnum(const uint16_t dpID, const char *permission)
+        static void defineDatapointEnum(const uint16_t dpID, const char *permission)
         {
-            defineDataPointEnum(dpID, permission, 0, "", 0);
+            defineDatapointEnum(dpID, permission, 0, "", 0);
         }
 
-        static void defineDataPointEnum(const uint16_t dpID, const char *permission, const int value)
+        static void defineDatapointEnum(const uint16_t dpID, const char *permission, const int value)
         {
-            defineDataPointEnum(dpID, permission, value, "", 0);
+            defineDatapointEnum(dpID, permission, value, "", 0);
         }
 
-        static void defineDataPointEnum(const uint16_t dpID, const char *permission, const int value, const char *policy)
+        static void defineDatapointEnum(const uint16_t dpID, const char *permission, const int value, const char *policy)
         {
-            defineDataPointEnum(dpID, permission, value, policy, 0);
+            defineDatapointEnum(dpID, permission, value, policy, 0);
         }
 
-        static void defineDataPointEnum(const uint16_t dpID, const char *permission, const int value, const char *policy, const int lapse)
+        static void defineDatapointEnum(const uint16_t dpID, const char *permission, const int value, const char *policy, const int lapse)
         {
-            intorobotDefineDataPointEnum(dpID, permission, value, policy, lapse);
+            intorobotDefineDatapointEnum(dpID, permission, value, policy, lapse);
         }
 
-        static void defineDataPointString(const uint16_t dpID, const char *permission)
+        static void defineDatapointString(const uint16_t dpID, const char *permission)
         {
-            defineDataPointString(dpID, permission, "", "", 0);
+            defineDatapointString(dpID, permission, "", "", 0);
         }
 
-        static void defineDataPointString(const uint16_t dpID, const char *permission, const char *value)
+        static void defineDatapointString(const uint16_t dpID, const char *permission, const char *value)
         {
-            defineDataPointString(dpID, permission, value, "", 0);
+            defineDatapointString(dpID, permission, value, "", 0);
         }
 
-        static void defineDataPointString(const uint16_t dpID, const char *permission, const char *value, const char *policy)
+        static void defineDatapointString(const uint16_t dpID, const char *permission, const char *value, const char *policy)
         {
-            defineDataPointString(dpID, permission, value, policy, 0);
+            defineDatapointString(dpID, permission, value, policy, 0);
         }
 
-        static void defineDataPointString(const uint16_t dpID, const char *permission, const char *value, const char *policy, const int lapse)
+        static void defineDatapointString(const uint16_t dpID, const char *permission, const char *value, const char *policy, const int lapse)
         {
-            intorobotDefineDataPointString(dpID, permission, value, policy, lapse);
+            intorobotDefineDatapointString(dpID, permission, value, policy, lapse);
         }
 
-        static void defineDataPointBinary(const uint16_t dpID, const char *permission)
+        static void defineDatapointBinary(const uint16_t dpID, const char *permission)
         {
-            defineDataPointBinary(dpID, permission, NULL, 0, "", 0);
+            defineDatapointBinary(dpID, permission, NULL, 0, "", 0);
         }
 
-        static void defineDataPointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len)
+        static void defineDatapointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len)
         {
-            defineDataPointBinary(dpID, permission, value, len, "", 0);
+            defineDatapointBinary(dpID, permission, value, len, "", 0);
         }
 
-        static void defineDataPointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len, const char *policy)
+        static void defineDatapointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len, const char *policy)
         {
-            defineDataPointBinary(dpID, permission, value, len, policy, 0);
+            defineDatapointBinary(dpID, permission, value, len, policy, 0);
         }
 
-        static void defineDataPointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len, const char *policy, const int lapse)
+        static void defineDatapointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len, const char *policy, const int lapse)
         {
-            intorobotDefineDataPointBinary(dpID, permission, value, len, policy, lapse);
+            intorobotDefineDatapointBinary(dpID, permission, value, len, policy, lapse);
         }
 
         // 读取数据点
-        static read_datapoint_result_t readDataPoint(const uint16_t dpID, bool &value)
+        static read_datapoint_result_t readDatapoint(const uint16_t dpID, bool &value)
         {
-            return intorobotReadDataPointBool(dpID, value);
+            return intorobotReadDatapointBool(dpID, value);
         }
 
 #ifdef INTOROBOT_ARCH_ARM
-        static read_datapoint_result_t readDataPoint(const uint16_t dpID, int &value)
+        static read_datapoint_result_t readDatapoint(const uint16_t dpID, int &value)
         {
-            return intorobotReadDataPointInt(dpID, value);
+            return intorobotReadDatapointInt(dpID, value);
         }
 #endif
 
-        static read_datapoint_result_t readDataPoint(const uint16_t dpID, int32_t &value)
+        static read_datapoint_result_t readDatapoint(const uint16_t dpID, int32_t &value)
         {
-            return intorobotReadDataPointInt32(dpID, value);
+            return intorobotReadDatapointInt32(dpID, value);
         }
 
-        static read_datapoint_result_t readDataPoint(const uint16_t dpID, uint32_t &value)
+        static read_datapoint_result_t readDatapoint(const uint16_t dpID, uint32_t &value)
         {
-            return intorobotReadDataPointUint32(dpID, value);
+            return intorobotReadDatapointUint32(dpID, value);
         }
 
-        static read_datapoint_result_t readDataPoint(const uint16_t dpID, float &value)
+        static read_datapoint_result_t readDatapoint(const uint16_t dpID, float &value)
         {
-            return intorobotReadDataPointFloat(dpID, value);
+            return intorobotReadDatapointFloat(dpID, value);
         }
 
-        static read_datapoint_result_t readDataPoint(const uint16_t dpID, double &value)
+        static read_datapoint_result_t readDatapoint(const uint16_t dpID, double &value)
         {
-            return intorobotReadDataPointDouble(dpID, value);
+            return intorobotReadDatapointDouble(dpID, value);
         }
 
-        static read_datapoint_result_t readDataPoint(const uint16_t dpID, String &value)
+        static read_datapoint_result_t readDatapoint(const uint16_t dpID, String &value)
         {
-            return intorobotReadDataPointString(dpID, value);
+            return intorobotReadDatapointString(dpID, value);
         }
 
-        static read_datapoint_result_t readDataPoint(const uint16_t dpID, char *value)
+        static read_datapoint_result_t readDatapoint(const uint16_t dpID, char *value)
         {
-            return intorobotReadDataPointStringChar(dpID, value);
+            return intorobotReadDatapointStringChar(dpID, value);
         }
 
-        static read_datapoint_result_t readDataPoint(const uint16_t dpID, uint8_t *value, uint16_t &len)
+        static read_datapoint_result_t readDatapoint(const uint16_t dpID, uint8_t *value, uint16_t &len)
         {
-            return intorobotReadDataPointBinary(dpID, value, len);
+            return intorobotReadDatapointBinary(dpID, value, len);
         }
 
         // 写数据点
-        static void writeDataPoint(const uint16_t dpID, bool value)
+        static void writeDatapoint(const uint16_t dpID, bool value)
         {
-            writeDataPoint(dpID, String(value).c_str());
+            writeDatapoint(dpID, String(value).c_str());
         }
 
 #ifdef INTOROBOT_ARCH_ARM
-        static void writeDataPoint(const uint16_t dpID, int value)
+        static void writeDatapoint(const uint16_t dpID, int value)
         {
-            writeDataPoint(dpID, String(value).c_str());
+            writeDatapoint(dpID, String(value).c_str());
         }
 #endif
-        static void writeDataPoint(const uint16_t dpID, int32_t value)
+        static void writeDatapoint(const uint16_t dpID, int32_t value)
         {
-            writeDataPoint(dpID, String(value).c_str());
+            writeDatapoint(dpID, String(value).c_str());
         }
 
-        static void writeDataPoint(const uint16_t dpID, uint32_t value)
+        static void writeDatapoint(const uint16_t dpID, uint32_t value)
         {
-            writeDataPoint(dpID, String(value).c_str());
+            writeDatapoint(dpID, String(value).c_str());
         }
 
-        static void writeDataPoint(const uint16_t dpID, float value)
+        static void writeDatapoint(const uint16_t dpID, float value)
         {
-            writeDataPoint(dpID, String(value).c_str());
+            writeDatapoint(dpID, String(value).c_str());
         }
 
-        static void writeDataPoint(const uint16_t dpID, double value)
+        static void writeDatapoint(const uint16_t dpID, double value)
         {
-            writeDataPoint(dpID, String(value).c_str());
+            writeDatapoint(dpID, String(value).c_str());
         }
 
-        static void writeDataPoint(const uint16_t dpID, String value)
+        static void writeDatapoint(const uint16_t dpID, String value)
         {
-            writeDataPoint(dpID, value.c_str());
+            writeDatapoint(dpID, value.c_str());
         }
 
-        static void writeDataPoint(const uint16_t dpID, const char *value)
+        static void writeDatapoint(const uint16_t dpID, const char *value)
         {
-            intorobotWriteDataPoint(dpID, value);
+            intorobotWriteDatapoint(dpID, value);
         }
 
-        static void writeDataPoint(const uint16_t dpID, uint8_t *value, uint16_t len)
+        static void writeDatapoint(const uint16_t dpID, uint8_t *value, uint16_t len)
         {
             //todo
         }
 
         // 发送数据点
-        static void sendDataPoint(const uint16_t dpID, bool value)
+        static void sendDatapoint(const uint16_t dpID, bool value)
         {
-            sendDataPoint(dpID, String(value).c_str());
+            sendDatapoint(dpID, String(value).c_str());
         }
 
 #ifdef INTOROBOT_ARCH_ARM
-        static void sendDataPoint(const uint16_t dpID, int value)
+        static void sendDatapoint(const uint16_t dpID, int value)
         {
-            sendDataPoint(dpID, String(value).c_str());
+            sendDatapoint(dpID, String(value).c_str());
         }
 #endif
-        static void sendDataPoint(const uint16_t dpID, int32_t value)
+        static void sendDatapoint(const uint16_t dpID, int32_t value)
         {
-            sendDataPoint(dpID, String(value).c_str());
+            sendDatapoint(dpID, String(value).c_str());
         }
 
-        static void sendDataPoint(const uint16_t dpID, uint32_t value)
+        static void sendDatapoint(const uint16_t dpID, uint32_t value)
         {
-            sendDataPoint(dpID, String(value).c_str());
+            sendDatapoint(dpID, String(value).c_str());
         }
 
-        static void sendDataPoint(const uint16_t dpID, float value)
+        static void sendDatapoint(const uint16_t dpID, float value)
         {
-            sendDataPoint(dpID, String(value).c_str());
+            sendDatapoint(dpID, String(value).c_str());
         }
 
-        static void sendDataPoint(const uint16_t dpID, double value)
+        static void sendDatapoint(const uint16_t dpID, double value)
         {
-            sendDataPoint(dpID, String(value).c_str());
+            sendDatapoint(dpID, String(value).c_str());
         }
 
-        static void sendDataPoint(const uint16_t dpID, String value)
+        static void sendDatapoint(const uint16_t dpID, String value)
         {
-            sendDataPoint(dpID, value.c_str());
+            sendDatapoint(dpID, value.c_str());
         }
 
-        static void sendDataPoint(const uint16_t dpID, const char *value)
+        static void sendDatapoint(const uint16_t dpID, const char *value)
         {
-            intorobotSendDataPoint(dpID, value);
+            intorobotSendDatapoint(dpID, value);
         }
 
-        static void sendDataPoint(const uint16_t dpID, uint8_t *value, uint16_t len)
+        static void sendDatapoint(const uint16_t dpID, uint8_t *value, uint16_t len)
         {
             //todo
         }
 
-        static void sendDataPointAll(void)
+        static void sendDatapointAll(void)
         {
-            intorobotSendDataPointAll();
+            intorobotSendDatapointAll();
         }
 
         //数据点组处理  todo
-        static void cleanDataPointGroup(uint8_t group = 0)
+        static void cleanDatapointGroup(uint8_t group = 0)
         {
         }
 
-        static void addDataPointToGroup(const uint16_t dpID, uint8_t group = 0)
+        static void addDatapointToGroup(const uint16_t dpID, uint8_t group = 0)
         {
         }
 
-        static void sendDataPointGroup(uint8_t group = 0)
+        static void sendDatapointGroup(uint8_t group = 0)
         {
         }
 };
 
 #ifndef configNO_CLOUD
-class IntoRobotClass: public IntoRobotDatePointClass, Print{
+class IntoRobotClass: public IntoRobotDatepointClass, Print{
 
     public:
 
@@ -436,7 +436,7 @@ class IntoRobotClass: public IntoRobotDatePointClass, Print{
 #endif
 
 #ifndef configNO_LORAWAN
-class IntoRobotClass: public IntoRobotDatePointClass {
+class IntoRobotClass: public IntoRobotDatepointClass {
 
     public:
         static void process(void) {

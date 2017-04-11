@@ -9,7 +9,7 @@
  *    IBM Zurich Research Lab - initial API, implementation and documentation
  *******************************************************************************/
 
-#include "../lmic/oslmic.h"
+#include "oslmic.h"
 
 #if defined(USE_ORIGINAL_AES)
 

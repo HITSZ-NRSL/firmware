@@ -7,6 +7,8 @@
 
 ### ENHANCEMENTS(优化)
 - [[PR #51]](https://github.com/HITSZ-NRSL/firmware/pull/51) [all] 优化IntoRobot 数据点处理接口
+- [[PR #53]](https://github.com/HITSZ-NRSL/firmware/pull/53) [all] IntoRobot 数据点接口从DataPoint改成Datapoint
+
 
 
 ### BUG FIXES(漏洞修复)

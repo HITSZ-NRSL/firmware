@@ -38,7 +38,7 @@ typedef unsigned int       uint;
 typedef const char* str_t;
 
 #include <string.h>
-#include "hal/hal.h"
+#include "hal.h"
 #define EV(a,b,c) /**/
 #define DO_DEVDB(field1,field2) /**/
 #if !defined(CFG_noassert)

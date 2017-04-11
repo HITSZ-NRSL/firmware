@@ -784,8 +784,8 @@ void intorobot_cloud_init(void)
 #endif
 
     // 添加默认数据点
-    intorobotDefineDataPointBool(0xFF80, UP_DOWN, false, "", 0);//reboot
-    intorobotDefineDataPointBool(0xFF81, UP_DOWN, false, "", 0);//write all datapoint
+    intorobotDefineDatapointBool(0xFF80, UP_DOWN, false, "", 0);//reboot
+    intorobotDefineDatapointBool(0xFF81, UP_DOWN, false, "", 0);//write all datapoint
 }
 
 bool intorobot_publish(api_version_t version, const char* topic, uint8_t* payload, unsigned int plength, uint8_t qos, uint8_t retained)
@@ -1170,14 +1170,14 @@ int intorobot_cloud_handle(void)
     bool reboot_flag = false, all_datapoint_flag = false;
     if(true == g_mqtt_client.loop()) {
         //reboot
-        if(RESULT_DATAPOINT_NEW == intorobotReadDataPointBool(0xFF80, reboot_flag)) {
+        if(RESULT_DATAPOINT_NEW == intorobotReadDatapointBool(0xFF80, reboot_flag)) {
             intorobot_cloud_disconnect();
             delay(500);
             HAL_Core_System_Reset();
         }
         //write all datepoint
-        if(RESULT_DATAPOINT_NEW == intorobotReadDataPointBool(0xFF81, all_datapoint_flag)) {
-            intorobotSendDataPointAll();
+        if(RESULT_DATAPOINT_NEW == intorobotReadDatapointBool(0xFF81, all_datapoint_flag)) {
+            intorobotSendDatapointAll();
         }
         //发送IntoRobot.printf打印到平台
         mqtt_send_debug_info();

@@ -41,7 +41,7 @@
 //  - An #include and #if guard was added
 //  - S_Table is now stored in PROGMEM
 
-#include "../../lmic/oslmic.h"
+#include "oslmic.h"
 
 #if defined(USE_IDEETRON_AES)
 

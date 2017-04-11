@@ -55,7 +55,7 @@ int intorobotDiscoverProperty(const uint16_t dpID)
     return -1;
 }
 
-void intorobotDefineDataPointBool(const uint16_t dpID, const char *permission, const bool value, const char *policy, const int lapse)
+void intorobotDefineDatapointBool(const uint16_t dpID, const char *permission, const bool value, const char *policy, const int lapse)
 {
     if (-1 == intorobotDiscoverProperty(dpID)) {
         // Create property structure
@@ -66,7 +66,7 @@ void intorobotDefineDataPointBool(const uint16_t dpID, const char *permission, c
     }
 }
 
-void intorobotDefineDataPointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value, const char *policy, const int lapse)
+void intorobotDefineDatapointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value, const char *policy, const int lapse)
 {
     if (-1 == intorobotDiscoverProperty(dpID)) {
         property_conf* prop;
@@ -87,7 +87,7 @@ void intorobotDefineDataPointNumber(const uint16_t dpID, const char *permission,
     }
 }
 
-void intorobotDefineDataPointEnum(const uint16_t dpID, const char *permission, const int value, const char *policy, const int lapse)
+void intorobotDefineDatapointEnum(const uint16_t dpID, const char *permission, const int value, const char *policy, const int lapse)
 {
     if (-1 == intorobotDiscoverProperty(dpID)) {
         double defaultValue = value;
@@ -102,7 +102,7 @@ void intorobotDefineDataPointEnum(const uint16_t dpID, const char *permission, c
     }
 }
 
-void intorobotDefineDataPointString(const uint16_t dpID, const char *permission, const char *value, const char *policy, const int lapse)
+void intorobotDefineDatapointString(const uint16_t dpID, const char *permission, const char *value, const char *policy, const int lapse)
 {
     if (-1 == intorobotDiscoverProperty(dpID)) {
         // Create property structure
@@ -113,7 +113,7 @@ void intorobotDefineDataPointString(const uint16_t dpID, const char *permission,
     }
 }
 
-void intorobotDefineDataPointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len, const char *policy, const int lapse)
+void intorobotDefineDatapointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len, const char *policy, const int lapse)
 {
     if (-1 != intorobotDiscoverProperty(dpID)) {
         // Create property structure
@@ -125,7 +125,7 @@ void intorobotDefineDataPointBinary(const uint16_t dpID, const char *permission,
     }
 }
 
-read_datapoint_result_t intorobotReadDataPointBool(const uint16_t dpID, bool &value)
+read_datapoint_result_t intorobotReadDatapointBool(const uint16_t dpID, bool &value)
 {
     int index = intorobotDiscoverProperty(dpID);
     if (index == -1) {
@@ -138,7 +138,7 @@ read_datapoint_result_t intorobotReadDataPointBool(const uint16_t dpID, bool &va
     return readResult;
 }
 
-read_datapoint_result_t intorobotReadDataPointInt(const uint16_t dpID, int &value)
+read_datapoint_result_t intorobotReadDatapointInt(const uint16_t dpID, int &value)
 {
     int index = intorobotDiscoverProperty(dpID);
     if (index == -1) {
@@ -151,7 +151,7 @@ read_datapoint_result_t intorobotReadDataPointInt(const uint16_t dpID, int &valu
     return readResult;
 }
 
-read_datapoint_result_t intorobotReadDataPointInt32(const uint16_t dpID, int32_t &value)
+read_datapoint_result_t intorobotReadDatapointInt32(const uint16_t dpID, int32_t &value)
 {
     int index = intorobotDiscoverProperty(dpID);
     if (index == -1) {
@@ -164,7 +164,7 @@ read_datapoint_result_t intorobotReadDataPointInt32(const uint16_t dpID, int32_t
     return readResult;
 }
 
-read_datapoint_result_t intorobotReadDataPointUint32(const uint16_t dpID, uint32_t &value)
+read_datapoint_result_t intorobotReadDatapointUint32(const uint16_t dpID, uint32_t &value)
 {
     int index = intorobotDiscoverProperty(dpID);
     if (index == -1) {
@@ -177,7 +177,7 @@ read_datapoint_result_t intorobotReadDataPointUint32(const uint16_t dpID, uint32
     return readResult;
 }
 
-read_datapoint_result_t intorobotReadDataPointFloat(const uint16_t dpID, float &value)
+read_datapoint_result_t intorobotReadDatapointFloat(const uint16_t dpID, float &value)
 {
     int index = intorobotDiscoverProperty(dpID);
     if (index == -1) {
@@ -190,7 +190,7 @@ read_datapoint_result_t intorobotReadDataPointFloat(const uint16_t dpID, float &
     return readResult;
 }
 
-read_datapoint_result_t intorobotReadDataPointDouble(const uint16_t dpID, double &value)
+read_datapoint_result_t intorobotReadDatapointDouble(const uint16_t dpID, double &value)
 {
     int index = intorobotDiscoverProperty(dpID);
     if (index == -1) {
@@ -203,7 +203,7 @@ read_datapoint_result_t intorobotReadDataPointDouble(const uint16_t dpID, double
     return readResult;
 }
 
-read_datapoint_result_t intorobotReadDataPointString(const uint16_t dpID, String &value)
+read_datapoint_result_t intorobotReadDatapointString(const uint16_t dpID, String &value)
 {
     int index = intorobotDiscoverProperty(dpID);
     if (index == -1) {
@@ -216,7 +216,7 @@ read_datapoint_result_t intorobotReadDataPointString(const uint16_t dpID, String
     return readResult;
 }
 
-read_datapoint_result_t intorobotReadDataPointStringChar(const uint16_t dpID, char *value)
+read_datapoint_result_t intorobotReadDatapointStringChar(const uint16_t dpID, char *value)
 {
     int index = intorobotDiscoverProperty(dpID);
     if (index == -1) {
@@ -229,7 +229,7 @@ read_datapoint_result_t intorobotReadDataPointStringChar(const uint16_t dpID, ch
     return readResult;
 }
 
-read_datapoint_result_t intorobotReadDataPointBinary(const uint16_t dpID, uint8_t *value, uint16_t &len)
+read_datapoint_result_t intorobotReadDatapointBinary(const uint16_t dpID, uint8_t *value, uint16_t &len)
 {
     int index = intorobotDiscoverProperty(dpID);
     if (index == -1) {
@@ -243,7 +243,7 @@ read_datapoint_result_t intorobotReadDataPointBinary(const uint16_t dpID, uint8_
     return readResult;
 }
 
-void intorobotWriteDataPoint(const uint16_t dpID, const char* value)
+void intorobotWriteDatapoint(const uint16_t dpID, const char* value)
 {
     int i = intorobotDiscoverProperty(dpID);
 
@@ -411,7 +411,7 @@ static String intorobotFormAllPropertyJson(void)
     return PropertyJson;
 }
 
-void intorobotSendDataPoint(const uint16_t dpID, const char* value)
+void intorobotSendDatapoint(const uint16_t dpID, const char* value)
 {
     int i = intorobotDiscoverProperty(dpID);
 
@@ -420,7 +420,7 @@ void intorobotSendDataPoint(const uint16_t dpID, const char* value)
         return;
     }
 
-    intorobotWriteDataPoint(dpID, value);
+    intorobotWriteDatapoint(dpID, value);
 
     //只允许下发
     if ( 0 == strcmp(properties[i]->permission, DOWN_ONLY) ) {
@@ -448,7 +448,7 @@ void intorobotSendDataPoint(const uint16_t dpID, const char* value)
     }
 }
 
-void intorobotSendDataPointAll(void)
+void intorobotSendDatapointAll(void)
 {
     String payload = intorobotFormAllPropertyJson();
     intorobot_publish(API_VERSION_V2, INTOROBOT_MQTT_RX_TOPIC, (uint8_t *)payload.c_str(), payload.length(), 0, false);
@@ -565,7 +565,7 @@ static uint16_t intorobotFormAllPropertyBinary(char* buffer, uint16_t len)
 }
 
 //datepoint process
-void intorobotSendDataPoint(const uint16_t dpID, const char* value)
+void intorobotSendDatapoint(const uint16_t dpID, const char* value)
 {
     int i = intorobotDiscoverProperty(dpID);
 
@@ -574,7 +574,7 @@ void intorobotSendDataPoint(const uint16_t dpID, const char* value)
         return;
     }
 
-    intorobotWriteDataPoint(dpID, value);
+    intorobotWriteDatapoint(dpID, value);
 
     //只允许下发
     if ( 0 == strcmp(properties[i]->permission, DOWN_ONLY) ) {
@@ -605,7 +605,7 @@ void intorobotSendDataPoint(const uint16_t dpID, const char* value)
     }
 }
 
-void intorobotSendDataPointAll(void)
+void intorobotSendDatapointAll(void)
 {
     uint8_t buffer[256];
     uint16_t len;

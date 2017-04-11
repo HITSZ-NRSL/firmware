@@ -88,27 +88,27 @@ struct property_conf {
 extern "C" {
 #endif
 
-void intorobotDefineDataPointBool(const uint16_t dpID, const char *permission, const bool value, const char *policy, const int lapse);
-void intorobotDefineDataPointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value, const char *policy, const int lapse);
-void intorobotDefineDataPointEnum(const uint16_t dpID, const char *permission, const int value, const char *policy, const int lapse);
-void intorobotDefineDataPointString(const uint16_t dpID, const char *permission, const char *value, const char *policy, const int lapse);
-void intorobotDefineDataPointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len, const char *policy, const int lapse);
+void intorobotDefineDatapointBool(const uint16_t dpID, const char *permission, const bool value, const char *policy, const int lapse);
+void intorobotDefineDatapointNumber(const uint16_t dpID, const char *permission, const double minValue, const double maxValue, const int resolution, const double value, const char *policy, const int lapse);
+void intorobotDefineDatapointEnum(const uint16_t dpID, const char *permission, const int value, const char *policy, const int lapse);
+void intorobotDefineDatapointString(const uint16_t dpID, const char *permission, const char *value, const char *policy, const int lapse);
+void intorobotDefineDatapointBinary(const uint16_t dpID, const char *permission, const uint8_t *value, const uint16_t len, const char *policy, const int lapse);
 
-read_datapoint_result_t intorobotReadDataPointBool(const uint16_t dpID, bool &value);
-read_datapoint_result_t intorobotReadDataPointInt(const uint16_t dpID, int &value);
-read_datapoint_result_t intorobotReadDataPointInt32(const uint16_t dpID, int32_t &value);
-read_datapoint_result_t intorobotReadDataPointUint32(const uint16_t dpID, uint32_t &value);
-read_datapoint_result_t intorobotReadDataPointDouble(const uint16_t dpID, double &value);
-read_datapoint_result_t intorobotReadDataPointFloat(const uint16_t dpID, float &value);
-read_datapoint_result_t intorobotReadDataPointString(const uint16_t dpID, String &value);
-read_datapoint_result_t intorobotReadDataPointStringChar(const uint16_t dpID, char *value);
-read_datapoint_result_t intorobotReadDataPointBinary(const uint16_t dpID, uint8_t *value, uint16_t &len);
+read_datapoint_result_t intorobotReadDatapointBool(const uint16_t dpID, bool &value);
+read_datapoint_result_t intorobotReadDatapointInt(const uint16_t dpID, int &value);
+read_datapoint_result_t intorobotReadDatapointInt32(const uint16_t dpID, int32_t &value);
+read_datapoint_result_t intorobotReadDatapointUint32(const uint16_t dpID, uint32_t &value);
+read_datapoint_result_t intorobotReadDatapointDouble(const uint16_t dpID, double &value);
+read_datapoint_result_t intorobotReadDatapointFloat(const uint16_t dpID, float &value);
+read_datapoint_result_t intorobotReadDatapointString(const uint16_t dpID, String &value);
+read_datapoint_result_t intorobotReadDatapointStringChar(const uint16_t dpID, char *value);
+read_datapoint_result_t intorobotReadDatapointBinary(const uint16_t dpID, uint8_t *value, uint16_t &len);
 
 void intorobotParseReceiveDataJson(uint8_t *payload, uint32_t len);
 void intorobotParseReceiveDataBinary(uint8_t *payload, uint32_t len);
-void intorobotWriteDataPoint(const uint16_t dpID, const char *value);
-void intorobotSendDataPoint(const uint16_t dpID, const char *value);
-void intorobotSendDataPointAll(void);
+void intorobotWriteDatapoint(const uint16_t dpID, const char *value);
+void intorobotSendDatapoint(const uint16_t dpID, const char *value);
+void intorobotSendDatapointAll(void);
 
 #ifdef __cplusplus
 }

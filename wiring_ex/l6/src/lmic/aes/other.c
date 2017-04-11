@@ -27,7 +27,7 @@
  *  16-byte key.
  */
 
-#include "../lmic/oslmic.h"
+#include "oslmic.h"
 
 #if !defined(USE_ORIGINAL_AES)
 

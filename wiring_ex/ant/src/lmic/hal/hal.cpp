@@ -12,7 +12,7 @@
 #include "wiring_spi.h"
 #include "wiring_interrupts.h"
 #include "wiring_system.h"
-#include "lmic/lmic.h"
+#include "lmic.h"
 #include "hal.h"
 
 SPIClass SPI1(HAL_SPI_INTERFACE2);

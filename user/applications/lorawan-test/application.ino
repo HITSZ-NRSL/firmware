@@ -30,29 +30,29 @@ void setup()
 {
     Serial.begin(115200);
     pinMode(LEDPIN, OUTPUT);
-    IntoRobot.defineDataPointEnum(DPID_ENUM_LIGHT_MODE, UP_DOWN, 0);                     //颜色模式
-    IntoRobot.defineDataPointNumber(DPID_NUMBER_TEMPERATURE, UP_ONLY, -100, 100, 2, 0);     //温度
-    IntoRobot.defineDataPointBool(DPID_BOOL_SWITCH, UP_DOWN, false);                     //灯泡开关
-    IntoRobot.defineDataPointBool(DPID_BOOL_LIGHT_STATUS, UP_ONLY, false);               //灯泡亮灭状态
-    IntoRobot.defineDataPointNumber(DPID_NUMBER_RHEOSTAT, UP_DOWN, 0, 100, 0, 0);        //速度
-    IntoRobot.defineDataPointString(DPID_STRING_LCD_DISPLAY, UP_DOWN, "oh yeah!");       //字符显示
+    IntoRobot.defineDatapointEnum(DPID_ENUM_LIGHT_MODE, UP_DOWN, 0);                     //颜色模式
+    IntoRobot.defineDatapointNumber(DPID_NUMBER_TEMPERATURE, UP_ONLY, -100, 100, 2, 0);     //温度
+    IntoRobot.defineDatapointBool(DPID_BOOL_SWITCH, UP_DOWN, false);                     //灯泡开关
+    IntoRobot.defineDatapointBool(DPID_BOOL_LIGHT_STATUS, UP_ONLY, false);               //灯泡亮灭状态
+    IntoRobot.defineDatapointNumber(DPID_NUMBER_RHEOSTAT, UP_DOWN, 0, 100, 0, 0);        //速度
+    IntoRobot.defineDatapointString(DPID_STRING_LCD_DISPLAY, UP_DOWN, "oh yeah!");       //字符显示
 }
 
 void loop()
 {
     /*
-    IntoRobot.writeDataPoint(DPID_ENUM_LIGHT_MODE, 1);
-    IntoRobot.writeDataPoint(DPID_NUMBER_TEMPERATURE, 11.11);
-    IntoRobot.writeDataPoint(DPID_BOOL_SWITCH, true);
-    IntoRobot.writeDataPoint(DPID_BOOL_LIGHT_STATUS, true);
-    IntoRobot.writeDataPoint(DPID_NUMBER_RHEOSTAT, 343);
-    IntoRobot.writeDataPoint(DPID_STRING_LCD_DISPLAY, "adfb");
-    IntoRobot.sendDataPointAll();
+    IntoRobot.writeDatapoint(DPID_ENUM_LIGHT_MODE, 1);
+    IntoRobot.writeDatapoint(DPID_NUMBER_TEMPERATURE, 11.11);
+    IntoRobot.writeDatapoint(DPID_BOOL_SWITCH, true);
+    IntoRobot.writeDatapoint(DPID_BOOL_LIGHT_STATUS, true);
+    IntoRobot.writeDatapoint(DPID_NUMBER_RHEOSTAT, 343);
+    IntoRobot.writeDatapoint(DPID_STRING_LCD_DISPLAY, "adfb");
+    IntoRobot.sendDatapointAll();
     delay(10000);
     */
 
         // 颜色模式
-    if (RESULT_DATAPOINT_NEW == IntoRobot.readDataPoint(DPID_ENUM_LIGHT_MODE, LightMode))
+    if (RESULT_DATAPOINT_NEW == IntoRobot.readDatapoint(DPID_ENUM_LIGHT_MODE, LightMode))
     {
         Serial.printf("Read Light Mode: ");
         switch(LightMode)
@@ -71,10 +71,10 @@ void loop()
                 break;
         }
         Serial.printf("\r\n");
-        IntoRobot.sendDataPoint(DPID_ENUM_LIGHT_MODE, LightMode);
+        IntoRobot.sendDatapoint(DPID_ENUM_LIGHT_MODE, LightMode);
     }
     //灯泡控制
-    if (RESULT_DATAPOINT_NEW == IntoRobot.readDataPoint(DPID_BOOL_SWITCH, LightSwitch))
+    if (RESULT_DATAPOINT_NEW == IntoRobot.readDatapoint(DPID_BOOL_SWITCH, LightSwitch))
     {
         if(true == LightSwitch)
         {
@@ -83,7 +83,7 @@ void loop()
 #else
             digitalWrite(LEDPIN, LOW);     // 打开灯泡
 #endif
-            IntoRobot.sendDataPoint(DPID_BOOL_LIGHT_STATUS, true);
+            IntoRobot.sendDatapoint(DPID_BOOL_LIGHT_STATUS, true);
         }
         else
         {
@@ -92,23 +92,23 @@ void loop()
 #else
             digitalWrite(LEDPIN, HIGH);    // 关闭灯泡
 #endif
-            IntoRobot.sendDataPoint(DPID_BOOL_LIGHT_STATUS, false);
+            IntoRobot.sendDatapoint(DPID_BOOL_LIGHT_STATUS, false);
         }
-        IntoRobot.sendDataPoint(DPID_BOOL_SWITCH, LightSwitch);
+        IntoRobot.sendDatapoint(DPID_BOOL_SWITCH, LightSwitch);
     }
 
     //速度控制
-    if (RESULT_DATAPOINT_NEW == IntoRobot.readDataPoint(DPID_NUMBER_RHEOSTAT, Rheostat_tmp))
+    if (RESULT_DATAPOINT_NEW == IntoRobot.readDatapoint(DPID_NUMBER_RHEOSTAT, Rheostat_tmp))
     {
         Rheostat = Rheostat_tmp;
         Serial.printf("Speed: %d\r\n", Rheostat);
     }
 
     //字符串显示
-    if (RESULT_DATAPOINT_NEW == IntoRobot.readDataPoint(DPID_STRING_LCD_DISPLAY, LcdDisplay))
+    if (RESULT_DATAPOINT_NEW == IntoRobot.readDatapoint(DPID_STRING_LCD_DISPLAY, LcdDisplay))
     {
         Serial.printf("Lcd Display: %s\r\n", LcdDisplay.c_str());
-        IntoRobot.sendDataPoint(DPID_STRING_LCD_DISPLAY, LcdDisplay);
+        IntoRobot.sendDatapoint(DPID_STRING_LCD_DISPLAY, LcdDisplay);
     }
 
     //温度上送
@@ -116,16 +116,16 @@ void loop()
     {Temperature = 0;}
     else
     {Temperature += 0.1;}
-    IntoRobot.writeDataPoint(DPID_NUMBER_TEMPERATURE, Temperature);
+    IntoRobot.writeDatapoint(DPID_NUMBER_TEMPERATURE, Temperature);
 
     //速度上送
     if(Rheostat > 100)
     {Rheostat = 0;}
     else
     {Rheostat += 5;}
-    IntoRobot.writeDataPoint(DPID_NUMBER_RHEOSTAT, Rheostat);
+    IntoRobot.writeDatapoint(DPID_NUMBER_RHEOSTAT, Rheostat);
 
-    IntoRobot.sendDataPointAll();
+    IntoRobot.sendDatapointAll();
 
     delay(10000);
 
