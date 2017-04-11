@@ -5,10 +5,12 @@
 #include "wiring_ex_lorawan.h"
 #include "wiring.h"
 
-// #define TEST_SX1278
+bool SX1278Test(int8_t &snrVal, int8_t &rssiVal,int8_t &txRssiVal)
+{
+    return false;
+}
 
-#ifdef TEST_SX1278
-=======
+
 #if 0
 #define DEFAULT_TIMEOUT     5     // second
 #define DEFAULT_TIMEWAIT    100   // millisecond

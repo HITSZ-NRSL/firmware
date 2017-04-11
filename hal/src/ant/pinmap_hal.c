@@ -64,21 +64,12 @@ STM32_Pin_Info __PIN_MAP[TOTAL_PINS] =
 /* D2            - 02 */ { GPIOB, GPIO_PIN_13, GPIO_PinSource13, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 /* D3            - 03 */ { GPIOB, GPIO_PIN_14, GPIO_PinSource14, NONE, NONE, TIM9, TIM_CHANNEL_2, PIN_MODE_NONE, 0, 0 },
 /* D4            - 04 */ { GPIOB, GPIO_PIN_15, GPIO_PinSource15, NONE, NONE, TIM11, TIM_CHANNEL_1, PIN_MODE_NONE, 0, 0 },
-<<<<<<< HEAD
-/* D5            - 05 */ { GPIOA, GPIO_PIN_13, GPIO_PinSource13, NONE, NONE, TIM10, TIM_CHANNEL_1, PIN_MODE_NONE, 0, 0 },
-/* D6            - 06 */ { GPIOA, GPIO_PIN_14, GPIO_PinSource14, NONE, NONE, TIM10, TIM_CHANNEL_1, PIN_MODE_NONE, 0, 0 },
-
-/* NOT USED      - 07 */ { NULL, NONE, NONE, NONE, NONE, NULL, NONE, NONE, NONE, NONE },
-/* NOT USED      - 08 */ { NULL, NONE, NONE, NONE, NONE, NULL, NONE, NONE, NONE, NONE },
-/* NOT USED      - 09 */ { NULL, NONE, NONE, NONE, NONE, NULL, NONE, NONE, NONE, NONE },
-=======
 /* D5            - 05 */ { GPIOA, GPIO_PIN_13, GPIO_PinSource13, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 /* D6            - 06 */ { GPIOA, GPIO_PIN_14, GPIO_PinSource14, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 /* D7            - 07 */ { GPIOA, GPIO_PIN_14, GPIO_PinSource14, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 /* TXD           - 08 */ { GPIOA, GPIO_PIN_9, GPIO_PinSource9, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 /* RXD           - 09 */ { GPIOA, GPIO_PIN_10, GPIO_PinSource10, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 
->>>>>>> develop
 /* NOT USED      - 10 */ { NULL, NONE, NONE, NONE, NONE, NULL, NONE, NONE, NONE, NONE },
 /* NOT USED      - 11 */ { NULL, NONE, NONE, NONE, NONE, NULL, NONE, NONE, NONE, NONE },
 /* NOT USED      - 12 */ { NULL, NONE, NONE, NONE, NONE, NULL, NONE, NONE, NONE, NONE },
@@ -106,24 +97,6 @@ STM32_Pin_Info __PIN_MAP[TOTAL_PINS] =
 /* A3            - 33 */ { GPIOA, GPIO_PIN_6, GPIO_PinSource6, ADC_CHANNEL_6, NONE, TIM3, TIM_CHANNEL_1, PIN_MODE_NONE, 0, 0 },
 /* A4            - 34 */ { GPIOA, GPIO_PIN_5, GPIO_PinSource5, ADC_CHANNEL_5, DAC_CHANNEL_2, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 /* A5            - 35 */ { GPIOA, GPIO_PIN_4, GPIO_PinSource4, ADC_CHANNEL_4, DAC_CHANNEL_1, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-<<<<<<< HEAD
-/* PA9           - 36 */ { GPIOA, GPIO_PIN_9, GPIO_PinSource9, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-/* PA10          - 37 */ { GPIOA, GPIO_PIN_10, GPIO_PinSource10, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-
-//lora pins
-/* RESET         - 38 */ { GPIOB, GPIO_PIN_9, GPIO_PinSource9,   NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-/* NSS           - 39 */ { GPIOA, GPIO_PIN_15, GPIO_PinSource15, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-/* DIO0          - 40 */ { GPIOC, GPIO_PIN_13, GPIO_PinSource13, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-/* DIO1          - 41 */ { GPIOB, GPIO_PIN_0, GPIO_PinSource0, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-/* DIO2          - 42 */ { GPIOB, GPIO_PIN_1, GPIO_PinSource1, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-/* DIO3          - 43 */ { GPIOB, GPIO_PIN_6, GPIO_PinSource6, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-/* DIO4          - 44 */ { GPIOB, GPIO_PIN_7, GPIO_PinSource7, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-/* DIO5          - 45 */ { GPIOB, GPIO_PIN_8, GPIO_PinSource8, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-/* RX_EN         - 46 */ { GPIOA, GPIO_PIN_8, GPIO_PinSource8, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
-
-
-=======
-
 //SX1278 pins
 /* SX1278_RESET  - 36 */ { GPIOB, GPIO_PIN_9, GPIO_PinSource9,   NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 /* SX1278_NSS    - 37 */ { GPIOA, GPIO_PIN_15, GPIO_PinSource15, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
@@ -134,7 +107,6 @@ STM32_Pin_Info __PIN_MAP[TOTAL_PINS] =
 /* SX1278_DIO4   - 42 */ { GPIOB, GPIO_PIN_7, GPIO_PinSource7, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 /* SX1278_DIO5   - 43 */ { GPIOB, GPIO_PIN_8, GPIO_PinSource8, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
 /* SX1278_RXTX   - 44 */ { GPIOA, GPIO_PIN_8, GPIO_PinSource8, NONE, NONE, NULL, NONE, PIN_MODE_NONE, 0, 0 },
->>>>>>> develop
 };
 
 STM32_Pin_Info* HAL_Pin_Map() {

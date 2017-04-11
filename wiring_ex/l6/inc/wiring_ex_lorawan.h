@@ -1,19 +1,10 @@
 #ifndef  WIRING_EX_LORAWAN_H_
 #define  WIRING_EX_LORAWAN_H_
 
-<<<<<<< HEAD
-
-#include "../src/lorawan/radio/inc/radio.h"
-#include "../src/lorawan/board/inc/sx1278-board.h"
-
-#include "../src/lorawan/radio/inc/sx1278.h"
-#include "../src/lorawan/board/inc/timer.h"
-#include "../src/lorawan/mac/inc/LoRaMac.h"
-
-#include "../src/lorawan/board/inc/utilities.h"
-
 #include "lmic.h"
 #include "hal/hal.h"
+
+bool SX1278Test(int8_t &snrVal, int8_t &rssiVal,int8_t &txRssiVal);
 
 #endif /* WIRING_LORAWAN_H_ */
 
