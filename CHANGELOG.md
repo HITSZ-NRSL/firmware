@@ -2,6 +2,7 @@
 
 ### FEATURES(功能)
 - [[PR #51]](https://github.com/HITSZ-NRSL/firmware/pull/51) [ant] 添加ant的支持
+- [[PR #52]](https://github.com/HITSZ-NRSL/firmware/pull/52) [ant] fig支持pwm功能
 
 
 ### ENHANCEMENTS(优化)

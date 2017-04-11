@@ -86,6 +86,29 @@
 /* #define ADC_Channel_0  ((uint8_t)0x00) */
 /* #define TIM1           ((uint8_t)0x00) */
 
+#define ESP32_TIMER_0  0
+#define ESP32_TIMER_1  1
+#define ESP32_TIMER_2  2
+#define ESP32_TIMER_3  3
+
+#define TIMER_PWM_CHANNEL_0 0
+#define TIMER_PWM_CHANNEL_1 1
+#define TIMER_PWM_CHANNEL_2 2
+#define TIMER_PWM_CHANNEL_3 3
+#define TIMER_PWM_CHANNEL_4 4
+#define TIMER_PWM_CHANNEL_5 5
+#define TIMER_PWM_CHANNEL_6 6
+#define TIMER_PWM_CHANNEL_7 7
+#define TIMER_PWM_CHANNEL_8 8
+#define TIMER_PWM_CHANNEL_9 9
+#define TIMER_PWM_CHANNEL_10 10
+#define TIMER_PWM_CHANNEL_11 11
+#define TIMER_PWM_CHANNEL_12 12
+#define TIMER_PWM_CHANNEL_13 13
+#define TIMER_PWM_CHANNEL_14 14
+#define TIMER_PWM_CHANNEL_15 15
+
+
 /* Private typedef -----------------------------------------------------------*/
 ESP32_Pin_Info __PIN_MAP[TOTAL_PINS] =
 {
@@ -98,16 +121,16 @@ ESP32_Pin_Info __PIN_MAP[TOTAL_PINS] =
  * timer_ch (1-3, or NONE)
  * pin_mode (NONE by default, can be set to OUTPUT, INPUT, or other types)
  */
-/*             - 00 */ { GPIO_1, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 01 */ { GPIO_3, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 02 */ { GPIO_5, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 03 */ { GPIO_16, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 04 */ { GPIO_17, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 05 */ { GPIO_18, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 06 */ { GPIO_19, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 07 */ { GPIO_21, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 08 */ { GPIO_22, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 09 */ { GPIO_23, NONE, NONE, NONE, PIN_MODE_NONE },
+/*             - 00 */ { GPIO_1, NONE, NONE, NONE, NONE,NONE,PIN_MODE_NONE },
+/*             - 01 */ { GPIO_3, NONE, NONE, NONE, NONE,NONE,PIN_MODE_NONE },
+/*             - 02 */ { GPIO_5, NONE, NONE, NONE, ESP32_TIMER_0,TIMER_PWM_CHANNEL_0,PIN_MODE_NONE },
+/*             - 03 */ { GPIO_16, NONE, NONE, NONE, ESP32_TIMER_0,TIMER_PWM_CHANNEL_1,PIN_MODE_NONE },
+/*             - 04 */ { GPIO_17, NONE, NONE, NONE, ESP32_TIMER_1,TIMER_PWM_CHANNEL_2,PIN_MODE_NONE },
+/*             - 05 */ { GPIO_18, NONE, NONE, NONE, ESP32_TIMER_1,TIMER_PWM_CHANNEL_3,PIN_MODE_NONE },
+/*             - 06 */ { GPIO_19, NONE, NONE, NONE, ESP32_TIMER_2,TIMER_PWM_CHANNEL_4,PIN_MODE_NONE },
+/*             - 07 */ { GPIO_21, NONE, NONE, NONE, ESP32_TIMER_2,TIMER_PWM_CHANNEL_5,PIN_MODE_NONE },
+/*             - 08 */ { GPIO_22, NONE, NONE, NONE, ESP32_TIMER_3,TIMER_PWM_CHANNEL_6,PIN_MODE_NONE },
+/*             - 09 */ { GPIO_23, NONE, NONE, NONE, ESP32_TIMER_3,TIMER_PWM_CHANNEL_7,PIN_MODE_NONE },
 /* NOT USED    - 10 */ { NONE, NONE, NONE, NONE, PIN_MODE_NONE },
 /* NOT USED    - 11 */ { NONE, NONE, NONE, NONE, PIN_MODE_NONE },
 /* NOT USED    - 12 */ { NONE, NONE, NONE, NONE, PIN_MODE_NONE },
@@ -128,16 +151,16 @@ ESP32_Pin_Info __PIN_MAP[TOTAL_PINS] =
 /* NOT USED    - 27 */ { NONE, NONE, NONE, NONE, PIN_MODE_NONE },
 /* NOT USED    - 28 */ { NONE, NONE, NONE, NONE, PIN_MODE_NONE },
 /* NOT USED    - 29 */ { NONE, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 30 */ { GPIO_0,  NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 31 */ { GPIO_2,  NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 32 */ { GPIO_4,  NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 33 */ { GPIO_12, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 34 */ { GPIO_13, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 35 */ { GPIO_14, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 36 */ { GPIO_15, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 37 */ { GPIO_25, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 38 */ { GPIO_26, NONE, NONE, NONE, PIN_MODE_NONE },
-/*             - 39 */ { GPIO_27, NONE, NONE, NONE, PIN_MODE_NONE },
+/*             - 30 */ { GPIO_0,  NONE, NONE, NONE, NONE,NONE,PIN_MODE_NONE },
+/*             - 31 */ { GPIO_2,  NONE, NONE, NONE, NONE,NONE,PIN_MODE_NONE },
+/*             - 32 */ { GPIO_4,  NONE, NONE, NONE, ESP32_TIMER_0,TIMER_PWM_CHANNEL_8,PIN_MODE_NONE },
+/*             - 33 */ { GPIO_12, NONE, NONE, NONE, ESP32_TIMER_0,TIMER_PWM_CHANNEL_9,PIN_MODE_NONE },
+/*             - 34 */ { GPIO_13, NONE, NONE, NONE, ESP32_TIMER_1,TIMER_PWM_CHANNEL_10,PIN_MODE_NONE },
+/*             - 35 */ { GPIO_14, NONE, NONE, NONE, ESP32_TIMER_1,TIMER_PWM_CHANNEL_11,PIN_MODE_NONE },
+/*             - 36 */ { GPIO_15, NONE, NONE, NONE, ESP32_TIMER_2,TIMER_PWM_CHANNEL_12,PIN_MODE_NONE },
+/*             - 37 */ { GPIO_25, NONE, NONE, NONE, ESP32_TIMER_2,TIMER_PWM_CHANNEL_13,PIN_MODE_NONE },
+/*             - 38 */ { GPIO_26, NONE, NONE, NONE, ESP32_TIMER_3,TIMER_PWM_CHANNEL_14,PIN_MODE_NONE },
+/*             - 39 */ { GPIO_27, NONE, NONE, NONE, ESP32_TIMER_3,TIMER_PWM_CHANNEL_15,PIN_MODE_NONE },
 /*             - 40 */ { GPIO_34, NONE, NONE, NONE, PIN_MODE_NONE },
 /*             - 41 */ { GPIO_35, NONE, NONE, NONE, PIN_MODE_NONE },
 /*             - 42 */ { GPIO_36, NONE, NONE, NONE, PIN_MODE_NONE },

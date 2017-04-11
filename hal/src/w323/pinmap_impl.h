@@ -33,6 +33,7 @@ typedef struct EESP32_Pin_Info {
     uint8_t adc_channel;
     uint8_t dac_channel;
     uint8_t timer_peripheral;
+    uint8_t timer_ch;
     PinMode pin_mode;
 } ESP32_Pin_Info;
 

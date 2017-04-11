@@ -47,7 +47,7 @@ PinFunction HAL_Validate_Pin_Function(pin_t pin, PinFunction pinFunction)
         return PF_ADC;
     if (pinFunction==PF_DAC && PIN_MAP[pin].dac_channel!=DAC_CHANNEL_NONE)
         return PF_DAC;
-    if (pinFunction==PF_TIMER && PIN_MAP[pin].timer_peripheral!=NULL)
+    if (pinFunction==PF_TIMER && PIN_MAP[pin].timer_peripheral != 0xFF)
         return PF_TIMER;
     return PF_DIO;
 }

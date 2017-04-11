@@ -25,9 +25,25 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "tone_hal.h"
+#include "esp32-hal-ledc.h"
+#include "esp32-hal-gpio.h"
+#include "pinmap_impl.h"
 
 void HAL_Tone_Start(uint8_t pin, uint32_t frequency, uint32_t duration)
 {
+    EESP32_Pin_Info* PIN_MAP = HAL_Pin_Map();
+    pin_t gpio_pin = PIN_MAP[pin].gpio_pin;
+    uint8_t channel = PIN_MAP[pin].timer_ch;
+
+    if(channel > 15 || gpio_pin > 27)
+    {
+        return;
+    }
+    else
+    {
+        ledcAttachPin(gpio_pin, channel);
+        ledcWriteTone(channel, frequency);
+    }
 }
 
 void HAL_Tone_Stop(uint8_t pin)
