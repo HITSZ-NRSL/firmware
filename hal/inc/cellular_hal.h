@@ -56,6 +56,8 @@ cellular_result_t cellular_status(void* reserved);
  */
 cellular_result_t  cellular_off(void* reserved);
 
+void cellular_drive_now(void);
+
 #ifdef __cplusplus
 // Todo - is storing raw string pointers correct here? These will only be valid
 // If they are stored as constants in the application.

@@ -1,9 +1,3 @@
-#if 0
-// pull in the sources from the HAL. It's a bit of a hack, but is simpler than trying to link the
-// full hal library.
-#include "../src/neutron/params_hal.cpp"
-
-#else
 
 #include <string.h>
 #include <stdio.h>
@@ -99,8 +93,6 @@ void read_system_params(system_params_t *psystem_params) {
         return;
     }
     flashStore.read(SYSTEM_PARAMS_START_ADDR, psystem_params, len);
-    for (int num = 0; num<len; num++) {
-    }
 }
 
 /*
@@ -220,4 +212,47 @@ int HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_TypeDef flag) {
     return 0;
 }
 
-#endif
+/*
+ * 读取ota文件大小
+ * */
+uint32_t HAL_PARAMS_Get_Boot_ota_app_size(void) {
+    return intorobot_boot_params.ota_app_size;
+}
+
+/*
+ * 保存ota文件大小
+ * */
+int HAL_PARAMS_Set_Boot_ota_app_size(uint32_t size) {
+    intorobot_boot_params.ota_app_size = size;
+    return 0;
+}
+
+/*
+ * 读取默认应用文件大小
+ * */
+uint32_t HAL_PARAMS_Get_Boot_def_app_size(void) {
+    return intorobot_boot_params.def_app_size;
+}
+
+/*
+ * 保存默认应用文件大小
+ * */
+int HAL_PARAMS_Set_Boot_def_app_size(uint32_t size) {
+    intorobot_boot_params.def_app_size = size;
+    return 0;
+}
+
+/*
+ * 读取升级boot文件大小
+ * */
+uint32_t HAL_PARAMS_Get_Boot_boot_size(void) {
+    return intorobot_boot_params.boot_size;
+}
+
+/*
+ * 保存升级boot文件大小
+ * */
+int HAL_PARAMS_Set_Boot_boot_size(uint32_t size) {
+    intorobot_boot_params.boot_size = size;
+    return 0;
+}

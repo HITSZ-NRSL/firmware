@@ -18,7 +18,7 @@
  */
 
 #ifndef SYSTEM_NETWORK_CELLULAR_H
-#define	SYSTEM_NETWORK_CELLULAR_H
+#define SYSTEM_NETWORK_CELLULAR_H
 
 
 #include "intorobot_config.h"
@@ -29,15 +29,17 @@
 #include "interrupts_hal.h"
 #include "wiring_interrupts.h"
 
+void network_notify_connected();
+void network_notify_disconnected();
+void network_notify_can_shutdown();
+void network_notify_dhcp(bool dhcp);
+
 class CellularNetworkInterface : public ManagedIPNetworkInterface<CellularConfig, CellularNetworkInterface>
 {
     volatile bool connect_cancelled = false;
     volatile bool connecting = false;
 
 protected:
-#if 0
-    virtual void on_setup_cleanup() override { /* n/a */ }
-
     virtual void connect_init() override { /* n/a */ }
 
     void connect_finalize_impl() {
@@ -53,7 +55,7 @@ protected:
         result = cellular_pdp_activate(savedCreds, NULL);
         if (result) { return; }
 
-        //DEBUG_D("savedCreds = %s %s %s\r\n", savedCreds->apn, savedCreds->username, savedCreds->password);
+        //SNETWORK_DEBUG("savedCreds = %s %s %s\r\n", savedCreds->apn, savedCreds->username, savedCreds->password);
         result = cellular_gprs_attach(savedCreds, NULL);
         if (result) { return; }
 
@@ -79,9 +81,11 @@ protected:
             cellular_cancel(false, HAL_IsISR(), NULL);
         }
     }
-#endif
-    void connect_now() override {  }
-    int status_now() override { return -1; }
+
+    void drive_now() override
+    {
+        cellular_drive_now();
+    }
 
     void on_now() override {
         cellular_on(NULL);
@@ -103,10 +107,10 @@ public:
     CellularNetworkInterface() {
         HAL_NET_Callbacks cb;
         cb.size = sizeof(HAL_NET_Callbacks);
-        cb.notify_connected = HAL_NET_notify_connected;
-        cb.notify_disconnected = HAL_NET_notify_disconnected;
-        cb.notify_dhcp = HAL_NET_notify_dhcp;
-        cb.notify_can_shutdown = HAL_NET_notify_can_shutdown;
+        cb.notify_connected = network_notify_connected;
+        cb.notify_disconnected = network_notify_disconnected;
+        cb.notify_dhcp = network_notify_dhcp;
+        cb.notify_can_shutdown = network_notify_can_shutdown;
         HAL_NET_SetCallbacks(&cb, nullptr);
     }
 
@@ -121,17 +125,16 @@ public:
     bool has_credentials() override
     {
         bool rv = cellular_sim_ready(NULL);
-        //LOG(INFO,"%s", (rv)?"Sim Ready":"Sim not inserted? Detecting...");
+        SNETWORK_DEBUG("%s", (rv)?"Sim Ready":"Sim not inserted? Detecting...");
         if (!rv) {
             cellular_on(NULL);
             rv = cellular_sim_ready(NULL);
-            //LOG(INFO,"%s", (rv)?"Sim Ready":"Sim not inserted.");
+            SNETWORK_DEBUG("%s", (rv)?"Sim Ready":"Sim not inserted.");
         }
         return rv;
     }
     int set_credentials(NetworkCredentials* creds) override { /* n/a */ return -1; }
 
-#if 0
     void connect_cancel(bool cancel) override {
         // only cancel if presently connecting
         bool require_cancel = false;
@@ -148,7 +151,6 @@ public:
             cellular_cancel(cancel, HAL_IsISR(), NULL);
         }
     }
-#endif
 
     void set_error_count(unsigned count) override { /* n/a */ }
 };

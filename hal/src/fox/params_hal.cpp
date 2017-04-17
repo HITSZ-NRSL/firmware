@@ -91,6 +91,7 @@ void read_boot_params(boot_params_t *pboot_params) {
     if(len > EEPROM_BOOT_PARAMS_MAX_SIZE) {
         return;
     }
+
     for (int num = 0; num<len; num++) {
         pboot[num] = HAL_EEPROM_Read(address+num);
     }
@@ -126,8 +127,6 @@ void read_system_params(system_params_t *psystem_params) {
         return;
     }
     flashStore.read(SYSTEM_PARAMS_START_ADDR, psystem_params, len);
-    for (int num = 0; num<len; num++) {
-    }
 }
 
 /*
@@ -244,6 +243,54 @@ INITPARAM_FLAG_TypeDef HAL_PARAMS_Get_Boot_initparam_flag(void) {
  * */
 int HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_TypeDef flag) {
     intorobot_boot_params.initparam_flag = flag;
+    return 0;
+}
+/********************************************************************************
+ *  添加参数
+ ********************************************************************************/
+
+/*
+ * 读取ota文件大小
+ * */
+uint32_t HAL_PARAMS_Get_Boot_ota_app_size(void) {
+    return intorobot_boot_params.ota_app_size;
+}
+
+/*
+ * 保存ota文件大小
+ * */
+int HAL_PARAMS_Set_Boot_ota_app_size(uint32_t size) {
+    intorobot_boot_params.ota_app_size = size;
+    return 0;
+}
+
+/*
+ * 读取默认应用文件大小
+ * */
+uint32_t HAL_PARAMS_Get_Boot_def_app_size(void) {
+    return intorobot_boot_params.def_app_size;
+}
+
+/*
+ * 保存默认应用文件大小
+ * */
+int HAL_PARAMS_Set_Boot_def_app_size(uint32_t size) {
+    intorobot_boot_params.def_app_size = size;
+    return 0;
+}
+
+/*
+ * 读取升级boot文件大小
+ * */
+uint32_t HAL_PARAMS_Get_Boot_boot_size(void) {
+    return intorobot_boot_params.boot_size;
+}
+
+/*
+ * 保存升级boot文件大小
+ * */
+int HAL_PARAMS_Set_Boot_boot_size(uint32_t size) {
+    intorobot_boot_params.boot_size = size;
     return 0;
 }
 
@@ -409,6 +456,21 @@ int HAL_PARAMS_Set_System_dw_domain(const char* buffer) {
         return 0;
     }
     return -1;
+}
+
+/*
+ * 读取子系统升级标志
+ * */
+uint8_t HAL_PARAMS_Get_System_subsys_flag(void) {
+    return intorobot_system_params.subsys_flag;
+}
+
+/*
+ * 保存子系统升级标志
+ * */
+int HAL_PARAMS_Set_System_subsys_flag(uint8_t flag) {
+    intorobot_system_params.subsys_flag = flag;
+    return 0;
 }
 
 /*

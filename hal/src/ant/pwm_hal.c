@@ -28,6 +28,25 @@
 #include "pinmap_impl.h"
 #include "hw_config.h"
 
+#define TIM_NUM   4
+
+typedef struct pwm_state_t {
+    uint8_t resolution;
+} pwm_state_t;
+
+static pwm_state_t PWM_State[TIM_NUM] = {
+    // Initialise all timers to 8-bit resolution
+    [0 ... (TIM_NUM - 1)].resolution = 8
+};
+
+/* #define TIM_PERIPHERAL_TO_STATE_IDX(tim) (((uint32_t)tim) >= APB1PERIPH_BASE ? ((((uint32_t)tim) - APB1PERIPH_BASE) / 0x400) : 0) */
+/* #define TIM_PERIPHERAL_TO_STATE_IDX(tim) (((uint32_t)tim) >= APB2PERIPH_BASE ? \ */
+/*                                           ((((uint32_t)tim) - APB2PERIPH_BASE) / (TIM11_BASE - TIM9_BASE)) : \ */
+/*                                           (((((uint32_t)tim) - APB1PERIPH_BASE) / (TIM3_BASE - TIM2_BASE)) + 2)) */
+
+#define TIM_PERIPHERAL_TO_STATE_IDX(tim) (((uint32_t)tim) >= APB2PERIPH_BASE ? \
+                                          ((((uint32_t)tim) - APB2PERIPH_BASE) / (0x1000)) : \
+                                          (((((uint32_t)tim) - APB1PERIPH_BASE) / (0x400)) + 2))
 
 void HAL_PWM_Write(uint16_t pin, uint8_t value)
 {
@@ -55,24 +74,20 @@ void HAL_PWM_Write_Ext(uint16_t pin, uint32_t value)
  */
 void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm_frequency)
 {
-    //DEBUG("Enter HAL_PWM_Write_With_Frequency_Ext...");
     //Map the pin to the appropriate port and pin on the STM32
     STM32_Pin_Info* PIN_MAP = HAL_Pin_Map();
 
     // exclude TIM1 for own use
     if(PIN_MAP[pin].timer_peripheral != NULL) //&& PIN_MAP[pin].timer_peripheral != TIM1)
     {
-        //DEBUG("PWM GPIO Configuration...");
         /* Common configuration for all channles */
         GPIO_InitTypeDef GPIO_InitStruct;
         GPIO_InitStruct.Mode  = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull  = GPIO_PULLDOWN;
         GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
 
-        // else if( (PIN_MAP[pin].timer_peripheral == TIM2) )
         if( (PIN_MAP[pin].timer_peripheral == TIM2) )
         {
-            //DEBUG("PWM TIM2  Configuration...");
             __HAL_RCC_TIM2_CLK_ENABLE();
 
             GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
@@ -92,7 +107,6 @@ void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm
         }
         else if( (PIN_MAP[pin].timer_peripheral == TIM3) )
         {
-            //DEBUG("PWM TIM3  Configuration...");
             __HAL_RCC_TIM3_CLK_ENABLE();
             GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
             GPIO_InitStruct.Pin       = PIN_MAP[pin].gpio_pin;
@@ -112,7 +126,6 @@ void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm
         }
         else if( (PIN_MAP[pin].timer_peripheral == TIM9) )
         {
-            //DEBUG("PWM TIM4  Configuration...");
             __HAL_RCC_TIM9_CLK_ENABLE();
             GPIO_InitStruct.Alternate = GPIO_AF3_TIM9;
             GPIO_InitStruct.Pin       = PIN_MAP[pin].gpio_pin;
@@ -129,29 +142,8 @@ void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm
                 HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
             }
         }
-        else if( (PIN_MAP[pin].timer_peripheral == TIM10) )
-        {
-            //DEBUG("PWM TIM5  Configuration...");
-            __HAL_RCC_TIM10_CLK_ENABLE();
-
-            GPIO_InitStruct.Alternate = GPIO_AF3_TIM10;
-            GPIO_InitStruct.Pin       = PIN_MAP[pin].gpio_pin;
-
-            /* Port Clock enable */
-            if( (PIN_MAP[pin].gpio_peripheral == GPIOA) )
-            {
-                __HAL_RCC_GPIOA_CLK_ENABLE();
-                HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-            }
-            else if( (PIN_MAP[pin].gpio_peripheral == GPIOB) )
-            {
-                __HAL_RCC_GPIOB_CLK_ENABLE();
-                HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-            }
-        }
         else if( (PIN_MAP[pin].timer_peripheral == TIM11) )
         {
-            //DEBUG("PWM TIM5  Configuration...");
             __HAL_RCC_TIM11_CLK_ENABLE();
 
             GPIO_InitStruct.Alternate = GPIO_AF3_TIM11;
@@ -169,9 +161,6 @@ void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm
                 HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
             }
         }
-        //DEBUG("SystemCoreClock: %ld", SystemCoreClock);
-        //DEBUG("pwm_frequency: %ld", pwm_frequency);
-        //DEBUG("value: %ld", value);
 
 #define TIM_COUNTER_CLOCK_FREQ 1000000 // in the param, the freq should be above 16 - 10000000
         // XXX:Note TIM_Prescaler and TIM_ARR and TIMCCR  should be
@@ -182,11 +171,8 @@ void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm
         uint32_t TIM_Prescaler = (uint32_t)((SystemCoreClock / TIM_COUNTER_CLOCK_FREQ) - 1);
 
         uint32_t TIM_ARR = (uint32_t)((TIM_COUNTER_CLOCK_FREQ / pwm_frequency) - 1);
-        uint32_t TIM_CCR = (uint32_t)(value * (TIM_ARR + 1) / 255);
-
-        //DEBUG("TIM_Prescaler: %d", TIM_Prescaler);
-        //DEBUG("TIM_ARR: %d", TIM_ARR);
-        //DEBUG("TIM_CCR: %d", TIM_CCR);
+        /* uint32_t TIM_CCR = (uint32_t)(value * (TIM_ARR + 1) / 255); */
+        uint32_t TIM_CCR = (uint32_t)(value * (TIM_ARR + 1) / ((1 << HAL_PWM_Get_Resolution(pin))-1));
 
         TIM_HandleTypeDef TimHandle;
         TIM_OC_InitTypeDef sConfig;
@@ -208,7 +194,6 @@ void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm
         sConfig.OCMode       = TIM_OCMODE_PWM1;
         sConfig.OCPolarity   = TIM_OCPOLARITY_HIGH;
         sConfig.OCFastMode   = TIM_OCFAST_DISABLE;
-       // sConfig.OCNPolarity  = TIM_OCNPOLARITY_HIGH;
 
         /* Set the pulse value for channel 1 */
         sConfig.Pulse = TIM_CCR;
@@ -240,4 +225,38 @@ uint16_t HAL_PWM_Get_Frequency(uint16_t pin)
 uint16_t HAL_PWM_Get_AnalogValue(uint16_t pin)
 {
     return 0;
+}
+
+uint8_t HAL_PWM_Get_Resolution(uint16_t pin)
+{
+    STM32_Pin_Info* PIN_MAP = HAL_Pin_Map();
+    if(PIN_MAP[pin].timer_peripheral)
+        {
+            return PWM_State[TIM_PERIPHERAL_TO_STATE_IDX(PIN_MAP[pin].timer_peripheral)].resolution;
+        }
+
+    return 0;
+}
+
+uint8_t HAL_PWM_Timer_Resolution(uint16_t pin)
+{
+    STM32_Pin_Info* PIN_MAP = HAL_Pin_Map();
+
+    if(PIN_MAP[pin].timer_peripheral == TIM2)
+    {
+        return 16;
+    }
+    return 16;
+}
+
+void HAL_PWM_Set_Resolution(uint16_t pin, uint8_t resolution)
+{
+    STM32_Pin_Info* PIN_MAP = HAL_Pin_Map();
+    if(PIN_MAP[pin].timer_peripheral)
+    {
+        if (resolution > 1 && resolution <= HAL_PWM_Timer_Resolution(pin))
+        {
+            PWM_State[TIM_PERIPHERAL_TO_STATE_IDX(PIN_MAP[pin].timer_peripheral)].resolution = resolution;
+        }
+    }
 }

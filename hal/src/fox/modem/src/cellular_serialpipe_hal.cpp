@@ -36,40 +36,40 @@ CellularSerialPipe::CellularSerialPipe(int rxSize, int txSize) :
     _pipeRx( rxSize ),
     _pipeTx( txSize )
 {
-    HAL_NVIC_DisableIRQ(USART1_IRQn);
+    HAL_NVIC_DisableIRQ(USART2_IRQn);
 }
 
 CellularSerialPipe::~CellularSerialPipe(void)
 {
     // wait for transmission of outgoing data
-    __HAL_RCC_USART1_FORCE_RESET();
-    __HAL_RCC_USART1_RELEASE_RESET();
+    __HAL_RCC_USART2_FORCE_RESET();
+    __HAL_RCC_USART2_RELEASE_RESET();
 
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_9);
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_10);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_2);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_3);
 
-    HAL_NVIC_DisableIRQ(USART1_IRQn);
+    HAL_NVIC_DisableIRQ(USART2_IRQn);
 }
 
 void CellularSerialPipe::begin(unsigned int baud)
 {
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_USART1_CLK_ENABLE();
+    __HAL_RCC_USART2_CLK_ENABLE();
 
     GPIO_InitTypeDef  GPIO_InitStruct;
     /* UART TX GPIO pin configuration  */
-    GPIO_InitStruct.Pin       = GPIO_PIN_9;
+    GPIO_InitStruct.Pin       = GPIO_PIN_2;
     GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull      = GPIO_NOPULL;
     GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
-    GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
     /* UART RX GPIO pin configuration  */
-    GPIO_InitStruct.Pin = GPIO_PIN_10;
-    GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
+    GPIO_InitStruct.Pin = GPIO_PIN_3;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    UartHandleCellular.Instance          = USART1;
+    UartHandleCellular.Instance          = USART2;
     UartHandleCellular.Init.BaudRate     = baud;
     UartHandleCellular.Init.WordLength   = UART_WORDLENGTH_8B;
     UartHandleCellular.Init.StopBits     = UART_STOPBITS_1;
@@ -81,8 +81,8 @@ void CellularSerialPipe::begin(unsigned int baud)
     HAL_UART_Init(&UartHandleCellular);
 
     //Configure the NVIC for UART
-    HAL_NVIC_SetPriority(USART1_IRQn, USART1_IRQ_PRIORITY, 0);
-    HAL_NVIC_EnableIRQ(USART1_IRQn);
+    HAL_NVIC_SetPriority(USART2_IRQn, USART2_IRQ_PRIORITY, 0);
+    HAL_NVIC_EnableIRQ(USART2_IRQn);
     __HAL_UART_ENABLE_IT(&UartHandleCellular, UART_IT_RXNE);
 }
 
@@ -148,7 +148,7 @@ void CellularSerialPipe::rxPause(void)
 
 extern "C"
 {
-    void HAL_USART1_Handler(UART_HandleTypeDef *huart)
+    void HAL_USART2_Handler(UART_HandleTypeDef *huart)
     {
         if((__HAL_UART_GET_FLAG(huart, UART_FLAG_RXNE) != RESET)
                 && (__HAL_UART_GET_IT_SOURCE(huart, UART_IT_RXNE) != RESET))
@@ -158,8 +158,8 @@ extern "C"
     }
 
     // Serial1 interrupt handler
-    void USART1_IRQHandler(void)
+    void USART2_IRQHandler(void)
     {
-        HAL_USART1_Handler(&UartHandleCellular);
+        HAL_USART2_Handler(&UartHandleCellular);
     }
 }

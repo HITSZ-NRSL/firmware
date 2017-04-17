@@ -30,9 +30,9 @@ bool FLASH_CompareMemory(flash_device_t sourceDeviceID, uint32_t sourceAddress,
                          uint32_t length);
 
 void FLASH_Erase(void);
-void FLASH_Backup(uint32_t FLASH_Address);
-void FLASH_Restore(uint32_t FLASH_Address);
-void FLASH_Restore_Bootloader(uint32_t FLASH_Address);
+bool FLASH_Backup(uint32_t FLASH_Address);
+bool FLASH_Restore(uint32_t FLASH_Address);
+bool FLASH_Restore_Bootloader(uint32_t FLASH_Address);
 void FLASH_Begin(uint32_t FLASH_Address, uint32_t imageSize);
 int FLASH_Update(const uint8_t *pBuffer, uint32_t address, uint32_t bufferSize);
 void FLASH_End(void);

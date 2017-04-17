@@ -49,9 +49,13 @@
 using namespace intorobot;
 
 #ifndef configNO_LORAWAN
+volatile uint8_t INTOROBOT_CLOUD_SOCKETED = 0;           //网络连接状态 1连接 0断开
+volatile uint8_t INTOROBOT_CLOUD_CONNECT_PREPARED = 0;   //平台链接预处理状态 1已经处理
+volatile uint8_t INTOROBOT_CLOUD_CONNECTED = 0;          //平台连接状态 1连接上了
 
-volatile uint8_t g_intorobot_lorawan_joined = 0;      //lorawan认证通过
-volatile uint8_t g_intorobot_lorawan_connected = 0;   //lorawan发送版本信息完毕
+
+volatile uint8_t INTOROBOT_LORAWAN_JOINED = 0; //lorawan认证通过
+volatile uint8_t INTOROBOT_LORAWAN_CONNECTED = 0; //lorawan发送版本信息完毕
 
 void os_getDevEui(u1_t* buf)
 {
@@ -75,7 +79,7 @@ void os_getDevKey(u1_t* buf)
 
 bool intorobot_lorawan_flag_connected(void)
 {
-    if (g_intorobot_lorawan_joined && g_intorobot_lorawan_connected) {
+    if (INTOROBOT_LORAWAN_JOINED && INTOROBOT_LORAWAN_CONNECTED) {
         return true;
     } else {
         return false;
@@ -185,7 +189,7 @@ void onEvent (ev_t ev) {
                 SLORAWAN_DEBUG("nwkskey: %s", nwkskey);
                 SLORAWAN_DEBUG("appskey: %s", appskey);
                 SLORAWAN_DEBUG("---------");
-                g_intorobot_lorawan_joined = 1;
+                INTOROBOT_LORAWAN_JOINED = 1;
                 system_rgb_blink(RGB_COLOR_WHITE, 2000); //白灯闪烁
             }
             break;

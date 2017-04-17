@@ -17,6 +17,7 @@
   ******************************************************************************
 */
 
+#include "hw_config.h"
 #include "wlan_hal.h"
 #include "memory_hal.h"
 #include "flash_map.h"
@@ -48,21 +49,51 @@ inline void CLR_WLAN_TIMEOUT() {
     //DEBUG("WLAN WD Cleared, was %d", wlan_timeout_duration);
 }
 
+//=======net notify===========
+static HAL_NET_Callbacks netCallbacks = { 0 };
+
+void HAL_NET_SetCallbacks(const HAL_NET_Callbacks* callbacks, void* reserved)
+{
+    netCallbacks.notify_connected = callbacks->notify_connected;
+    netCallbacks.notify_disconnected = callbacks->notify_disconnected;
+    netCallbacks.notify_dhcp = callbacks->notify_dhcp;
+    netCallbacks.notify_can_shutdown = callbacks->notify_can_shutdown;
+}
+
+void HAL_NET_notify_connected()
+{
+    if (netCallbacks.notify_connected) {
+        netCallbacks.notify_connected();
+    }
+}
+
+void HAL_NET_notify_disconnected()
+{
+    if (netCallbacks.notify_disconnected) {
+        netCallbacks.notify_disconnected();
+    }
+}
+
+void HAL_NET_notify_dhcp(bool dhcp)
+{
+    if (netCallbacks.notify_dhcp) {
+        netCallbacks.notify_dhcp(dhcp); // dhcp dhcp
+    }
+}
+
+void HAL_NET_notify_can_shutdown()
+{
+    if (netCallbacks.notify_can_shutdown) {
+        netCallbacks.notify_can_shutdown();
+    }
+}
+
 uint32_t HAL_NET_SetNetWatchDog(uint32_t timeOutInMS)
 {
     return 0;
 }
 
-int wlan_clear_credentials()
-{
-    return 0;
-}
-
-int wlan_has_credentials()
-{
-    return 0;
-}
-
+//=======wifi activate/deactivate===========
 wlan_result_t wlan_activate()
 {
     return 0;
@@ -73,36 +104,69 @@ wlan_result_t wlan_deactivate()
     return 0;
 }
 
-int wlan_connect()
+void wlan_setup()
 {
-    int result = 0;
-    if(wlan_status()) {
-        result = esp32_connect();
-        return result;
-    }
-    return 0;
+    esp32_setMode(WIFI_MODE_STA);
+    esp32_setDHCP(true);
+    esp32_setAutoConnect(true);
+    esp32_setAutoReconnect(true);
 }
 
-wlan_result_t wlan_disconnect()
+//=======wifi connect===========
+int wlan_connect_init()
+{
+    return esp32_connect();
+}
+
+wlan_result_t wlan_connect_finalize()
+{
+    return 0;
+}
+wlan_result_t wlan_disconnect_now()
 {
     return esp32_disconnect();
 }
 
-int wlan_status()
+void wlan_connect_cancel(bool called_from_isr)
 {
-    wl_status_t status = esp32_status();
-    switch(status) {
-        case WL_CONNECTED:
-            return 0;
-        default:
-            return 1;
-    }
-    return 0;
+
 }
 
 int wlan_connected_rssi(void)
 {
     return esp32_getRSSI();
+}
+
+void wlan_drive_now(void)
+{
+}
+
+//================credentials======================
+int wlan_clear_credentials()
+{
+    return 0;
+}
+
+int wlan_has_credentials()
+{
+    return 0;
+}
+
+bool wlan_reset_credentials_store_required()
+{
+    return false;
+}
+
+wlan_result_t wlan_reset_credentials_store()
+{
+    wlan_clear_credentials();
+    return 0;
+}
+
+
+int wlan_get_credentials(wlan_scan_result_t callback, void* callback_data)
+{
+    return 0;
 }
 
 int wlan_set_credentials(WLanCredentials* c)
@@ -124,9 +188,9 @@ int wlan_set_credentials(WLanCredentials* c)
     return 0;
 }
 
+//==============imlink==================
 void wlan_Imlink_start()
 {
-    DEBUG("wlan_Imlink_start");
     esp32_beginSmartConfig();
 }
 
@@ -141,17 +205,9 @@ imlink_status_t wlan_Imlink_get_status()
 
 void wlan_Imlink_stop()
 {
-    DEBUG("wlan_Imlink_stop");
     esp32_stopSmartConfig();
 }
 
-void wlan_setup()
-{
-    esp32_setMode(WIFI_MODE_STA);
-    esp32_setDHCP(true);
-    esp32_setAutoConnect(true);
-    esp32_setAutoReconnect(true);
-}
 
 void wlan_fetch_ipconfig(WLanConfig* config)
 {
@@ -361,14 +417,6 @@ int wlan_scan(wlan_scan_result_t callback, void* cookie)
     }
 }
 
-/**
- * Lists all WLAN credentials currently stored on the device
- */
-int wlan_get_credentials(wlan_scan_result_t callback, void* callback_data)
-{
-    // Reading credentials from the CC3000 is not possible
-    return 0;
-}
 
 /**
  * wifi set station and ap mac addr
@@ -431,3 +479,4 @@ int wlan_set_macaddr_when_init(void)
          esp32_setMode(WIFI_MODE_STA);
      }
 }
+

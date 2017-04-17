@@ -32,6 +32,47 @@
 boot_params_t intorobot_boot_params;         //bootloader参数
 system_params_t intorobot_system_params;     //设备参数
 
+//board type
+#define INTOROBOT_BOARD_TYPE    "888002"
+#define INTOROBOT_BOARD_TYPE1   "887002"
+#define INTOROBOT_BOARD_NAME    "neutron"
+
+
+uint16_t HAL_Board_Type(char* dest, uint16_t destLen, uint8_t type)
+{
+    uint32_t len;
+
+    if (dest!=NULL && destLen>0) {
+        memset(dest, 0, destLen);
+        len = MIN(strlen(INTOROBOT_BOARD_TYPE1), destLen-1);
+        if(0==type) {
+            memcpy(dest, INTOROBOT_BOARD_TYPE, len);
+        }
+        else{
+            memcpy(dest, INTOROBOT_BOARD_TYPE1, len);
+        }
+        return len;
+    }
+    return 0;
+}
+
+uint32_t HAL_Platform_ID(void)
+{
+    return PLATFORM_ID;
+}
+
+uint32_t HAL_Platform_Name(char* dest, uint16_t destLen)
+{
+    uint32_t len;
+
+    if (dest!=NULL && destLen>0) {
+        memset(dest, 0, destLen);
+        len = MIN(strlen(INTOROBOT_BOARD_NAME), destLen-1);
+        memcpy(dest, INTOROBOT_BOARD_NAME, len);
+        return len;
+    }
+    return 0;
+}
 
 /*初始化bootloader参数区*/
 void init_boot_params(boot_params_t *pboot_params) {
@@ -91,6 +132,7 @@ void read_boot_params(boot_params_t *pboot_params) {
     if(len > EEPROM_BOOT_PARAMS_MAX_SIZE) {
         return;
     }
+
     for (int num = 0; num<len; num++) {
         pboot[num] = HAL_EEPROM_Read(address+num);
     }
@@ -126,8 +168,6 @@ void read_system_params(system_params_t *psystem_params) {
         return;
     }
     flashStore.read(SYSTEM_PARAMS_START_ADDR, psystem_params, len);
-    for (int num = 0; num<len; num++) {
-    }
 }
 
 /*
@@ -409,6 +449,21 @@ int HAL_PARAMS_Set_System_dw_domain(const char* buffer) {
         return 0;
     }
     return -1;
+}
+
+/*
+ * 读取sv_select标志
+ * */
+SV_SELECT_FLAG_TypeDef HAL_PARAMS_Get_System_sv_select(void) {
+    return (SV_SELECT_FLAG_TypeDef)intorobot_system_params.sv_select;
+}
+
+/*
+ * 保存sv_select标志
+ * */
+int HAL_PARAMS_Set_System_sv_select(SV_SELECT_FLAG_TypeDef flag) {
+    intorobot_system_params.sv_select = flag;
+    return 0;
 }
 
 /*

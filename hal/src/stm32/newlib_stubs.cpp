@@ -54,7 +54,7 @@ static void call_constructors(unsigned long *start, unsigned long *end)
 extern "C" {
     void CallConstructors(void)
     {
-        call_constructors(&link_constructors_location, &link_constructors_end);
+       call_constructors(&link_constructors_location, &link_constructors_end);
     }
 
     void *__dso_handle = NULL;

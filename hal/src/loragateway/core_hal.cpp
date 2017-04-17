@@ -42,7 +42,6 @@
 #include "task.h"
 #include "malloc.h"
 
-
 /* Private typedef ----------------------------------------------------------*/
 
 /* Private define -----------------------------------------------------------*/
@@ -62,12 +61,11 @@ extern volatile uint32_t TimingDelay;
 
 
 /* Private function prototypes -----------------------------------------------*/
-/**
- * The mutex to ensure only one thread manipulates the heap at a given time.
- */
 extern "C"
 {
-    //static osSemaphoreId malloc_protect_sem;     //申请释放内存保护信号量
+    /**
+     * The mutex to ensure only one thread manipulates the heap at a given time.
+     */
     static os_mutex_recursive_t malloc_mutex = 0;
 
     //static void init_malloc_semaphore(void)
@@ -100,6 +98,9 @@ static void application_task_start(void *argument)
  */
 int main(void)
 {
+#if defined(DEBUG_BUILD)
+    init_debug_mutex();
+#endif
     init_malloc_mutex();
     xTaskCreate( application_task_start, "app_thread", APPLICATION_STACK_SIZE/sizeof( portSTACK_TYPE ), NULL, 2, &app_thread_handle);
     vTaskStartScheduler();
@@ -132,10 +133,10 @@ void HAL_Core_Config(void)
 #endif
     //Wiring pins default to inputs
 #if !defined(USE_SWD_JTAG) && !defined(USE_SWD)
-    for (pin_t pin=D0; pin<=D7; pin++)
-//        HAL_Pin_Mode(pin, INPUT);
-    for (pin_t pin=A0; pin<=A7; pin++)
-//        HAL_Pin_Mode(pin, INPUT);
+    for (pin_t pin=D0; pin<=D8; pin++)
+        //HAL_Pin_Mode(pin, INPUT);
+    for (pin_t pin=A4; pin<=A7; pin++)
+        //HAL_Pin_Mode(pin, INPUT);
 #endif
     HAL_RTC_Initial();
     HAL_RNG_Initial();
@@ -180,7 +181,6 @@ void HAL_Core_Load_params(void)
 
 void HAL_Core_Setup(void)
 {
-    //esp8266MDM.init();
     HAL_IWDG_Config(DISABLE);
     HAL_Core_Load_params();
     HAL_Bootloader_Update_If_Needed();
@@ -267,19 +267,6 @@ void HAL_Core_Enter_Bootloader(bool persist)
 
 uint16_t HAL_Core_Get_Subsys_Version(char* buffer, uint16_t len)
 {
-/*    char temp[32];
-    uint16_t templen;
-
-    if (buffer!=NULL && len>0) {
-        if(esp8266MDM.getNetVersion(temp))
-        {
-            templen = MIN(strlen(temp), len-1);
-            memset(buffer, 0, len);
-            memcpy(buffer, temp, templen);
-            return templen;
-        }
-    }
-    */
     return 0;
 }
 

@@ -27,20 +27,6 @@ const sock_handle_t SOCKET_INVALID = (sock_handle_t)-1;
 sock_handle_t socket_create(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, network_interface_t nif)
 {
     sock_handle_t handle = esp8266_conn.socketCreate(protocol==IPPROTO_TCP ? MDM_IPPROTO_TCP : MDM_IPPROTO_UDP, port);
-    if (socket_handle_valid(handle) && (protocol==IPPROTO_UDP))
-    {
-        sockaddr_t tSocketAddr;
-
-        memset(&tSocketAddr, 0, sizeof(sockaddr_t));
-        tSocketAddr.sa_family = AF_INET;
-        tSocketAddr.sa_data[0] = (port & 0xFF00) >> 8;
-        tSocketAddr.sa_data[1] = (port & 0x00FF);
-        tSocketAddr.sa_data[2] = 255;  // Todo IPv6
-        tSocketAddr.sa_data[3] = 255;
-        tSocketAddr.sa_data[4] = 255;
-        tSocketAddr.sa_data[5] = 255;
-        socket_connect(handle, &tSocketAddr, sizeof(tSocketAddr));
-    }
     return handle;
 }
 

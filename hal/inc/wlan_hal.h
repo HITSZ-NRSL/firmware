@@ -43,18 +43,6 @@ extern "C" {
 #include <string.h> // for memset
 #endif
 
-typedef enum
-{
-  ANT_INTERNAL = 0, ANT_EXTERNAL = 1, ANT_AUTO = 3
-} WLanSelectAntenna_TypeDef;
-
-typedef enum {
-    IMLINK_SUCCESS = 0,
-    IMLINK_FAIL = 1,
-    IMLINK_DOING = 2,
-    IMLINK_IDLE = 3,
-} imlink_status_t;
-
 typedef int wlan_result_t;
 
 typedef struct __attribute__((__packed__))  _WLanConfig_t {
@@ -67,13 +55,12 @@ typedef struct __attribute__((__packed__))  _WLanConfig_t {
 #define WLanConfig_Size_V1   (sizeof(NetworkConfig)+2+33)
 #define WLanConfig_Size_V2   (WLanConfig_Size_V1+6)
 
-
 STATIC_ASSERT(WLanConfigSize, sizeof(WLanConfig)==WLanConfig_Size_V2);
 
-
-int wlan_connect();
-wlan_result_t wlan_disconnect();
-int wlan_status();
+/**
+ * Called once at startup to initialize the wlan hardware.
+ */
+void wlan_setup();
 
 /**
  * Enable wifi without connecting.
@@ -85,7 +72,22 @@ wlan_result_t wlan_activate();
  */
 wlan_result_t wlan_deactivate();
 
+/**
+ * Connect start the wireless connection.
+ */
+wlan_result_t  wlan_connect_init();
 
+/**
+ * Finalize the connection by connecting to stored profiles.
+ */
+wlan_result_t  wlan_connect_finalize();
+
+wlan_result_t wlan_disconnect_now();
+/**
+ * Cancel a previous call to any blocking wifi connect method.
+ * @param called_from_isr - set to true if this is being called from an ISR.
+ */
+void wlan_connect_cancel(bool called_from_isr);
 
 /**
  * @return <0 for a valid signal strength, in db.
@@ -94,8 +96,7 @@ wlan_result_t wlan_deactivate();
  */
 int wlan_connected_rssi();
 
-int wlan_clear_credentials();
-int wlan_has_credentials();
+void wlan_drive_now(void);
 
 // Provide compatibility with the original cc3000 headers.
 #ifdef WLAN_SEC_UNSEC
@@ -111,7 +112,6 @@ typedef enum {
     WLAN_SEC_WPA2,
     WLAN_SEC_NOT_SET = 0xFF
 } WLanSecurityType;
-
 
 typedef enum {
     WLAN_CIPHER_NOT_SET = 0,
@@ -137,15 +137,45 @@ typedef struct {
 #define WLAN_SET_CREDENTIALS_UNKNOWN_SECURITY_TYPE (-1)
 #define WLAN_SET_CREDENTIALS_CIPHER_REQUIRED (-2)
 
-/**
- *
- * @param credentials
- * @return 0 on success.
- */
+typedef struct WiFiAccessPoint {
+   size_t size;
+   char ssid[33];
+   uint8_t ssidLength;
+   uint8_t bssid[6];
+   WLanSecurityType security;
+   WLanSecurityCipher cipher;
+   uint8_t channel;
+   int maxDataRate;   // the mdr in bits/s
+   int rssi;        // when scanning
+
+#ifdef __cplusplus
+   WiFiAccessPoint()
+   {
+       memset(this, 0, sizeof(*this));
+       size = sizeof(*this);
+   }
+#endif
+} WiFiAccessPoint;
+
+typedef void (*wlan_scan_result_t)(WiFiAccessPoint* ap, void* cookie);
+
+int wlan_clear_credentials();
+int wlan_has_credentials();
+bool wlan_reset_credentials_store_required();
+wlan_result_t  wlan_reset_credentials_store();
 int wlan_set_credentials(WLanCredentials* credentials);
+int wlan_get_credentials(wlan_scan_result_t callback, void* callback_data);
+
 /**
  * Initialize imlink config mode.
  */
+typedef enum {
+    IMLINK_SUCCESS = 0,
+    IMLINK_FAIL = 1,
+    IMLINK_DOING = 2,
+    IMLINK_IDLE = 3,
+} imlink_status_t;
+
 void wlan_Imlink_start();
 void wlan_Imlink_stop();
 imlink_status_t wlan_Imlink_get_status();
@@ -156,22 +186,6 @@ void wlan_set_error_count(uint32_t error_count);
  * Retrieve IP address info. Available after HAL_WLAN_notify_dhcp() has been callted.
  */
 void wlan_fetch_ipconfig(WLanConfig* config);
-
-/**
- * Called once at startup to initialize the wlan hardware.
- */
-void wlan_setup();
-
-/**
- * Select the Wi-Fi antenna.
- */
-int wlan_select_antenna(WLanSelectAntenna_TypeDef antenna);
-
-/**
- * Cancel a previous call to any blocking wifi connect method.
- * @param called_from_isr - set to true if this is being called from an ISR.
- */
-void wlan_connect_cancel(bool called_from_isr);
 
 typedef enum {
     DYNAMIC_IP,
@@ -196,31 +210,6 @@ void wlan_set_ipaddress(const HAL_IPAddress* device, const HAL_IPAddress* netmas
         const HAL_IPAddress* gateway, const HAL_IPAddress* dns1, const HAL_IPAddress* dns2, void* reserved);
 
 
-
-typedef struct WiFiAccessPoint {
-   size_t size;
-   char ssid[33];
-   uint8_t ssidLength;
-   uint8_t bssid[6];
-   WLanSecurityType security;
-   WLanSecurityCipher cipher;
-   uint8_t channel;
-   int maxDataRate;   // the mdr in bits/s
-   int rssi;        // when scanning
-
-#ifdef __cplusplus
-
-   WiFiAccessPoint()
-   {
-       memset(this, 0, sizeof(*this));
-       size = sizeof(*this);
-   }
-#endif
-} WiFiAccessPoint;
-
-typedef void (*wlan_scan_result_t)(WiFiAccessPoint* ap, void* cookie);
-
-
 /**
  * @param callback  The callback that receives each scanned AP
  * @param cookie    An opaque handle that is passed to the callback.
@@ -235,7 +224,6 @@ int wlan_scan(wlan_scan_result_t callback, void* cookie);
  * @return count of stored credentials, negative on error.
  */
 
-int wlan_get_credentials(wlan_scan_result_t callback, void* callback_data);
 
 int wlan_set_macaddr(uint8_t *stamacaddr, uint8_t *apmacaddr);
 int wlan_get_macaddr(uint8_t *stamacaddr, uint8_t *apmacaddr);

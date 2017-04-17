@@ -55,7 +55,7 @@ uint16_t addressToSectorIndex(uint32_t address)
 uint32_t sectorIndexToStartAddress(uint16_t sector)
 {
     return sector<7 ? sectorAddresses[sector] :
-        ((sector-7)<<17)+0x8020000;
+        ((sector-7)<<17)+0x8060000;
 }
 
 static inline uint16_t InternalSectorToWriteProtect(uint32_t startAddress)
@@ -134,7 +134,7 @@ bool FLASH_CheckValidAddressRange(flash_device_t flashDeviceID, uint32_t startAd
     else if (flashDeviceID == FLASH_SERIAL)
     {
 #ifdef USE_SERIAL_FLASH
-        if (startAddress < 0x4000 || endAddress >= 0x100000)
+        if (endAddress >= 0x200000)
         {
             return false;
         }
@@ -572,20 +572,20 @@ void FLASH_Erase(void)
     //FLASH_EraseMemory(FLASH_INTERNAL, CORE_FW_ADDRESS, FIRMWARE_IMAGE_SIZE);
 }
 
-void FLASH_Backup(uint32_t FLASH_Address)
+bool FLASH_Backup(uint32_t FLASH_Address)
 {
 #ifdef USE_SERIAL_FLASH
-    FLASH_CopyMemory(FLASH_INTERNAL, CORE_FW_ADDRESS, FLASH_SERIAL, FLASH_Address, FIRMWARE_IMAGE_SIZE, 0, 0);
+    return FLASH_CopyMemory(FLASH_INTERNAL, CORE_FW_ADDRESS, FLASH_SERIAL, FLASH_Address, FIRMWARE_IMAGE_SIZE, 0, 0);
 #else
     //Don't have enough space in Internal Flash to save a Backup copy of the firmware
 #endif
 }
 
-void FLASH_Restore(uint32_t FLASH_Address)
+bool FLASH_Restore(uint32_t FLASH_Address)
 {
 #ifdef USE_SERIAL_FLASH
     //CRC verification Disabled by default
-    FLASH_CopyMemory(FLASH_SERIAL, FLASH_Address, FLASH_INTERNAL, CORE_FW_ADDRESS, FIRMWARE_IMAGE_SIZE, 0, 0);
+    return FLASH_CopyMemory(FLASH_SERIAL, FLASH_Address, FLASH_INTERNAL, CORE_FW_ADDRESS, FIRMWARE_IMAGE_SIZE, 0, 0);
 #else
     //commented below since FIRMWARE_IMAGE_SIZE != Actual factory firmware image size
     //FLASH_CopyMemory(FLASH_INTERNAL, FLASH_Address, FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION, FIRMWARE_IMAGE_SIZE, true);
@@ -593,11 +593,11 @@ void FLASH_Restore(uint32_t FLASH_Address)
 #endif
 }
 
-void FLASH_Restore_Bootloader(uint32_t FLASH_Address)
+bool FLASH_Restore_Bootloader(uint32_t FLASH_Address)
 {
 #ifdef USE_SERIAL_FLASH
     //CRC verification Disabled by default
-    FLASH_CopyMemory(FLASH_SERIAL, FLASH_Address, FLASH_INTERNAL, INTERNAL_FLASH_START, BOOTLOADER_IMAGE_SIZE, 0, 0);
+    return FLASH_CopyMemory(FLASH_SERIAL, FLASH_Address, FLASH_INTERNAL, INTERNAL_FLASH_START, BOOTLOADER_IMAGE_SIZE, 0, 0);
 #else
     //commented below since FIRMWARE_IMAGE_SIZE != Actual factory firmware image size
     //FLASH_CopyMemory(FLASH_INTERNAL, FLASH_Address, FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION, FIRMWARE_IMAGE_SIZE, true);

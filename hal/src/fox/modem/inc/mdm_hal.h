@@ -63,7 +63,7 @@ public:
         \return true if successful, false otherwise
     */
     bool connect(const char* simpin = NULL,
-            const char* apn = "spark.telefonica.com", const char* username = NULL,
+            const char* apn = "CMNET", const char* username = NULL,
             const char* password = NULL, Auth auth = AUTH_DETECT);
 
     /**
@@ -152,6 +152,7 @@ public:
     // Data Connection (GPRS)
     // ----------------------------------------------------------------
 
+    ip_status_t getIpStatus(void);
     /** register (Attach) the MT to the GPRS service.
         \param apn  the of the network provider e.g. "internet" or "apn.provider.com"
         \param username is the user name text string for the authentication phase
@@ -159,7 +160,7 @@ public:
         \param auth is the authentication mode (CHAP,PAP,NONE or DETECT)
         \return the ip that is assigned
     */
-    MDM_IP join(const char* apn = "spark.telefonica.com", const char* username = NULL,
+    MDM_IP join(const char* apn = "intorobot.telefonica.com", const char* username = NULL,
                        const char* password = NULL, Auth auth = AUTH_DETECT);
 
     /** deregister (detach) the MT from the GPRS service.
@@ -194,7 +195,7 @@ public:
         \param port in case of UDP, this optional port where it is bind
         \return the socket handle if successful or SOCKET_ERROR on failure
     */
-    int socketSocket(IpProtocol ipproto, int port = -1);
+    int socketCreate(IpProtocol ipproto, int port = -1);
 
     /** make a socket connection
         \param socket the socket handle
@@ -486,10 +487,12 @@ protected:
     static int _cbUACTIND(int type, const char* buf, int len, int* i);
     static int _cbUDOPN(int type, const char* buf, int len, char* mccmnc);
     // sockets
-    static int _cbCMIP(int type, const char* buf, int len, MDM_IP* ip);
-    static int _cbUPSND(int type, const char* buf, int len, int* act);
-    static int _cbUPSND(int type, const char* buf, int len, MDM_IP* ip);
-    static int _cbUDNSRN(int type, const char* buf, int len, MDM_IP* ip);
+    static int _cbIPSHUT(int type, const char* buf, int len, char *temp);
+    static int _cbSAPBR(int type, const char* buf, int len, int* act);
+    static int _cbCIFSR(int type, const char* buf, int len, MDM_IP* ip);
+    static int _cbCDNSGIP(int type, const char* buf, int len, MDM_IP* ip);
+    static int _cbGetIpStatus(int type, const char* buf, int len, ip_status_t* result);
+    static int _cbSocketConnect(int type, const char* buf, int len, char *tmp);
     static int _cbUSOCR(int type, const char* buf, int len, int* handle);
     static int _cbUSOCTL(int type, const char* buf, int len, int* handle);
     typedef struct { char* buf; int len; } USORDparam;
@@ -517,10 +520,14 @@ protected:
     // management struture for sockets
     typedef struct {
         int handle;
-        system_tick_t timeout_ms;
+        volatile IpProtocol ipproto;
+        volatile int localip;
+        volatile MDM_IP remoteip;
+        volatile int remoteport;
         volatile bool connected;
         volatile int pending;
         volatile bool open;
+        Pipe<char>* pipe;
     } SockCtrl;
     // LISA-C has 6 TCP and 6 UDP sockets
     // LISA-U and SARA-G have 7 sockets

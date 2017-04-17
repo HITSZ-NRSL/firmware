@@ -19,10 +19,10 @@
 #ifndef PARSER_H
 #define	PARSER_H
 
-//#include "modem/inc/mdm_hal.h"
+#include "modem/inc/mdm_hal.h"
 
 
-//extern MDMEsp8266Serial esp8266MDM;
+extern MDMCellularSerial CellularMDM;
 
 
 

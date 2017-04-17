@@ -41,7 +41,7 @@
 /* Private typedef -----------------------------------------------------------*/
 // I2Cnum_SDA_SCL
 typedef enum I2C_Num_Def {
-    I2C1_SDA_SCL_USER = 0,
+    I2C1_GROUP = 0,
 } I2C_Num_Def;
 
 typedef enum I2C_Transaction_Ending_Condition {
@@ -201,10 +201,10 @@ void HAL_I2C_Initial(HAL_I2C_Interface i2c, void* reserved)
 {
     if(i2c == HAL_I2C_INTERFACE1) // for users
     {
-        i2cMap[i2c] = &I2C_MAP[I2C1_SDA_SCL_USER];
+        i2cMap[i2c] = &I2C_MAP[I2C1_GROUP];
     }
 
-    i2cMap[i2c]->I2C_ClockSpeed       = CLOCK_SPEED_400KHZ;
+    i2cMap[i2c]->I2C_ClockSpeed       = CLOCK_SPEED_100KHZ;
     i2cMap[i2c]->I2C_Enabled          = false;
     i2cMap[i2c]->rxBufferIndex        = 0;
     i2cMap[i2c]->rxBufferLength       = 0;

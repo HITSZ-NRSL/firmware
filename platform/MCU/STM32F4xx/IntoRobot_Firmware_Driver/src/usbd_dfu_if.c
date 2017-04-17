@@ -28,12 +28,23 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_dfu_if.h"
 #include "stm32f4xx_hal_conf.h"
+#include "platform_config.h"
+#include "spi_flash.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
+#ifdef HAS_SERIAL_FLASH
+#define FLASH_DESC_STR      "@Internal+SPI Flash   /0x08000000/04*016Ka,01*064Kg,03*128Kg,124*128Ka,512*004Kg"
+#else
 #define FLASH_DESC_STR      "@Internal Flash   /0x08000000/04*016Ka,01*064Kg,03*128Kg"
+#endif
 #define FLASH_ERASE_TIME    (uint16_t)50
 #define FLASH_PROGRAM_TIME  (uint16_t)50
+
+#define FLASH_MASK 0xFF000000
+
+#define INTERNAL_FLASH_BASE 0x08000000
+#define SPI_FLASH_BASE      0x09000000
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
@@ -42,10 +53,10 @@ static uint32_t GetSector(uint32_t Address);
 
 /* Extern function prototypes ------------------------------------------------*/
 uint16_t Flash_If_Init(void);
+uint16_t Flash_If_DeInit(void);
 uint16_t Flash_If_Erase(uint32_t Add);
 uint16_t Flash_If_Write(uint8_t *src, uint8_t *dest, uint32_t Len);
 uint8_t *Flash_If_Read(uint8_t *src, uint8_t *dest, uint32_t Len);
-uint16_t Flash_If_DeInit(void);
 uint16_t Flash_If_GetStatus(uint32_t Add, uint8_t Cmd, uint8_t *buffer);
 
 
@@ -64,25 +75,13 @@ __ALIGN_BEGIN USBD_DFU_MediaTypeDef USBD_DFU_fops __ALIGN_END = {
     Flash_If_GetStatus,
 };
 
-/* Private functions ---------------------------------------------------------*/
-/**
- * @brief  Initializes Memory.
- * @param  None
- * @retval 0 if operation is successeful, MAL_FAIL else.
- */
-uint16_t Flash_If_Init(void)
+static uint16_t Internal_Flash_If_Init(void)
 {
-    /* Unlock the internal flash */
     HAL_FLASH_Unlock();
     return 0;
 }
 
-/**
- * @brief  De-Initializes Memory.
- * @param  None
- * @retval 0 if operation is successeful, MAL_FAIL else.
- */
-uint16_t Flash_If_DeInit(void)
+static uint16_t Internal_Flash_If_DeInit(void)
 {
     /* Lock the internal flash */
     HAL_FLASH_Lock();
@@ -90,12 +89,7 @@ uint16_t Flash_If_DeInit(void)
     return 0;
 }
 
-/**
- * @brief  Erases sector.
- * @param  Add: Address of sector to be erased.
- * @retval 0 if operation is successeful, MAL_FAIL else.
- */
-uint16_t Flash_If_Erase(uint32_t Add)
+static uint16_t Internal_Flash_If_Erase(uint32_t Add)
 {
     uint32_t startsector = 0;
     uint32_t sectornb = 0;
@@ -112,11 +106,123 @@ uint16_t Flash_If_Erase(uint32_t Add)
     eraseinitstruct.NbSectors = 1;
     status = HAL_FLASHEx_Erase(&eraseinitstruct, &sectornb);
 
-    if (status != HAL_OK)
-    {
+    if (status != HAL_OK) {
         return 1;
     }
     return 0;
+}
+
+static uint16_t Internal_Flash_If_Write(uint8_t *src, uint8_t *dest, uint32_t Len)
+{
+    uint32_t i = 0;
+
+    for(i = 0; i < Len; i+=4)
+    {
+        if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, (uint32_t)(dest+i), *(uint32_t*)(src+i)) == HAL_OK) {
+            if(*(uint32_t *)(src + i) != *(uint32_t*)(dest+i)) {
+                return 2;
+            }
+        } else {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+static uint8_t *Internal_Flash_If_Read(uint8_t *src, uint8_t *dest, uint32_t Len)
+{
+    uint32_t i = 0;
+    uint8_t *psrc = src;
+
+    for(i = 0; i < Len; i++)
+    {
+        dest[i] = *psrc++;
+    }
+    /* Return a valid address to avoid HardFault */
+    return (uint8_t*)(dest);
+}
+
+#ifdef HAS_SERIAL_FLASH
+static uint16_t SPI_If_Init(void)
+{
+    sFLASH_Init();
+    return 0;
+}
+
+static uint16_t SPI_If_DeInit(void)
+{
+    return 0;
+}
+
+static uint16_t SPI_If_Erase(uint32_t Add)
+{
+    sFLASH_EraseSector(Add);
+    return 0;
+}
+
+static uint16_t SPI_If_Write(uint8_t *src, uint8_t *dest, uint32_t Len)
+{
+    sFLASH_WriteBuffer(src, (uint32_t)dest, Len);
+    return 0;
+}
+
+static uint8_t *SPI_If_Read(uint8_t *src, uint8_t *dest, uint32_t Len)
+{
+    sFLASH_ReadBuffer(dest, (uint32_t)src, Len);
+    return (uint8_t*)(dest);
+}
+#endif
+
+/* Private functions ---------------------------------------------------------*/
+/**
+ * @brief  Initializes Memory.
+ * @param  None
+ * @retval 0 if operation is successeful, MAL_FAIL else.
+ */
+uint16_t Flash_If_Init(void)
+{
+    Internal_Flash_If_Init();
+#ifdef HAS_SERIAL_FLASH
+    SPI_If_Init();
+#endif
+    return 0;
+}
+
+/**
+ * @brief  De-Initializes Memory.
+ * @param  None
+ * @retval 0 if operation is successeful, MAL_FAIL else.
+ */
+uint16_t Flash_If_DeInit(void)
+{
+    Internal_Flash_If_DeInit();
+#ifdef HAS_SERIAL_FLASH
+    SPI_If_DeInit();
+#endif
+    return 0;
+}
+
+/**
+ * @brief  Erases sector.
+ * @param  Add: Address of sector to be erased.
+ * @retval 0 if operation is successeful, MAL_FAIL else.
+ */
+uint16_t Flash_If_Erase(uint32_t Add)
+{
+    switch (Add & FLASH_MASK)
+    {
+        case INTERNAL_FLASH_BASE:
+            return Internal_Flash_If_Erase(Add);
+            break;
+#ifdef HAS_SERIAL_FLASH
+        case SPI_FLASH_BASE:
+            return SPI_If_Erase(Add);
+            break;
+#endif
+        default:
+            return 1;
+    }
+    return 1;
 }
 
 /**
@@ -128,28 +234,20 @@ uint16_t Flash_If_Erase(uint32_t Add)
  */
 uint16_t Flash_If_Write(uint8_t *src, uint8_t *dest, uint32_t Len)
 {
-    uint32_t i = 0;
-
-    for(i = 0; i < Len; i+=4)
+    switch ((uint32_t)dest & FLASH_MASK)
     {
-        /* Device voltage range supposed to be [2.7V to 3.6V], the operation will
-           be done by byte */
-        if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, (uint32_t)(dest+i), *(uint32_t*)(src+i)) == HAL_OK)
-        {
-            /* Check the written value */
-            if(*(uint32_t *)(src + i) != *(uint32_t*)(dest+i))
-            {
-                /* Flash content doesn't match SRAM content */
-                return 2;
-            }
-        }
-        else
-        {
-            /* Error occurred while writing data in Flash memory */
+        case INTERNAL_FLASH_BASE:
+            return Internal_Flash_If_Write(src, dest, Len);
+            break;
+#ifdef HAS_SERIAL_FLASH
+        case SPI_FLASH_BASE:
+            return SPI_If_Write(src, dest, Len);
+            break;
+#endif
+        default:
             return 1;
-        }
     }
-    return 0;
+    return 1;
 }
 
 /**
@@ -161,15 +259,20 @@ uint16_t Flash_If_Write(uint8_t *src, uint8_t *dest, uint32_t Len)
  */
 uint8_t *Flash_If_Read(uint8_t *src, uint8_t *dest, uint32_t Len)
 {
-    uint32_t i = 0;
-    uint8_t *psrc = src;
-
-    for(i = 0; i < Len; i++)
+    switch ((uint32_t)dest & FLASH_MASK)
     {
-        dest[i] = *psrc++;
+        case INTERNAL_FLASH_BASE:
+            return Internal_Flash_If_Read(src, dest, Len);
+            break;
+#ifdef HAS_SERIAL_FLASH
+        case SPI_FLASH_BASE:
+            return SPI_If_Read(src, dest, Len);
+            break;
+#endif
+        default:
+            return 0;
     }
-    /* Return a valid address to avoid HardFault */
-    return (uint8_t*)(dest);
+    return 0;
 }
 
 /**
@@ -241,6 +344,5 @@ static uint32_t GetSector(uint32_t Address)
     }
     return sector;
 }
-
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

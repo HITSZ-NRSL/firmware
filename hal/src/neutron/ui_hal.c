@@ -173,7 +173,7 @@ void HAL_UI_SysTick_Handler(void)
         if(BUTTON_last_state)
         {
             TimingBUTTON = 0;
-            BUTTON_last_state = 1;
+            BUTTON_last_state = 0;
         }
     }
 }

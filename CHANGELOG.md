@@ -3,19 +3,20 @@
 ### FEATURES(功能)
 - [[PR #51]](https://github.com/HITSZ-NRSL/firmware/pull/51) [ant] 添加ant的支持
 - [[PR #52]](https://github.com/HITSZ-NRSL/firmware/pull/52) [ant] fig支持pwm功能
+- [[PR #54]](https://github.com/HITSZ-NRSL/firmware/pull/54) [fox] 添加fox支持,包括bootloader和应用程序
 
 
 ### ENHANCEMENTS(优化)
 - [[PR #51]](https://github.com/HITSZ-NRSL/firmware/pull/51) [all] 优化IntoRobot 数据点处理接口
 - [[PR #53]](https://github.com/HITSZ-NRSL/firmware/pull/53) [all] IntoRobot 数据点接口从DataPoint改成Datapoint
-
-
+- [[PR #54]](https://github.com/HITSZ-NRSL/firmware/pull/54) [neutron/nut/fig/w67/w323] 获取网络状态采取通知机制
 
 ### BUG FIXES(漏洞修复)
+- [[PR #54]](https://github.com/HITSZ-NRSL/firmware/pull/55) [all] STM32L151xB 芯片 ajson print申请变量大小改成512个字节
 
 
 ### INTERNAL(内部)
-
+- [[PR #54]](https://github.com/HITSZ-NRSL/firmware/pull/54) [all] PRODUCT_ID 默认值修改成空, PRODUCT_SECRET 默认值修改成空, PRODUCT_VERSION 默认值修改成1
 
 
 ## v1.5.1-rc.1

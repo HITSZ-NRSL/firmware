@@ -1,9 +1,3 @@
-#if 0
-// pull in the sources from the HAL. It's a bit of a hack, but is simpler than trying to link the
-// full hal library.
-#include "../src/neutron/timer_hal.c"
-
-#else
 
 #include "hw_config.h"
 #include "timer_hal.h"
@@ -37,4 +31,3 @@ system_tick_t HAL_Timer_Get_Milli_Seconds(void)
     return GetSystem1MsTick();
 }
 
-#endif

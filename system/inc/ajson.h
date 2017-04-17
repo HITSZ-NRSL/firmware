@@ -46,8 +46,12 @@
 #define EOF -1
 #endif
 
-//#define PRINT_BUFFER_LEN 1536
+//#if defined (STM32L151xB) || defined (STM32F103xB)
+#if defined (STM32L151xB)
 #define PRINT_BUFFER_LEN 512   //改小， 如果内存不够，容易申请失败
+#else
+#define PRINT_BUFFER_LEN 1536
+#endif
 
 // The aJson structure:
 typedef struct aJsonObject

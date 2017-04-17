@@ -65,8 +65,8 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 /*
 * Pin mapping. Borrowed from Wiring
 */
-#define TOTAL_PINS             38
-#define TOTAL_ANALOG_PINS      8
+#define TOTAL_PINS             37
+#define TOTAL_ANALOG_PINS      7
 #define TOTAL_DIGITAL_PINS     8
 #define FIRST_ANALOG_PIN       30
 
@@ -86,34 +86,30 @@ STM32_Pin_Info* HAL_Pin_Map(void);
 #define A4 34
 #define A5 35
 #define A6 36
-#define A7 37
 
 // Uart pins
-#define CTS A0
-#define RTS A1
-
-#define TX A2
-#define RX A3
+#define TX 8
+#define RX 9
 
 // SPI pins
-#define SS   A4
-#define SCK  A5
-#define MISO A6
-#define MOSI A7
+#define SS   D5
+#define SCK  D2
+#define MISO D3
+#define MOSI D4
 
-#define SS1   D4
-#define SCK1  D3
-#define MISO1 D2
-#define MOSI1 D0
+#define SS1   A5
+#define SCK1  A4
+#define MISO1 A3
+#define MOSI1 A2
 
 // I2C pins
-#define SDA  D2
-#define SCL  D1
+#define SDA  D1
+#define SCL  D0
 
 #define LED_USER  D7
 
 #define TOTAL_USARTS        1
-#define TOTAL_SPIS          1
+#define TOTAL_SPIS          2
 #define TOTAL_I2CS          1
 
 #define LSBFIRST 0

@@ -44,6 +44,7 @@
 uint32_t BUTTON_press_time=0;
 
 uint8_t USB_DFU_MODE          = 0;
+uint8_t CELLULAR_UPDATE_MODE  = 0;
 uint8_t SERIAL_COM_MODE       = 0;
 uint8_t DEFAULT_FIRMWARE_MODE = 0;
 uint8_t OTA_FIRMWARE_MODE     = 0;
@@ -60,7 +61,6 @@ int main(void)
 {
     HAL_System_Config();
     BOOT_DEBUG("boot start...\r\n");
-    HAL_UI_RGB_Color(RGB_COLOR_BLACK);
 
     HAL_PARAMS_Load_Boot_Params();
     HAL_PARAMS_Load_System_Params();
@@ -75,8 +75,9 @@ int main(void)
     if(!HAL_UI_Mode_BUTTON_GetState(BUTTON1))
     {
 #define TIMING_DFU_DOWNLOAD_MODE     1000   //dfu 下载模式
+#define TIMING_CELLULAR_UPDATE_MODE  3000   //celluar升级判断时间
 #define TIMING_DEFAULT_RESTORE_MODE  7000   //默认固件灯程序升级判断时间
-#define TIMING_SERIAL_COM_MODE       10000  //gprs串口转接判断时间
+#define TIMING_SERIAL_COM_MODE       10000  //celluar串口转接判断时间
 #define TIMING_FACTORY_RESET_MODE    13000  //恢复出厂程序判断时间
 #define TIMING_NC                    20000  //无操作判断时间
         while (!HAL_UI_Mode_BUTTON_GetState(BUTTON1))
@@ -102,9 +103,15 @@ int main(void)
             }
             else if( BUTTON_press_time > TIMING_DEFAULT_RESTORE_MODE )
             {
-                USB_DFU_MODE = 0;
+                CELLULAR_UPDATE_MODE = 0;
                 DEFAULT_FIRMWARE_MODE = 1;
                 HAL_UI_RGB_Color(RGB_COLOR_GREEN);
+            }
+            else if( BUTTON_press_time > TIMING_CELLULAR_UPDATE_MODE )
+            {
+                USB_DFU_MODE = 0;
+                CELLULAR_UPDATE_MODE = 1;
+                HAL_UI_RGB_Color(RGB_COLOR_RED);
             }
             else if( BUTTON_press_time > TIMING_DFU_DOWNLOAD_MODE )
             {
@@ -123,7 +130,7 @@ int main(void)
             case BOOT_FLAG_DEFAULT_RESTORE: //默认程序下载
                 DEFAULT_FIRMWARE_MODE = 1;
                 break;
-            case BOOT_FLAG_SERIAL_COM:      //gprs串口通讯
+            case BOOT_FLAG_SERIAL_COM:      //cellular串口通讯
                 SERIAL_COM_MODE = 1;
                 break;
             case BOOT_FLAG_FACTORY_RESET:   //恢复出厂
@@ -165,6 +172,11 @@ int main(void)
         Enter_Default_RESTORE_Mode();
         DEFAULT_FIRMWARE_MODE = 0;
     }
+    else if(CELLULAR_UPDATE_MODE)
+    {
+        BOOT_DEBUG("cellular update\r\n");
+        Enter_Cellular_Update_Mode();
+    }
     else if(USB_DFU_MODE)
     {
         BOOT_DEBUG("dfu\r\n");
@@ -186,7 +198,8 @@ int main(void)
     delay(LIGHTTIME);
     HAL_UI_RGB_Color(RGB_COLOR_BLACK); //防止进入应用程序初始化三色灯 导致闪灯
 
-    while(1);
+    //Enter_Flash_Test();
+
     start_app();
     return 0;
 }

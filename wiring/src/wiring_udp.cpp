@@ -79,14 +79,44 @@ void UDP::releaseBuffer()
 
 uint8_t UDP::begin(uint16_t port, network_interface_t nif)
 {
+    return begin(IPAddress(IPADDR_ANY), 8888, port, nif);
+}
+
+uint8_t UDP::begin(IPAddress remoteIP, uint16_t remotePort, uint16_t port, network_interface_t nif)
+{
     bool bound = 0;
     if(Network.from(nif).ready())
     {
         _sock = socket_create(AF_INET, SOCK_DGRAM, IPPROTO_UDP, port, nif);
         if (socket_handle_valid(_sock))
         {
+            sockaddr_t tSocketAddr;
+            int connected = 0;
+
             WUDP_DEBUG("udp begin success! create socket %d",_sock);
-            flush(); // clear buffer
+            flush();
+            tSocketAddr.sa_family = AF_INET;
+            tSocketAddr.sa_data[0] = (remotePort & 0xFF00) >> 8;
+            tSocketAddr.sa_data[1] = (remotePort & 0x00FF);
+            tSocketAddr.sa_data[2] = remoteIP[0];        // Todo IPv6
+            tSocketAddr.sa_data[3] = remoteIP[1];
+            tSocketAddr.sa_data[4] = remoteIP[2];
+            tSocketAddr.sa_data[5] = remoteIP[3];
+
+            uint32_t ot = HAL_NET_SetNetWatchDog(S2M(MAX_SEC_WAIT_CONNECT));
+            connected = (socket_connect(_sock, &tSocketAddr, sizeof(tSocketAddr)) == 0 ? 1 : 0);
+            HAL_NET_SetNetWatchDog(ot);
+            if(connected)
+            {
+                WUDP_DEBUG("upd connect success! create socket %d", _sock);
+            }
+            else
+            {
+                WUDP_DEBUG("upd connect failed!");
+                stop();
+            }
+            _remoteIP = remoteIP;
+            _remotePort = remotePort;
             _port = port;
             _nif = nif;
             bound = true;
@@ -116,30 +146,35 @@ void UDP::stop()
     flush();
 }
 
-int UDP::beginPacket(const char *host, uint16_t port)
+int UDP::beginPacket()
+{
+    return beginPacket(_remoteIP, _remotePort);
+}
+
+int UDP::beginPacket(const char *remoteHost, uint16_t remotePort)
 {
     if(Network.from(_nif).ready())
     {
         HAL_IPAddress ip_addr;
 
-        if(inet_gethostbyname((char*)host, strlen(host), &ip_addr, _nif, NULL) == 0)
+        if(inet_gethostbyname((char*)remoteHost, strlen(remoteHost), &ip_addr, _nif, NULL) == 0)
         {
             IPAddress remote_addr(ip_addr);
-            return beginPacket(remote_addr, port);
+            return beginPacket(remote_addr, remotePort);
         }
     }
     return 0;
 }
 
-int UDP::beginPacket(IPAddress ip, uint16_t port)
+int UDP::beginPacket(IPAddress remoteIP, uint16_t remotePort)
 {
     // default behavior previously was to use a 512 byte buffer, so instantiate that if not already done
     if (!_buffer && _buffer_size) {
         setBuffer(_buffer_size);
     }
 
-    _remoteIP = ip;
-    _remotePort = port;
+    _remoteIP = remoteIP;
+    _remotePort = remotePort;
     flush();
     return _buffer_size;
 }

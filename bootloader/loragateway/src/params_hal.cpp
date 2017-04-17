@@ -99,8 +99,6 @@ void read_system_params(system_params_t *psystem_params) {
         return;
     }
     flashStore.read(SYSTEM_PARAMS_START_ADDR, psystem_params, len);
-    for (int num = 0; num<len; num++) {
-    }
 }
 
 /*

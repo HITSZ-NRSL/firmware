@@ -31,6 +31,7 @@ extern "C" {
 #include "esp8266_wifi_type.h"
 #include "wl_definitions.h"
 
+bool esp8266_wifiInit(void);
 bool esp8266_setMode(WiFiMode_t m);
 WiFiMode_t esp8266_getMode();
 bool esp8266_enableSTA(bool enable);

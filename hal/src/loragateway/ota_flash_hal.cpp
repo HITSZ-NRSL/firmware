@@ -29,8 +29,6 @@
 #include "memory_hal.h"
 #include "service_debug.h"
 
-
-
 static bool bootloader_requires_update(void)
 {
     char subsys_ver[32] = {0}, temp[16] = {0};

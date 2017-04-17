@@ -37,6 +37,7 @@ extern "C" {
 }
 
 #include "timer_hal.h"
+#include "net_hal.h"
 #include "service_debug.h"
 
 
@@ -65,6 +66,40 @@ inline void CLR_WIFI_TIMEOUT() {
     //DEBUG("esp8266 WIFI WD Cleared, was %d", esp8266_wifi_timeout_duration);
 }
 
+static void _eventCallback(System_Event_t * evt)
+{
+    switch (evt->event)
+    {
+        case EVENT_STAMODE_CONNECTED:
+            DEBUG("EVENT_STAMODE_CONNECTED");
+            break;
+        case EVENT_STAMODE_DISCONNECTED:
+            DEBUG("EVENT_STAMODE_DISCONNECTED");
+            HAL_NET_notify_disconnected();
+            break;
+        case EVENT_STAMODE_AUTHMODE_CHANGE:
+            DEBUG("EVENT_STAMODE_AUTHMODE_CHANGE");
+            break;
+        case EVENT_STAMODE_GOT_IP:
+            DEBUG("EVENT_STAMODE_GOT_IP");
+            HAL_NET_notify_dhcp(true);
+            HAL_NET_notify_connected();
+            break;
+        case EVENT_SOFTAPMODE_STACONNECTED:
+        case EVENT_SOFTAPMODE_STADISCONNECTED:
+            break;
+        default:
+            break;
+    }
+}
+
+/**
+ * set new mode
+ * @param m WiFiMode_t
+ */
+bool esp8266_wifiInit(void) {
+    wifi_set_event_handler_cb(_eventCallback);
+}
 
 /**
  * set new mode
@@ -146,10 +181,11 @@ uint8_t* esp8266_getMacAddress(uint8_t* mac) {
 
 bool esp8266_setDHCP(char enable)
 {
-    if(true == enable)
+    if(true == enable) {
         wifi_station_dhcpc_start();
-    else
+    } else {
         wifi_station_dhcpc_stop();
+    }
     return true;
 }
 
@@ -205,10 +241,11 @@ bool _smartConfigDone = false;
 void smartConfigCallback(uint32_t st, void* result) {
     sc_status status = (sc_status) st;
 
-    DEBUG_D("beginSmartConfig status = %d \r\n", status);
+    DEBUG("beginSmartConfig status = %d", status);
     if(status == SC_STATUS_LINK) {
         station_config* sta_conf = reinterpret_cast<station_config*>(result);
-
+        DEBUG("ssid     = %s", sta_conf->ssid);
+        DEBUG("password = %s", sta_conf->password);
         wifi_station_set_config(sta_conf);
         wifi_station_disconnect();
         wifi_station_connect();
@@ -221,7 +258,7 @@ void smartConfigCallback(uint32_t st, void* result) {
  * Start SmartConfig
  */
 bool esp8266_beginSmartConfig() {
-    DEBUG_D("esp8266_beginSmartConfig\r\n");
+    DEBUG("esp8266_beginSmartConfig");
     if(_smartConfigStarted) {
         return false;
     }
@@ -244,7 +281,7 @@ bool esp8266_beginSmartConfig() {
  *  Stop SmartConfig
  */
 bool esp8266_stopSmartConfig() {
-    DEBUG_D("esp8266_stopSmartConfig\r\n");
+    DEBUG("esp8266_stopSmartConfig");
     if(!_smartConfigStarted) {
         return true;
     }

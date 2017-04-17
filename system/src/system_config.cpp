@@ -43,7 +43,7 @@
 #include "system_version.h"
 
 /*debug switch*/
-// #define SYSTEM_CONFIG_DEBUG
+#define SYSTEM_CONFIG_DEBUG
 
 #ifdef SYSTEM_CONFIG_DEBUG
 #define SCONFIG_DEBUG(...)  do {DEBUG(__VA_ARGS__);}while(0)
@@ -278,7 +278,6 @@ void DeviceConfig::dealCheckWifi(void)
     if (root == NULL)
     {return;}
 
-    network_status(0, 0, NULL);
     if(WiFi.ready()) {
         manage_ip_config();
         aJson.addNumberToObject(root, "status", 200);
@@ -887,7 +886,7 @@ static volatile uint8_t UdpStep = 0;
 void UdpDeviceConfig::init(void)
 {
     Udp.setTimeout(50);
-    wlan_setup();
+    network_setup(0, 0, NULL);
     wlan_Imlink_start();
     UdpStep = 0;
 }
@@ -927,7 +926,7 @@ int UdpDeviceConfig::available(void)
                 CLR_CONFIG_TIMEOUT();
                 UdpStep = 0;
             }
-            if( network_status(0, 0, NULL) ) {
+            if( network_ready(0, 0, NULL) ) {
                 system_rgb_blink(RGB_COLOR_RED, 200);
                 Udp.begin(5556);
                 //Udp.beginPacket 放在此处是因为设备接收到udp数据后，可以自动获取remoteip和remoteport。

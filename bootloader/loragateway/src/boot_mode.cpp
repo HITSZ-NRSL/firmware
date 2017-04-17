@@ -63,8 +63,11 @@ void USBD_CDC_Process(void)
     }
     if(len)
     {
-        USBD_CDC_SetTxBuffer(&USBD_Device, TxBuffer, len);
-        while(USBD_CDC_TransmitPacket(&USBD_Device) != USBD_OK);
+        if (USBD_STATE_CONFIGURED == USBD_Device.dev_state)
+        {
+            USBD_CDC_SetTxBuffer(&USBD_Device, TxBuffer, len);
+            while(USBD_CDC_TransmitPacket(&USBD_Device) != USBD_OK);
+        }
     }
 
     len=0;
@@ -169,5 +172,15 @@ void Enter_DFU_Mode(void)
     USBD_DFU_Init();
     while(1)
     {}
+}
+
+void Enter_Cellular_Update_Mode(void)
+{
+    HAL_UI_RGB_Color(RGB_COLOR_RED);
+    USBD_CDC_Init();
+    while (1)
+    {
+        USBD_CDC_Process();
+    }
 }
 

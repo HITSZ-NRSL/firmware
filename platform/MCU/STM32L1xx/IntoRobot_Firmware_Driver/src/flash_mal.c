@@ -527,7 +527,7 @@ void FLASH_Erase(void)
     //FLASH_EraseMemory(FLASH_INTERNAL, CORE_FW_ADDRESS, FIRMWARE_IMAGE_SIZE);
 }
 
-void FLASH_Backup(uint32_t FLASH_Address)
+bool FLASH_Backup(uint32_t FLASH_Address)
 {
 #ifdef USE_SERIAL_FLASH
     FLASH_CopyMemory(FLASH_INTERNAL, CORE_FW_ADDRESS, FLASH_SERIAL, FLASH_Address, FIRMWARE_IMAGE_SIZE, 0, 0);
@@ -536,7 +536,7 @@ void FLASH_Backup(uint32_t FLASH_Address)
 #endif
 }
 
-void FLASH_Restore(uint32_t FLASH_Address)
+bool FLASH_Restore(uint32_t FLASH_Address)
 {
 #ifdef USE_SERIAL_FLASH
     //CRC verification Disabled by default
@@ -548,7 +548,7 @@ void FLASH_Restore(uint32_t FLASH_Address)
 #endif
 }
 
-void FLASH_Restore_Bootloader(uint32_t FLASH_Address)
+bool FLASH_Restore_Bootloader(uint32_t FLASH_Address)
 {
 #ifdef USE_SERIAL_FLASH
     //CRC verification Disabled by default

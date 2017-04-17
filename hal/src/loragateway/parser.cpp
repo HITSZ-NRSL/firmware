@@ -17,6 +17,6 @@
  */
 
 
-//#include "modem/inc/mdm_hal.h"
+#include "modem/inc/mdm_hal.h"
 
-//MDMEsp8266Serial esp8266MDM;
+MDMCellularSerial CellularMDM;

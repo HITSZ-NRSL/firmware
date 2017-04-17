@@ -23,7 +23,7 @@
 #include "stm32f4xx.h"
 #include "service_debug.h"
 
-#define TONE_TIM_COUNTER_CLOCK_FREQ 1000000 ////TIM Counter clock = 1MHz
+#define TONE_TIM_COUNTER_CLOCK_FREQ 1000000 //TIM Counter clock = 1MHz
 
 TIM_HandleTypeDef TimHandleTone;
 /*
@@ -35,7 +35,7 @@ TIM_HandleTypeDef TimHandleTone;
  */
 void HAL_Tone_Start(uint8_t pin, uint32_t frequency, uint32_t duration)
 {
-    DEBUG("Enter HAL_Tone_Start ...");
+    /* DEBUG("Enter HAL_Tone_Start ..."); */
     if(frequency < 20 || frequency > 20000)
     {
         return;//no tone for frequency outside of human audible range
@@ -44,16 +44,19 @@ void HAL_Tone_Start(uint8_t pin, uint32_t frequency, uint32_t duration)
     STM32_Pin_Info* PIN_MAP = HAL_Pin_Map();
     if(PIN_MAP[pin].timer_peripheral != NULL && PIN_MAP[pin].timer_peripheral != TIM1)
     {
+        if(PIN_MAP[pin].timer_peripheral == NULL)
+        {
+            return;
+        }
         /* Common configuration for all channles */
         GPIO_InitTypeDef GPIO_InitStruct;
         GPIO_InitStruct.Mode  = GPIO_MODE_AF_PP;
         GPIO_InitStruct.Pull  = GPIO_PULLUP;
         GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 
-        // else if( (PIN_MAP[pin].timer_peripheral == TIM2) )
         if( (PIN_MAP[pin].timer_peripheral == TIM2) )
         {
-            DEBUG("Tone TIM2  Configuration...");
+            /* DEBUG("Tone TIM2  Configuration..."); */
             __HAL_RCC_TIM2_CLK_ENABLE();
 
             GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
@@ -76,18 +79,7 @@ void HAL_Tone_Start(uint8_t pin, uint32_t frequency, uint32_t duration)
         }
         else if( (PIN_MAP[pin].timer_peripheral == TIM3) )
         {
-            // D0 and A7 share the same TIM3->CHANNEL2, only one can work at a time.
-            // D2 and A6 share the same TIM3->CHANNEL1, only one can work at a time.
-            if (pin == D0)
-                PIN_MAP[A7].timer_ccr = 0;
-            else if(pin == A7)
-                PIN_MAP[D0].timer_ccr = 0;
-            else if(pin == D2)
-                PIN_MAP[A6].timer_ccr = 0;
-            else if(pin == A6)
-                PIN_MAP[D2].timer_ccr = 0;
-
-            DEBUG("Tone TIM3  Configuration...");
+            /* DEBUG("Tone TIM3  Configuration..."); */
             __HAL_RCC_TIM3_CLK_ENABLE();
             GPIO_InitStruct.Alternate = GPIO_AF2_TIM3;
             GPIO_InitStruct.Pin       = PIN_MAP[pin].gpio_pin;
@@ -110,7 +102,7 @@ void HAL_Tone_Start(uint8_t pin, uint32_t frequency, uint32_t duration)
         }
         else if( (PIN_MAP[pin].timer_peripheral == TIM4) )
         {
-            DEBUG("Tone TIM4  Configuration...");
+            /* DEBUG("Tone TIM4  Configuration..."); */
             __HAL_RCC_TIM4_CLK_ENABLE();
             GPIO_InitStruct.Alternate = GPIO_AF2_TIM4;
             GPIO_InitStruct.Pin       = PIN_MAP[pin].gpio_pin;
@@ -132,7 +124,7 @@ void HAL_Tone_Start(uint8_t pin, uint32_t frequency, uint32_t duration)
         }
         else if( (PIN_MAP[pin].timer_peripheral == TIM5) )
         {
-            DEBUG("Tone TIM5  Configuration...");
+            /* DEBUG("Tone TIM5  Configuration..."); */
             __HAL_RCC_TIM5_CLK_ENABLE();
 
             GPIO_InitStruct.Alternate = GPIO_AF2_TIM5;
@@ -166,18 +158,26 @@ void HAL_Tone_Start(uint8_t pin, uint32_t frequency, uint32_t duration)
         {
             timer_channel_toggle_count = 2 * frequency * duration / 1000; // Change to seconds.
         }
-        DEBUG("Tone TIM_Prescaler: %d", TIM_Prescaler);
-        DEBUG("Tone TIM_CCR: %d", TIM_CCR);
+        /* DEBUG("Tone TIM_Prescaler: %d", TIM_Prescaler); */
+        /* DEBUG("Tone TIM_CCR: %d", TIM_CCR); */
 
         PIN_MAP[pin].timer_ccr = TIM_CCR;
         PIN_MAP[pin].user_property = timer_channel_toggle_count;
+        /* DEBUG("Tone toggle count: %d", timer_channel_toggle_count); */
 
         TIM_OC_InitTypeDef sConfig;
         TimHandleTone.Instance = PIN_MAP[pin].timer_peripheral;
-        TimHandleTone.Init.Period            = 0xFFFF; // 16 bit timer 65535
-        TimHandleTone.Init.Prescaler         = TIM_Prescaler;
-        TimHandleTone.Init.ClockDivision     = 0;
-        TimHandleTone.Init.CounterMode       = TIM_COUNTERMODE_UP;
+        if(PIN_MAP[pin].timer_peripheral == TIM2 || PIN_MAP[pin].timer_peripheral == TIM5)
+        {
+            TimHandleTone.Init.Period     = 0xFFFFFFFF; // 32 bit for TIM2 TIM5
+        }
+        else
+        {
+            TimHandleTone.Init.Period     = 0xFFFF; // 16 bit timer 65535
+        }
+        TimHandleTone.Init.Prescaler      = TIM_Prescaler;
+        TimHandleTone.Init.ClockDivision  = 0;
+        TimHandleTone.Init.CounterMode    = TIM_COUNTERMODE_UP;
         HAL_TIM_OC_Init(&TimHandleTone);
 
         /*##-2- Configure the Output Compare channels ##############################*/
@@ -205,6 +205,7 @@ void HAL_Tone_Start(uint8_t pin, uint32_t frequency, uint32_t duration)
     {
         // Error
         DEBUG("The Tone First Error");
+        return;
     }
 }
 
@@ -316,6 +317,26 @@ void TIM5_IRQHandler(void)
     HAL_TIM_IRQHandler(&TimHandleTone);
 }
 
+#define NONE 0xFF
+#define TIM2_TONE_CHANNEL_1    A4
+#define TIM2_TONE_CHANNEL_2    D2
+#define TIM2_TONE_CHANNEL_3    NONE
+#define TIM2_TONE_CHANNEL_4    NONE
+
+#define TIM3_TONE_CHANNEL_1    D3
+#define TIM3_TONE_CHANNEL_2    D4
+#define TIM3_TONE_CHANNEL_3    A1
+#define TIM3_TONE_CHANNEL_4    A0
+
+#define TIM4_TONE_CHANNEL_1    NONE
+#define TIM4_TONE_CHANNEL_2    NONE
+#define TIM4_TONE_CHANNEL_3    D0
+#define TIM4_TONE_CHANNEL_4    D1
+
+#define TIM5_TONE_CHANNEL_1    NONE
+#define TIM5_TONE_CHANNEL_2    A6
+#define TIM5_TONE_CHANNEL_3    NONE
+#define TIM5_TONE_CHANNEL_4    NONE
 /**
  * @brief  Output Compare callback in non blocking mode
  * @param  htim : TIM OC handle
@@ -325,155 +346,143 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
 {
     uint32_t uhCapture = 0;
     STM32_Pin_Info* PIN_MAP = HAL_Pin_Map();
-    // CHANNEL_1: TIM2(A5), TIM3(D2, A6), TIM4(D7), TIM5(A0)
-    // CHANNEL_2: TIM2(D3), TIM3(D0, A7),           TIM5(A1)
-    // CHANNEL_3:                                   TIM5(A2)
-    // CHANNEL_4:                                   TIM5(A3)
+
     if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_1)
     {
         uhCapture = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_1);
         if(htim->Instance == TIM2)
         {
-            if(PIN_MAP[A5].user_property != -1)
+            if(PIN_MAP[TIM2_TONE_CHANNEL_1].user_property != -1)
             {
                 /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (uhCapture + PIN_MAP[A5].timer_ccr));
-                if (PIN_MAP[A5].user_property > 0)
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (uhCapture + PIN_MAP[TIM2_TONE_CHANNEL_1].timer_ccr));
+                if (PIN_MAP[TIM2_TONE_CHANNEL_1].user_property > 0)
                 {
-                    PIN_MAP[A5].user_property -= 1;
+                    PIN_MAP[TIM2_TONE_CHANNEL_1].user_property -= 1;
                 }
                 else
                 {
-                    HAL_Tone_Stop(A5);
+                    HAL_Tone_Stop(TIM2_TONE_CHANNEL_1);
                 }
             }
         }
         else if(htim->Instance == TIM3)
         {
-            if(PIN_MAP[D2].user_property != -1)
+            if(PIN_MAP[TIM3_TONE_CHANNEL_1].user_property != -1)
             {
                 /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (uhCapture + PIN_MAP[D2].timer_ccr));
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (uhCapture + PIN_MAP[TIM3_TONE_CHANNEL_1].timer_ccr));
 
-                if (PIN_MAP[D2].user_property > 0)
+                if (PIN_MAP[TIM3_TONE_CHANNEL_1].user_property > 0)
                 {
-                    PIN_MAP[D2].user_property -= 1;
+                    PIN_MAP[TIM3_TONE_CHANNEL_1].user_property -= 1;
                 }
                 else
                 {
-                    HAL_Tone_Stop(D2);
-                }
-            }
-            else if(PIN_MAP[A6].user_property != -1)
-            {
-                /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (uhCapture + PIN_MAP[A6].timer_ccr));
-
-                if (PIN_MAP[A6].user_property > 0)
-                {
-                    PIN_MAP[A6].user_property -= 1;
-                }
-                else
-                {
-                    HAL_Tone_Stop(A6);
+                    HAL_Tone_Stop(TIM3_TONE_CHANNEL_1);
                 }
             }
         }
         else if(htim->Instance == TIM4)
         {
-            if(PIN_MAP[D7].user_property != -1)
+            if(PIN_MAP[TIM4_TONE_CHANNEL_1].user_property != -1)
             {
                 /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (uhCapture + PIN_MAP[D7].timer_ccr));
-                if (PIN_MAP[D7].user_property > 0)
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (uhCapture + PIN_MAP[TIM4_TONE_CHANNEL_1].timer_ccr));
+                if (PIN_MAP[TIM4_TONE_CHANNEL_1].user_property > 0)
                 {
-                    PIN_MAP[D7].user_property -= 1;
+                    PIN_MAP[TIM4_TONE_CHANNEL_1].user_property -= 1;
                 }
                 else
                 {
-                    HAL_Tone_Stop(D7);
+                    HAL_Tone_Stop(TIM4_TONE_CHANNEL_1);
                 }
             }
         }
         else if(htim->Instance == TIM5)
         {
-            /* Set the Capture Compare Register value */
-            __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (uhCapture + PIN_MAP[A0].timer_ccr));
-            if(PIN_MAP[A0].user_property != -1)
+            if(PIN_MAP[TIM5_TONE_CHANNEL_1].user_property != -1)
             {
-                if (PIN_MAP[A0].user_property > 0)
+                /* Set the Capture Compare Register value */
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (uhCapture + PIN_MAP[TIM5_TONE_CHANNEL_1].timer_ccr));
+                if(PIN_MAP[TIM5_TONE_CHANNEL_1].user_property != -1)
                 {
-                    PIN_MAP[A0].user_property -= 1;
-                }
-                else
-                {
-                    HAL_Tone_Stop(A0);
+                    if (PIN_MAP[TIM5_TONE_CHANNEL_1].user_property > 0)
+                    {
+                        PIN_MAP[TIM5_TONE_CHANNEL_1].user_property -= 1;
+                    }
+                    else
+                    {
+                        HAL_Tone_Stop(TIM5_TONE_CHANNEL_1);
+                    }
                 }
             }
         }
     }
-    // CHANNEL_2: TIM2(D3), TIM3(D0, A7),           TIM5(A1)
     else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_2)
     {
         uhCapture = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_2);
         if(htim->Instance == TIM2)
         {
-            if(PIN_MAP[D3].user_property != -1)
+            if(PIN_MAP[TIM2_TONE_CHANNEL_2].user_property != -1)
             {
                 /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (uhCapture + PIN_MAP[D3].timer_ccr));
-                if (PIN_MAP[D3].user_property > 0)
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (uhCapture + PIN_MAP[TIM2_TONE_CHANNEL_2].timer_ccr));
+                if (PIN_MAP[TIM2_TONE_CHANNEL_2].user_property > 0)
                 {
-                    PIN_MAP[D3].user_property -= 1;
+                    PIN_MAP[TIM2_TONE_CHANNEL_2].user_property -= 1;
                 }
                 else
                 {
-                    HAL_Tone_Stop(D3);
+                    HAL_Tone_Stop(TIM2_TONE_CHANNEL_2);
                 }
             }
         }
         else if(htim->Instance == TIM3)
         {
-            if(PIN_MAP[D0].user_property != -1)
+            if(PIN_MAP[TIM3_TONE_CHANNEL_2].user_property != -1)
             {
                 /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (uhCapture + PIN_MAP[D0].timer_ccr));
-                if (PIN_MAP[D0].user_property > 0)
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (uhCapture + PIN_MAP[TIM3_TONE_CHANNEL_2].timer_ccr));
+                if (PIN_MAP[TIM3_TONE_CHANNEL_2].user_property > 0)
                 {
-                    PIN_MAP[D0].user_property -= 1;
+                    PIN_MAP[TIM3_TONE_CHANNEL_2].user_property -= 1;
                 }
                 else
                 {
-                    HAL_Tone_Stop(D0);
+                    HAL_Tone_Stop(TIM3_TONE_CHANNEL_2);
                 }
             }
-            else if(PIN_MAP[A7].user_property != -1)
+        }
+        else if(htim->Instance == TIM4)
+        {
+            if(PIN_MAP[TIM4_TONE_CHANNEL_2].user_property != -1)
             {
                 /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (uhCapture + PIN_MAP[A7].timer_ccr));
-                if (PIN_MAP[A7].user_property > 0)
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (uhCapture + PIN_MAP[TIM4_TONE_CHANNEL_2].timer_ccr));
+                if (PIN_MAP[TIM4_TONE_CHANNEL_2].user_property > 0)
                 {
-                    PIN_MAP[A7].user_property -= 1;
+                    PIN_MAP[TIM4_TONE_CHANNEL_2].user_property -= 1;
                 }
                 else
                 {
-                    HAL_Tone_Stop(A7);
+                    HAL_Tone_Stop(TIM4_TONE_CHANNEL_2);
                 }
             }
         }
         else if(htim->Instance == TIM5)
         {
-            if(PIN_MAP[A1].user_property != -1)
+            if(PIN_MAP[TIM5_TONE_CHANNEL_2].user_property != -1)
             {
                 /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (uhCapture + PIN_MAP[A1].timer_ccr));
-                if (PIN_MAP[A1].user_property > 0)
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_2, (uhCapture + PIN_MAP[TIM5_TONE_CHANNEL_2].timer_ccr));
+                if (PIN_MAP[TIM5_TONE_CHANNEL_2].user_property > 0)
                 {
-                    PIN_MAP[A1].user_property -= 1;
+                    PIN_MAP[TIM5_TONE_CHANNEL_2].user_property -= 1;
                 }
                 else
                 {
-                    HAL_Tone_Stop(A1);
+                    HAL_Tone_Stop(TIM5_TONE_CHANNEL_2);
                 }
             }
         }
@@ -482,19 +491,67 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
     else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_3)
     {
         uhCapture = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_3);
-        if(htim->Instance == TIM5)
+        if(htim->Instance == TIM2)
         {
-            if(PIN_MAP[A2].user_property != -1)
+            if(PIN_MAP[TIM2_TONE_CHANNEL_3].user_property != -1)
             {
                 /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, (uhCapture + PIN_MAP[A2].timer_ccr));
-                if (PIN_MAP[A2].user_property > 0)
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, (uhCapture + PIN_MAP[TIM2_TONE_CHANNEL_3].timer_ccr));
+                if (PIN_MAP[TIM2_TONE_CHANNEL_3].user_property > 0)
                 {
-                    PIN_MAP[A2].user_property -= 1;
+                    PIN_MAP[TIM2_TONE_CHANNEL_3].user_property -= 1;
                 }
                 else
                 {
-                    HAL_Tone_Stop(A2);
+                    HAL_Tone_Stop(TIM2_TONE_CHANNEL_3);
+                }
+            }
+        }
+        else if(htim->Instance == TIM3)
+        {
+            if(PIN_MAP[TIM3_TONE_CHANNEL_3].user_property != -1)
+            {
+                /* Set the Capture Compare Register value */
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, (uhCapture + PIN_MAP[TIM3_TONE_CHANNEL_3].timer_ccr));
+                if (PIN_MAP[TIM3_TONE_CHANNEL_3].user_property > 0)
+                {
+                    PIN_MAP[TIM3_TONE_CHANNEL_3].user_property -= 1;
+                }
+                else
+                {
+                    HAL_Tone_Stop(TIM3_TONE_CHANNEL_3);
+                }
+            }
+        }
+        else if(htim->Instance == TIM4)
+        {
+            if(PIN_MAP[TIM4_TONE_CHANNEL_3].user_property != -1)
+            {
+                /* Set the Capture Compare Register value */
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, (uhCapture + PIN_MAP[TIM4_TONE_CHANNEL_3].timer_ccr));
+                if (PIN_MAP[TIM4_TONE_CHANNEL_3].user_property > 0)
+                {
+                    PIN_MAP[TIM4_TONE_CHANNEL_3].user_property -= 1;
+                }
+                else
+                {
+                    HAL_Tone_Stop(TIM4_TONE_CHANNEL_3);
+                }
+            }
+        }
+        else if(htim->Instance == TIM5)
+        {
+            if(PIN_MAP[TIM5_TONE_CHANNEL_3].user_property != -1)
+            {
+                /* Set the Capture Compare Register value */
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_3, (uhCapture + PIN_MAP[TIM5_TONE_CHANNEL_3].timer_ccr));
+                if (PIN_MAP[TIM5_TONE_CHANNEL_3].user_property > 0)
+                {
+                    PIN_MAP[TIM5_TONE_CHANNEL_3].user_property -= 1;
+                }
+                else
+                {
+                    HAL_Tone_Stop(TIM5_TONE_CHANNEL_3);
                 }
             }
         }
@@ -503,19 +560,67 @@ void HAL_TIM_OC_DelayElapsedCallback(TIM_HandleTypeDef *htim)
     else if(htim->Channel == HAL_TIM_ACTIVE_CHANNEL_4)
     {
         uhCapture = HAL_TIM_ReadCapturedValue(htim, TIM_CHANNEL_4);
-        if(htim->Instance == TIM5)
+        if(htim->Instance == TIM2)
         {
-            if(PIN_MAP[A3].user_property != -1)
+            if(PIN_MAP[TIM2_TONE_CHANNEL_4].user_property != -1)
             {
                 /* Set the Capture Compare Register value */
-                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4, (uhCapture + PIN_MAP[A3].timer_ccr));
-                if (PIN_MAP[A3].user_property > 0)
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4, (uhCapture + PIN_MAP[TIM2_TONE_CHANNEL_4].timer_ccr));
+                if (PIN_MAP[TIM2_TONE_CHANNEL_4].user_property > 0)
                 {
-                    PIN_MAP[A3].user_property -= 1;
+                    PIN_MAP[TIM2_TONE_CHANNEL_4].user_property -= 1;
                 }
                 else
                 {
-                    HAL_Tone_Stop(A3);
+                    HAL_Tone_Stop(TIM2_TONE_CHANNEL_4);
+                }
+            }
+        }
+        else if(htim->Instance == TIM3)
+        {
+            if(PIN_MAP[TIM3_TONE_CHANNEL_4].user_property != -1)
+            {
+                /* Set the Capture Compare Register value */
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4, (uhCapture + PIN_MAP[TIM3_TONE_CHANNEL_4].timer_ccr));
+                if (PIN_MAP[TIM3_TONE_CHANNEL_4].user_property > 0)
+                {
+                    PIN_MAP[TIM3_TONE_CHANNEL_4].user_property -= 1;
+                }
+                else
+                {
+                    HAL_Tone_Stop(TIM3_TONE_CHANNEL_4);
+                }
+            }
+        }
+        else if(htim->Instance == TIM4)
+        {
+            if(PIN_MAP[TIM4_TONE_CHANNEL_4].user_property != -1)
+            {
+                /* Set the Capture Compare Register value */
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4, (uhCapture + PIN_MAP[TIM4_TONE_CHANNEL_4].timer_ccr));
+                if (PIN_MAP[TIM4_TONE_CHANNEL_4].user_property > 0)
+                {
+                    PIN_MAP[TIM4_TONE_CHANNEL_4].user_property -= 1;
+                }
+                else
+                {
+                    HAL_Tone_Stop(TIM4_TONE_CHANNEL_4);
+                }
+            }
+        }
+        else if(htim->Instance == TIM5)
+        {
+            if(PIN_MAP[TIM5_TONE_CHANNEL_4].user_property != -1)
+            {
+                /* Set the Capture Compare Register value */
+                __HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_4, (uhCapture + PIN_MAP[TIM5_TONE_CHANNEL_4].timer_ccr));
+                if (PIN_MAP[TIM5_TONE_CHANNEL_4].user_property > 0)
+                {
+                    PIN_MAP[TIM5_TONE_CHANNEL_4].user_property -= 1;
+                }
+                else
+                {
+                    HAL_Tone_Stop(TIM5_TONE_CHANNEL_4);
                 }
             }
         }

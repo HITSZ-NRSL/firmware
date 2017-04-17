@@ -17,8 +17,8 @@
   ******************************************************************************
 */
 
-#ifndef RGBLED_HAL_H
-#define RGBLED_HAL_H
+#ifndef UI_HAL_H
+#define UI_HAL_H
 
 #include <stdint.h>
 

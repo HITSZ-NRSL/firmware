@@ -38,7 +38,7 @@
 /* Private variables ---------------------------------------------------------*/
 extern UART_HandleTypeDef UartHandleCellular;
 /* Private function prototypes -----------------------------------------------*/
-void HAL_USART1_Cellular_Handler(UART_HandleTypeDef *huart);
+void HAL_USART2_Cellular_Handler(UART_HandleTypeDef *huart);
 /* Private functions ---------------------------------------------------------*/
 
 /******************************************************************************/
@@ -167,9 +167,9 @@ void OTG_FS_IRQHandler(void)
  * @param  None
  * @retval None
  */
-void USART1_IRQHandler(void)
+void USART2_IRQHandler(void)
 {
-    HAL_USART1_Cellular_Handler(&UartHandleCellular);
+    HAL_USART2_Cellular_Handler(&UartHandleCellular);
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

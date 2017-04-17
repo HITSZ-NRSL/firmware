@@ -42,15 +42,11 @@ void USB_USART_Initial(uint32_t baudRate)
     //create usb mutex
     //osMutexDef(USB_MUT);
     //usb_mutex = osMutexCreate(osMutex(USB_MUT));
-    if (LineCoding.bitrate != baudRate)
-    {
-        if (!baudRate && LineCoding.bitrate)
-        {
+    if (LineCoding.bitrate != baudRate) {
+        if (!baudRate && LineCoding.bitrate) {
             USBD_Stop(&USBD_Device);
             USBD_DeInit(&USBD_Device);
-        }
-        else if (!LineCoding.bitrate)
-        {
+        } else if (!LineCoding.bitrate) {
             /* Init Device Library */
             USBD_Init(&USBD_Device, &VCP_Desc, 0);
             /* Add Supported Class */
@@ -104,14 +100,10 @@ int32_t USB_USART_Receive_Data(uint8_t peek)
 {
     uint8_t data;
 
-    if(USB_USART_Available_Data())
-    {
-        if(peek)
-        {
+    if(USB_USART_Available_Data()) {
+        if(peek) {
             sdkTryQueueData(&USB_Rx_Queue, sdkGetQueueHead(&USB_Rx_Queue) , &data);
-        }
-        else
-        {
+        } else {
             sdkGetQueueData(&USB_Rx_Queue, &data);
         }
         return data;
@@ -127,8 +119,7 @@ int32_t USB_USART_Receive_Data(uint8_t peek)
  *******************************************************************************/
 int32_t USB_USART_Available_Data_For_Write(void)
 {
-    if (USB_USART_Connected())
-    {
+    if (USB_USART_Connected()) {
         return 1;
     }
     return -1;
@@ -145,12 +136,11 @@ void USB_USART_Send_Data(uint8_t Data)
     //TODO
     //osMutexWait(usb_mutex, osWaitForever);
 
-    if (USBD_STATE_CONFIGURED == USBD_Device.dev_state)
-    {
+    if (USBD_STATE_CONFIGURED == USBD_Device.dev_state) {
         USBD_CDC_SetTxBuffer(&USBD_Device, &Data, 1);
-        //while(USBD_CDC_TransmitPacket(&USBD_Device)!=USBD_OK);//如果没有连接 将卡在这里
-        USBD_CDC_TransmitPacket(&USBD_Device);
-        HAL_Delay_Microseconds(1000);
+        while(USBD_CDC_TransmitPacket(&USBD_Device)!=USBD_OK);//如果没有连接 将卡在这里
+        //USBD_CDC_TransmitPacket(&USBD_Device);
+        //HAL_Delay_Microseconds(1000);
     }
 
     //TODO

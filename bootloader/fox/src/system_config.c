@@ -22,37 +22,6 @@ void log_output(const char* msg)
 void usart_debug_initial(uint32_t baud)
 {
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    __HAL_RCC_USART2_CLK_ENABLE();
-
-    GPIO_InitTypeDef  GPIO_InitStruct;
-    /* UART TX GPIO pin configuration  */
-    GPIO_InitStruct.Pin       = GPIO_PIN_2 | GPIO_PIN_3;
-    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull      = GPIO_NOPULL;
-    GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
-    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-    UartHandleDebug.Instance          = USART2;
-    UartHandleDebug.Init.BaudRate     = baud;
-    UartHandleDebug.Init.WordLength   = UART_WORDLENGTH_8B;
-    UartHandleDebug.Init.StopBits     = UART_STOPBITS_1;
-    UartHandleDebug.Init.Parity       = UART_PARITY_NONE;
-    UartHandleDebug.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
-    UartHandleDebug.Init.Mode         = UART_MODE_TX_RX;
-    UartHandleDebug.Init.OverSampling = UART_OVERSAMPLING_16;
-    HAL_UART_DeInit(&UartHandleDebug);
-    HAL_UART_Init(&UartHandleDebug);
-
-    //set_logger_output(log_output, ALL_LEVEL); //注册debug实现函数
-}
-
-void usart_cellular_initial(uint32_t baud)
-{
-    HAL_NVIC_DisableIRQ(USART1_IRQn);
-    sdkReleaseQueue(&USART_Cellular_Queue);
-
-    __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_USART1_CLK_ENABLE();
 
     GPIO_InitTypeDef  GPIO_InitStruct;
@@ -64,7 +33,38 @@ void usart_cellular_initial(uint32_t baud)
     GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    UartHandleCellular.Instance          = USART1;
+    UartHandleDebug.Instance          = USART1;
+    UartHandleDebug.Init.BaudRate     = baud;
+    UartHandleDebug.Init.WordLength   = UART_WORDLENGTH_8B;
+    UartHandleDebug.Init.StopBits     = UART_STOPBITS_1;
+    UartHandleDebug.Init.Parity       = UART_PARITY_NONE;
+    UartHandleDebug.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
+    UartHandleDebug.Init.Mode         = UART_MODE_TX_RX;
+    UartHandleDebug.Init.OverSampling = UART_OVERSAMPLING_16;
+    HAL_UART_DeInit(&UartHandleDebug);
+    HAL_UART_Init(&UartHandleDebug);
+
+    set_logger_output(log_output, ALL_LEVEL); //注册debug实现函数
+}
+
+void usart_cellular_initial(uint32_t baud)
+{
+    HAL_NVIC_DisableIRQ(USART2_IRQn);
+    sdkReleaseQueue(&USART_Cellular_Queue);
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_USART2_CLK_ENABLE();
+
+    GPIO_InitTypeDef  GPIO_InitStruct;
+    /* UART TX GPIO pin configuration  */
+    GPIO_InitStruct.Pin       = GPIO_PIN_2 | GPIO_PIN_3;
+    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull      = GPIO_NOPULL;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_FAST;
+    GPIO_InitStruct.Alternate = GPIO_AF7_USART2;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    UartHandleCellular.Instance          = USART2;
     UartHandleCellular.Init.BaudRate     = baud;
     UartHandleCellular.Init.WordLength   = UART_WORDLENGTH_8B;
     UartHandleCellular.Init.StopBits     = UART_STOPBITS_1;
@@ -78,12 +78,12 @@ void usart_cellular_initial(uint32_t baud)
 
     sdkInitialQueue(&USART_Cellular_Queue, CELLULAR_USART_QUEUE_SIZE); //初始化cellular接受缓冲队列
     //Configure the NVIC for UART
-    HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(USART1_IRQn);
+    HAL_NVIC_SetPriority(USART2_IRQn, 0, 0);
+    HAL_NVIC_EnableIRQ(USART2_IRQn);
     __HAL_UART_ENABLE_IT(&UartHandleCellular, UART_IT_RXNE);
 }
 
-void HAL_USART1_Cellular_Handler(UART_HandleTypeDef *huart)
+void HAL_USART2_Cellular_Handler(UART_HandleTypeDef *huart)
 {
     uint8_t c;
 
@@ -99,52 +99,59 @@ void Cellular_GPIO_Initial(void)
 {
     GPIO_InitTypeDef   GPIO_InitStruct;
 
-    //A6 reset
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    GPIO_InitStruct.Pin = GPIO_PIN_9;
+    //sim800c PWK_KEY
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    GPIO_InitStruct.Pin = GPIO_PIN_6;
     GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET); //PWK_KEY 高电平
+
+    //sim800c VDD_EXT
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-    //A6 PWR_KEY
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    GPIO_InitStruct.Pin = GPIO_PIN_10;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET); //PWR_KEY
-    //A6 INT
-    /*
-    __HAL_RCC_GPIOC_CLK_ENABLE();
-    GPIO_InitStruct.Pin = GPIO_PIN_13;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET); //默认高电平
-    */
 }
 
-void Cellular_Reset(void)
+void Cellular_Power_On(void)
 {
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);  //reset
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_RESET); //PWR_KEY
-    HAL_Delay(200);
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);  //reset
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET); //PWR_KEY
+    if(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
+        //sim800c 重新开机
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);   //PWK_KEY 低电平
+        HAL_Delay(1200);
+        HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET); //PWK_KEY 高电平
+    }
+}
+
+void Cellular_Enter_UpdateMode(void)
+{
+    HAL_NVIC_DisableIRQ(USART2_IRQn);
+    sdkReleaseQueue(&USART_Cellular_Queue);
+
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    GPIO_InitTypeDef  GPIO_InitStruct;
+    GPIO_InitStruct.Pin       = GPIO_PIN_2 | GPIO_PIN_3;
+    GPIO_InitStruct.Mode      = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull      = GPIO_NOPULL;
+    GPIO_InitStruct.Speed     = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
 void HAL_System_Config(void)
 {
     Set_System();
     usart_debug_initial(115200);
-    HAL_RTC_Initial();
     HAL_UI_Initial();
-    usart_cellular_initial(115200);  //通讯采取115200波特率
+    HAL_UI_RGB_Color(RGB_COLOR_CYAN);
     Cellular_GPIO_Initial();
-    //Cellular_Reset();
-    HAL_EEPROM_Init();   //初始化eeprom区
+    Cellular_Power_On(); //必须放到HAL_RTC_Initial()之前 因为HAL_RTC_Initial()断电运行需要1S以上,此时检测VDD_EXT可能带来不确定因素.
+    HAL_RTC_Initial();
+    usart_cellular_initial(115200);  //通讯采取115200波特率
+    HAL_EEPROM_Init();  //初始化eeprom区
 }
 
 system_tick_t millis(void)
@@ -163,5 +170,10 @@ void delay(uint32_t ms)
 void System_Reset(void)
 {
     NVIC_SystemReset();
+}
+
+void System_LineCodingBitRateHandler(uint32_t bitrate)
+{
+    usart_cellular_initial(bitrate);
 }
 

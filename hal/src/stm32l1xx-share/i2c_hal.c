@@ -495,4 +495,3 @@ void HAL_I2C_Enable_DMA_Mode(HAL_I2C_Interface i2c, bool enable,void* reserved)
     //TODO
     /* Presently I2C Master mode uses polling and I2C Slave mode uses Interrupt */
 }
-

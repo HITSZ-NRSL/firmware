@@ -149,8 +149,8 @@ void HAL_Core_Config(void)
 void HAL_Core_Load_params(void)
 {
     // load params
-    HAL_PARAMS_Load_System_Params();
     HAL_PARAMS_Load_Boot_Params();
+    HAL_PARAMS_Load_System_Params();
     // check if need init params
     if(INITPARAM_FLAG_FACTORY_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) //初始化参数 保留密钥
     {
@@ -169,11 +169,13 @@ void HAL_Core_Load_params(void)
 
     //保存子系统程序版本号
     char subsys_ver1[32] = {0}, subsys_ver2[32] = {0};
-    HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1));
-    HAL_PARAMS_Get_System_subsys_ver(subsys_ver2, sizeof(subsys_ver2));
-    if(strcmp(subsys_ver1, subsys_ver2))
+    if(HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1)))
     {
-        HAL_PARAMS_Set_System_subsys_ver(subsys_ver1);
+        HAL_PARAMS_Get_System_subsys_ver(subsys_ver2, sizeof(subsys_ver2));
+        if(strcmp(subsys_ver1, subsys_ver2))
+        {
+            HAL_PARAMS_Set_System_subsys_ver(subsys_ver1);
+        }
     }
 }
 

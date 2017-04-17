@@ -24,7 +24,12 @@
 int inet_gethostbyname(const char* hostname, uint16_t hostnameLen, HAL_IPAddress* out_ip_addr,
         network_interface_t nif, void* reserved)
 {
-    return -1;
+    uint32_t result = CellularMDM.gethostbyname(hostname);
+    if (result > 0) {
+        out_ip_addr->ipv4 = result;
+        return 0;
+    }
+    return 1;
 }
 
 int inet_ping(const HAL_IPAddress* address, network_interface_t nif, uint8_t nTries,

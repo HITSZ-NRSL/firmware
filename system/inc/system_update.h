@@ -21,8 +21,7 @@ void system_lineCodingBitRateHandler(uint32_t bitrate);
 }
 #endif
 
-
-#ifndef configNO_NETWORK
+#ifndef configNO_CLOUD
 
 #define UPDATE_ERROR_OK                 (0)
 #define UPDATE_ERROR_WRITE              (1)

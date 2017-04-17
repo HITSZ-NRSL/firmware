@@ -31,7 +31,14 @@ extern "C" {
 #define HALSOCKET_DEBUG_D(...)
 #endif
 
-const sock_handle_t SOCKET_MAX = (sock_handle_t)5; // 5 total sockets, handle 0-4
+typedef struct {
+    int handle;
+    uint8_t ipproto;
+} SockCtrl;
+
+static volatile SockCtrl _sockets[10];
+
+const sock_handle_t SOCKET_MAX = (sock_handle_t)10; // 10 total sockets, handle 0-9
 const sock_handle_t SOCKET_INVALID = (sock_handle_t)-1;
 
 sock_handle_t socket_create(uint8_t family, uint8_t type, uint8_t protocol, uint16_t port, network_interface_t nif)
@@ -54,6 +61,9 @@ sock_handle_t socket_create(uint8_t family, uint8_t type, uint8_t protocol, uint
         tSocketAddr.sa_data[5] = 0;
         bind(handle, &tSocketAddr, sizeof(tSocketAddr));
         fcntl(handle, F_SETFL, O_NONBLOCK);
+
+        _sockets[handle].handle = handle;
+        _sockets[handle].ipproto = protocol;
     } else if (socket_handle_valid(handle) && (protocol==IPPROTO_TCP)) {
         /*  Unimplemented: connect timeout
         struct timeval tv;
@@ -61,18 +71,23 @@ sock_handle_t socket_create(uint8_t family, uint8_t type, uint8_t protocol, uint
         tv.tv_usec = 0;
         setsockopt(handle, SOL_SOCKET, SO_CONTIMEO, (char *)&tv, sizeof(struct timeval));
         */
+        _sockets[handle].handle = handle;
+        _sockets[handle].ipproto = protocol;
     }
     return handle;
 }
 
 int32_t socket_connect(sock_handle_t sd, const sockaddr_t *addr, long addrlen)
 {
-    struct sockaddr tSocketAddr;
+    if (socket_handle_valid(sd) && (_sockets[sd].ipproto==IPPROTO_TCP)) {
+        struct sockaddr tSocketAddr;
 
-    memset(&tSocketAddr, 0, sizeof(struct sockaddr));
-    tSocketAddr.sa_family = addr->sa_family;
-    memcpy(tSocketAddr.sa_data, addr->sa_data, 14);
-    return connect(sd, &tSocketAddr, sizeof(tSocketAddr));
+        memset(&tSocketAddr, 0, sizeof(struct sockaddr));
+        tSocketAddr.sa_family = addr->sa_family;
+        memcpy(tSocketAddr.sa_data, addr->sa_data, 14);
+        return connect(sd, &tSocketAddr, sizeof(tSocketAddr));
+    }
+    return 0;
 }
 
 sock_result_t socket_reset_blocking_call()

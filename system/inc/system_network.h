@@ -71,10 +71,6 @@ void network_off(network_handle_t network, uint32_t flags, uint32_t param1, void
  * @param flags     NETWORK_LISTEN_EXIT bring the device out of listening mode
  * @param reserved
  */
-void network_listen(network_handle_t network, uint32_t flags, void* reserved);
-bool network_listening(network_handle_t network, uint32_t param1, void* reserved);
-
-
 bool network_has_credentials(network_handle_t network, uint32_t param1, void* reserved);
 
 #include "wlan_hal.h"

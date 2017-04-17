@@ -111,6 +111,7 @@ class UDP : public Stream, public Printable {
          */
         void releaseBuffer();
 
+        virtual uint8_t begin(IPAddress remoteIP, uint16_t remotePort, uint16_t port, network_interface_t nif=0);
         /**
          * @param port  The local port to connect to.
          * @param nif   The network interface to connect to
@@ -155,8 +156,9 @@ class UDP : public Stream, public Printable {
          * @param port      The destination port of the peer
          * @return non-zero on success.
          */
-        virtual int beginPacket(IPAddress ip, uint16_t port);
-        virtual int beginPacket(const char *host, uint16_t port);
+        virtual int beginPacket();
+        virtual int beginPacket(IPAddress remoteIP, uint16_t remotePort);
+        virtual int beginPacket(const char *remoteHost, uint16_t remotePort);
 
         /**
          * Writes to the currently open packet after a call to {@link #beginPacket}.

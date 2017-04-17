@@ -18,6 +18,7 @@
  */
 
 #include "intorobot_config.h"
+
 #include "wiring_ticks.h"
 #include "system_network.h"
 #include "system_network_internal.h"
@@ -30,13 +31,14 @@
 #include "ui_hal.h"
 #include <string.h>
 
-volatile uint8_t INTOROBOT_WLAN_STARTED;
-volatile uint8_t INTOROBOT_WLAN_SLEEP;
-
-#ifndef configNO_NETWORK
-
 uint32_t wlan_watchdog_base;
 uint32_t wlan_watchdog_duration;
+
+volatile uint8_t INTOROBOT_WLAN_RESET;
+volatile uint8_t INTOROBOT_WLAN_SLEEP;
+volatile uint8_t INTOROBOT_WLAN_STARTED;
+
+#ifndef configNO_NETWORK
 
 #ifdef configWIRING_WIFI_ENABLE
 #include "system_network_wifi.h"
@@ -52,6 +54,25 @@ ManagedNetworkInterface& network = cellular;
 inline NetworkInterface& nif(network_interface_t _nif) { return cellular; }
 #endif
 
+void network_notify_connected()
+{
+    network.notify_connected();
+}
+
+void network_notify_disconnected()
+{
+    network.notify_disconnected();
+}
+
+void network_notify_can_shutdown()
+{
+    network.notify_can_shutdown();
+}
+
+void network_notify_dhcp(bool dhcp)
+{
+    network.notify_dhcp(dhcp);
+}
 
 const void* network_config(network_handle_t network, uint32_t param, void* reserved)
 {
@@ -71,11 +92,6 @@ void network_disconnect(network_handle_t network, uint32_t param, void* reserved
 bool network_ready(network_handle_t network, uint32_t param, void* reserved)
 {
     return nif(network).ready();
-}
-
-bool network_status(network_handle_t network, uint32_t param, void* reserved)
-{
-    return nif(network).status();
 }
 
 bool network_connecting(network_handle_t network, uint32_t param, void* reserved)
@@ -113,16 +129,6 @@ void network_off(network_handle_t network, uint32_t flags, uint32_t param, void*
  * @param flags  bit 0 set means to stop listening.
  * @param
  */
-void network_listen(network_handle_t network, uint32_t flags, void*)
-{
-    nif(network).listen();
-}
-
-bool network_listening(network_handle_t network, uint32_t, void*)
-{
-    return nif(network).listening();
-}
-
 int network_set_credentials(network_handle_t network, uint32_t, NetworkCredentials* credentials, void*)
 {
     SYSTEM_THREAD_CONTEXT_SYNC_CALL_RESULT(nif(network).set_credentials(credentials));

@@ -22,21 +22,51 @@
 #include "wlan_hal.h"
 #include "wiring_ex_process.h"
 
+//=======net notify===========
+static HAL_NET_Callbacks netCallbacks = { 0 };
+
+void HAL_NET_SetCallbacks(const HAL_NET_Callbacks* callbacks, void* reserved)
+{
+    netCallbacks.notify_connected = callbacks->notify_connected;
+    netCallbacks.notify_disconnected = callbacks->notify_disconnected;
+    netCallbacks.notify_dhcp = callbacks->notify_dhcp;
+    netCallbacks.notify_can_shutdown = callbacks->notify_can_shutdown;
+}
+
+void HAL_NET_notify_connected()
+{
+    if (netCallbacks.notify_connected) {
+        netCallbacks.notify_connected();
+    }
+}
+
+void HAL_NET_notify_disconnected()
+{
+    if (netCallbacks.notify_disconnected) {
+        netCallbacks.notify_disconnected();
+    }
+}
+
+void HAL_NET_notify_dhcp(bool dhcp)
+{
+    if (netCallbacks.notify_dhcp) {
+        netCallbacks.notify_dhcp(dhcp); // dhcp dhcp
+    }
+}
+
+void HAL_NET_notify_can_shutdown()
+{
+    if (netCallbacks.notify_can_shutdown) {
+        netCallbacks.notify_can_shutdown();
+    }
+}
+
 uint32_t HAL_NET_SetNetWatchDog(uint32_t timeOutInMS)
 {
     return 0;
 }
 
-int wlan_clear_credentials()
-{
-    return 0;
-}
-
-int wlan_has_credentials()
-{
-    return 0;
-}
-
+//=======wifi activate/deactivate===========
 wlan_result_t wlan_activate()
 {
     return 0;
@@ -47,7 +77,12 @@ wlan_result_t wlan_deactivate()
     return 0;
 }
 
-int wlan_connect()
+void wlan_setup()
+{
+}
+
+//=======wifi connect===========
+int wlan_connect_init()
 {
     Process Proc;
 
@@ -57,23 +92,19 @@ int wlan_connect()
     return 0;
 }
 
-wlan_result_t wlan_disconnect()
+wlan_result_t wlan_connect_finalize()
 {
     return 0;
 }
 
-int wlan_status()
+wlan_result_t wlan_disconnect_now()
 {
-    Process Proc;
+    return 0;
+}
 
-    Proc.begin("wifi_connect");
-    Proc.addParameter("STATUS");
-    int res = Proc.run();
-    if(res == 0)
-    {
-        return 0;
-    }
-    return -1;
+void wlan_connect_cancel(bool called_from_isr)
+{
+
 }
 
 int wlan_connected_rssi(void)
@@ -85,8 +116,7 @@ int wlan_connected_rssi(void)
     Proc.begin("wifi_get_current");
     Proc.addParameter("RSSI");
     int res = Proc.run();
-    if(res == 0)
-    {
+    if(res == 0) {
         while (Proc.available())
         {
             tmp+=(char)Proc.read();
@@ -94,6 +124,50 @@ int wlan_connected_rssi(void)
         rssi=tmp.toInt();
     }
     return rssi;
+}
+
+void wlan_drive_now(void)
+{
+}
+
+int wlan_status()
+{
+    Process Proc;
+
+    Proc.begin("wifi_connect");
+    Proc.addParameter("STATUS");
+    int res = Proc.run();
+    if(res == 0) {
+        return 0;
+    }
+    return -1;
+}
+
+//================credentials======================
+int wlan_clear_credentials()
+{
+    return 0;
+}
+
+int wlan_has_credentials()
+{
+    return 0;
+}
+
+bool wlan_reset_credentials_store_required()
+{
+    return false;
+}
+
+wlan_result_t wlan_reset_credentials_store()
+{
+    wlan_clear_credentials();
+    return 0;
+}
+
+int wlan_get_credentials(wlan_scan_result_t callback, void* callback_data)
+{
+    return 0;
 }
 
 int wlan_set_credentials(WLanCredentials* c)
@@ -104,8 +178,7 @@ int wlan_set_credentials(WLanCredentials* c)
     Proc.addParameter(c->ssid);
     if(c->password) {
         Proc.addParameter(c->password);
-    }
-    else {
+    } else {
         Proc.addParameter("");
     }
     Proc.addParameter("auto");
@@ -129,6 +202,7 @@ int wlan_set_credentials(WLanCredentials* c)
     return 0;
 }
 
+//==============imlink==================
 void wlan_Imlink_start()
 {
     Process Proc;
@@ -152,10 +226,6 @@ void wlan_Imlink_stop()
     Proc.run();
 }
 
-void wlan_setup()
-{
-}
-
 void wlan_fetch_ipconfig(WLanConfig* config)
 {
     uint8_t addr_data[4];
@@ -167,8 +237,7 @@ void wlan_fetch_ipconfig(WLanConfig* config)
     Proc.begin("wifi_get_ifconfig");
     Proc.addParameter("LOCALIP");
     res = Proc.run();
-    if(res == 0)
-    {
+    if(res == 0) {
         while (Proc.available())
         {
             tmp+=(char)Proc.read();
@@ -193,8 +262,7 @@ void wlan_fetch_ipconfig(WLanConfig* config)
     Proc.begin("wifi_get_ifconfig");
     Proc.addParameter("GATEWAYIP");
     res = Proc.run();
-    if(res == 0)
-    {
+    if(res == 0) {
         while (Proc.available())
         {
             tmp+=(char)Proc.read();
@@ -206,8 +274,7 @@ void wlan_fetch_ipconfig(WLanConfig* config)
     Proc.begin("wifi_get_ifconfig");
     Proc.addParameter("MACADDRESS");
     res = Proc.run();
-    if(res == 0)
-    {
+    if(res == 0) {
         while (Proc.available())
         {
             tmp+=(char)Proc.read();
@@ -219,8 +286,7 @@ void wlan_fetch_ipconfig(WLanConfig* config)
     Proc.begin("wifi_get_current");
     Proc.addParameter("SSID");
     res = Proc.run();
-    if(res == 0)
-    {
+    if(res == 0) {
         while (Proc.available())
         {
             tmp+=(char)Proc.read();
@@ -231,8 +297,7 @@ void wlan_fetch_ipconfig(WLanConfig* config)
     Proc.begin("wifi_get_current");
     Proc.addParameter("BSSID");
     res = Proc.run();
-    if(res == 0)
-    {
+    if(res == 0) {
         while (Proc.available())
         {
             tmp+=(char)Proc.read();
@@ -273,14 +338,6 @@ int wlan_scan(wlan_scan_result_t callback, void* cookie)
     return -1;
 }
 
-/**
- * Lists all WLAN credentials currently stored on the device
- */
-int wlan_get_credentials(wlan_scan_result_t callback, void* callback_data)
-{
-    // Reading credentials from the CC3000 is not possible
-    return 0;
-}
 
 /**
  * wifi set station and ap mac addr

@@ -67,8 +67,7 @@ public:
 #ifdef INTOROBOT_PLATFORM
     static inline uint32_t ticksPerMicrosecond()
     {
-        //return SYSTEM_US_TICKS;
-        return 0;
+        return SYSTEM_US_TICKS;
     }
 
     static inline uint32_t ticks()

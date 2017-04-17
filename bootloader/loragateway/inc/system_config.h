@@ -24,7 +24,7 @@ extern "C" {
 
 void usart_cellular_initial(uint32_t baud);
 void Cellular_GPIO_Initial(void);
-void Cellular_Reset(void);
+void Cellular_Power_On(void);
 void HAL_System_Config(void);
 system_tick_t millis(void);
 void delay(uint32_t ms);

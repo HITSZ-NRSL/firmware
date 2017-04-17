@@ -63,9 +63,10 @@
 using namespace intorobot;
 
 #ifndef configNO_CLOUD
-volatile uint8_t g_intorobot_network_connected = 0;    //网络连接状态 1连接 0断开
-volatile uint8_t g_intorobot_cloud_pregrocessed = 0;   //平台链接预处理状态 1已经处理
-volatile uint8_t g_intorobot_cloud_connected = 0;      //平台连接状态 1连接上了
+volatile uint8_t INTOROBOT_CLOUD_SOCKETED = 0;           //网络连接状态 1连接 0断开
+volatile uint8_t INTOROBOT_CLOUD_CONNECT_PREPARED = 0;   //平台链接预处理状态 1已经处理
+volatile uint8_t INTOROBOT_CLOUD_CONNECTED = 0;          //平台连接状态 1连接上了
+
 
 struct CallBackList g_callback_list;  //回调结构体
 struct CloudDebugBuffer  g_debug_tx_buffer;
@@ -1062,7 +1063,7 @@ void mqtt_receive_debug_info(uint8_t *pIn, uint32_t len)
  */
 bool intorobot_cloud_flag_connected(void)
 {
-    if (g_intorobot_network_connected && g_intorobot_cloud_connected) {
+    if (INTOROBOT_CLOUD_SOCKETED && INTOROBOT_CLOUD_CONNECTED) {
         return true;
     } else {
         return false;
@@ -1188,7 +1189,7 @@ int intorobot_cloud_handle(void)
 
 static UDP ntp_time_udp;
 /*Send the request packet to the NTP server.*/
-static void send_ntp_request_packet(IPAddress timeServerIP)
+static void send_ntp_request_packet()
 {
     uint8_t packetBuffer[48];
 
@@ -1202,7 +1203,7 @@ static void send_ntp_request_packet(IPAddress timeServerIP)
     packetBuffer[13]  = 0x4E;
     packetBuffer[14]  = 49;
     packetBuffer[15]  = 52;
-    ntp_time_udp.beginPacket(timeServerIP, (int)123); // NTP Server and Port
+    ntp_time_udp.beginPacket(); // NTP Server and Port
     ntp_time_udp.write(packetBuffer, 48);
     ntp_time_udp.endPacket();
 }
@@ -1216,10 +1217,10 @@ static time_t get_ntp_time(void)
     IPAddress ntpServer = Cellular.resolve(NTP_TIMESERVER);
 #endif
 
-    ntp_time_udp.begin(8888);
+    ntp_time_udp.begin(ntpServer, (int)123, 8888);
     for (int i = 0 ; i < 4 ; i++)
     {
-        send_ntp_request_packet(ntpServer);
+        send_ntp_request_packet();
         uint32_t beginWait = millis();
         while (millis() - beginWait < 2000)
         {

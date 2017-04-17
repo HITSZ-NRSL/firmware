@@ -119,8 +119,10 @@ void Network_Setup(void)
         network.connect();
     }
     if (network.connected()) {
+        INTOROBOT_CLOUD_SOCKETED = 1;
         system_rgb_blink(RGB_COLOR_BLUE, 1000);//蓝灯闪烁
     } else {
+        INTOROBOT_CLOUD_SOCKETED = 0;
         system_rgb_blink(RGB_COLOR_GREEN, 1000);//绿灯闪烁
     }
     network_connection_attempt_init();
@@ -133,15 +135,18 @@ void manage_network_connection()
         return;
 
     static bool was_connected = false;
-    if (network.status()) {
+    if (network.ready()) {
         if(!was_connected) {
+            DEBUG("was_connected = %d", was_connected);
             system_rgb_blink(RGB_COLOR_BLUE, 1000);//蓝灯闪烁
+            INTOROBOT_CLOUD_SOCKETED = 1;
         }
         was_connected = true;
     } else {
         if(was_connected) {
+            INTOROBOT_CLOUD_SOCKETED = 0;
 #ifndef configNO_CLOUD
-            g_intorobot_cloud_connected = 0;
+            INTOROBOT_CLOUD_CONNECTED = 0;
 #endif
             system_rgb_blink(RGB_COLOR_GREEN, 1000);//绿灯闪烁
         }
@@ -161,7 +166,7 @@ void manage_app_auto_update(void)
 #if 0
     if (network.connected())
     {
-        if (g_intorobot_cloud_connected)
+        if (INTOROBOT_CLOUD_CONNECTED)
         {
             //发送时间间隔到
             static system_tick_t start_millis = millis();
@@ -214,9 +219,8 @@ void manage_app_auto_update(void)
 
 void preprocess_cloud_connection(void)
 {
-    if (network.connected()) {
-        if (!g_intorobot_cloud_pregrocessed) {
-
+    if (INTOROBOT_CLOUD_SOCKETED) {
+        if (!INTOROBOT_CLOUD_CONNECT_PREPARED) {
             // 同步时间
             intorobot_sync_time();
 
@@ -235,31 +239,32 @@ void preprocess_cloud_connection(void)
                     // 注册设备
                     if(intorobot_device_register())
                     {
+                        HAL_Delay_Milliseconds(200);
                         // 激活设备
                         intorobot_device_activate();
                     }
                     break;
             }
             cloud_connection_attempt_init();
-            g_intorobot_cloud_pregrocessed = 1;
+            INTOROBOT_CLOUD_CONNECT_PREPARED = 1;
         }
     }
 }
 
 void establish_cloud_connection(void)
 {
-    if (network.connected()) {
-        if (!g_intorobot_cloud_connected) {
+    if (INTOROBOT_CLOUD_SOCKETED) {
+        if (!INTOROBOT_CLOUD_CONNECTED) {
             if (in_cloud_backoff_period())
                 return;
 
             int connect_result = intorobot_cloud_connect();
             if (connect_result >= 0) {
-                g_intorobot_cloud_connected = 1;
+                INTOROBOT_CLOUD_CONNECTED = 1;
                 cloud_failed_connection_attempts = 0;
                 system_rgb_blink(RGB_COLOR_WHITE, 2000); //白灯闪烁
             } else {
-                g_intorobot_cloud_connected = 0;
+                INTOROBOT_CLOUD_CONNECTED = 0;
                 intorobot_cloud_disconnect();
                 cloud_connection_failed();
             }
@@ -269,11 +274,11 @@ void establish_cloud_connection(void)
 
 void handle_cloud_connection(void)
 {
-    if (network.connected()) {
-        if (g_intorobot_cloud_connected) {
+    if (INTOROBOT_CLOUD_SOCKETED) {
+        if (INTOROBOT_CLOUD_CONNECTED) {
             int err = intorobot_cloud_handle();
             if (err) {
-                g_intorobot_cloud_connected = 0;
+                INTOROBOT_CLOUD_CONNECTED = 0;
                 intorobot_cloud_disconnect();
                 system_rgb_blink(RGB_COLOR_BLUE, 1000);
             }
@@ -292,6 +297,17 @@ void manage_cloud_connection(void)
         handle_cloud_connection();
     }
 }
+
+void cloud_disconnect(bool closeSocket)
+{
+    if (INTOROBOT_CLOUD_CONNECTED) {
+        STASK_DEBUG("Cloud: disconnecting");
+        INTOROBOT_CLOUD_CONNECTED = 0;
+        intorobot_cloud_disconnect();
+        STASK_DEBUG("Cloud: disconnected");
+    }
+}
+
 #endif
 
 #ifndef configNO_LORAWAN
@@ -329,7 +345,7 @@ void LoraWAN_Setup(void)
                 LMIC_setLinkCheckMode(0);
                 LMIC.dn2Dr = DR_SF9;
                 LMIC_setDrTxpow(DR_SF7,14);
-                g_intorobot_lorawan_joined = 1;
+                INTOROBOT_LORAWAN_JOINED = 1;
                 system_rgb_blink(RGB_COLOR_WHITE, 2000); //白灯闪烁
             }
             break;
@@ -347,9 +363,9 @@ void LoraWAN_Setup(void)
 
 void manage_lorawan_connection(void)
 {
-    if(g_intorobot_lorawan_joined && !g_intorobot_lorawan_connected) {
+    if(INTOROBOT_LORAWAN_JOINED && !INTOROBOT_LORAWAN_CONNECTED) {
         intorobot_lorawan_send_terminal_info();
-        g_intorobot_lorawan_connected = 1;
+        INTOROBOT_LORAWAN_CONNECTED = 1;
     }
     os_runloop_once();
 }

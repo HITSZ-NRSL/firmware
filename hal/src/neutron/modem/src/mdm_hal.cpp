@@ -276,6 +276,15 @@ int MDMParser::waitFinalResp(_CALLBACKPTR cb /* = NULL*/,
                     }
                 }
             }
+            else if (type == TYPE_CONNECT) {
+            }
+            else if (type == TYPE_DHCP) {
+                HAL_NET_notify_connected();
+                HAL_NET_notify_dhcp(true);
+            }
+            else if (type == TYPE_DISCONNECT) {
+                HAL_NET_notify_disconnected();
+            }
             /*******************************************/
             if (cb) {
                 int len = LENGTH(ret);
@@ -295,7 +304,7 @@ int MDMParser::waitFinalResp(_CALLBACKPTR cb /* = NULL*/,
                 return RESP_ABORTED; // This means the current command was ABORTED, so retry your command if critical.
         }
         // relax a bit
-        //HAL_Delay_Milliseconds(10);
+        HAL_Delay_Milliseconds(10);
     }while (!TIMEOUT(start, timeout_ms) && !_cancel_all_operations);
 
     return WAIT;
@@ -724,6 +733,11 @@ ip_status_t MDMParser::getIpStatus(void)
     }
     UNLOCK();
     return result;
+}
+
+void MDMParser::drive(void)
+{
+    waitFinalResp(NULL, NULL, 0);
 }
 
 int MDMParser::_cbGetWifiInfo(int type, const char* buf, int len, wifi_info_t *wifiInfo)

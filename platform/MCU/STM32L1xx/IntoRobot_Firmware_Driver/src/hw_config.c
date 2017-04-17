@@ -80,13 +80,16 @@ static void SystemClock_Config(void)
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
-    /* Enable HSE Oscillator and Activate PLL with HSE as source */
-    RCC_OscInitStruct.OscillatorType      = RCC_OSCILLATORTYPE_HSE;
-    RCC_OscInitStruct.HSEState            = RCC_HSE_ON;
-    RCC_OscInitStruct.PLL.PLLState        = RCC_PLL_ON;
-    RCC_OscInitStruct.PLL.PLLSource       = RCC_PLLSOURCE_HSE;
-    RCC_OscInitStruct.PLL.PLLMUL          = RCC_PLL_MUL8;
-    RCC_OscInitStruct.PLL.PLLDIV          = RCC_PLL_DIV3;
+    //内部时钟需打开，用于ADC的模拟部分时钟来源,其ADC的数字时钟来源为APB2
+    RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_HSE;
+    RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+    RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+    RCC_OscInitStruct.HSICalibrationValue = 16;
+    /* RCC_OscInitStruct.LSIState = RCC_LSI_ON; */
+    RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+    RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+    RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL8;
+    RCC_OscInitStruct.PLL.PLLDIV = RCC_PLL_DIV3;
     if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
         Error_Handler();
@@ -110,6 +113,19 @@ static void SystemClock_Config(void)
     {
         Error_Handler();
     }
+
+    #if 0
+    RCC_PeriphCLKInitTypeDef PeriphClkInit;
+
+    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
+    PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
+    HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
+	
+    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
+	
+    HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
+    #endif
+	
 }
 
 /**

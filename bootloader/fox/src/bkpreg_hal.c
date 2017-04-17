@@ -1,9 +1,3 @@
-#if 0
-// pull in the sources from the HAL. It's a bit of a hack, but is simpler than trying to link the
-// full hal library.
-#include "../src/neutron/bkpreg_hal.c"
-
-#else
 
 #include "bkpreg_hal.h"
 #include "hw_config.h"
@@ -109,4 +103,3 @@ uint32_t HAL_Core_Read_Backup_Register(uint32_t BKP_DR)
     return 0xFFFFFFFF;
 }
 
-#endif

@@ -25,6 +25,9 @@
 #include "intorobot_macros.h"
 #include "service_debug.h"
 #include "timer_hal.h"
+
+#undef PLATFORM_THREADING  // 关闭debug 任务保护
+
 #if PLATFORM_THREADING
 #include "concurrent_hal.h"
 #endif
@@ -33,10 +36,6 @@ LoggerOutputLevel log_level_at_run_time = LOG_LEVEL_AT_RUN_TIME;
 debug_output_fn debug_output_;
 
 #if PLATFORM_THREADING
-
-#define LOCK()      __debug_lock()
-#define UNLOCK()    __debug_unlock()
-
 static os_mutex_recursive_t debug_mutex = 0;
 
 void init_debug_mutex(void)
@@ -55,7 +54,15 @@ static void __debug_unlock(void)
     if (debug_mutex)
         os_mutex_recursive_unlock(debug_mutex);
 }
+
+#define LOCK()      __debug_lock()
+#define UNLOCK()    __debug_unlock()
+
 #else
+
+void init_debug_mutex(void)
+{
+}
 
 #define LOCK()
 #define UNLOCK()

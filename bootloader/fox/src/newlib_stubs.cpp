@@ -1,9 +1,3 @@
-#if 0
-// pull in the sources from the HAL. It's a bit of a hack, but is simpler than trying to link the
-// full hal library.
-#include "../src/neutron/newlib_stubs.cpp"
-
-#else
 
 /* Define caddr_t as char* */
 #include <sys/types.h>
@@ -165,4 +159,3 @@ void __verbose_terminate_handler()
 
 }
 
-#endif

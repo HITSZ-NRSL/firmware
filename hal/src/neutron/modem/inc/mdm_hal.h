@@ -32,7 +32,7 @@
 #include "enums_hal.h"
 
 /* Include for debug capabilty */
-//#define MODEM_DEBUG
+#define MODEM_DEBUG
 
 #define MDM_ESP8266_RESET_DELAY  4000
 
@@ -104,6 +104,9 @@ public:
 
     /* get wifi status */
     ip_status_t getIpStatus(void);
+
+    /* drive */
+    void drive(void);
 
     /* get wifi info */
     bool getWifiInfo(wifi_info_t *wifiInfo);

@@ -118,7 +118,14 @@
 #endif
 
 //NVIC Priorities based on NVIC_PriorityGroup_4
-#define USART1_IRQ_PRIORITY                 0       //modem(esp8266) USART1 Interrupt
+#if PLATFORM_NEUTRON == PLATFORM_ID || PLATFORM_LORAGATEWAY == PLATFORM_ID
+#define USART1_IRQ_PRIORITY                 0       //modem(esp8266 sim800c)
+#define USART2_IRQ_PRIORITY                 7       //USART2 Interrupt
+#else
+#define USART1_IRQ_PRIORITY                 7       //USART1 Interrupt
+#define USART2_IRQ_PRIORITY                 0       //modem(sim800c) USART2 Interrupt
+#endif
+
 #ifdef USE_USB_OTG_FS
 #define OTG_FS_IRQ_PRIORITY                 2       //USB OTG FS Interrupt
 #define OTG_FS_WKUP_IRQ_PRIORITY            2       //USB OTG FS Wakeup Interrupt
@@ -131,7 +138,6 @@
 #define RTC_Alarm_IRQ_PRIORITY              3       //RTC Alarm Interrupt
 #define RTC_WKUP_IRQ_PRIORITY               4       //RTC Seconds Interrupt
 #define TIM2_IRQ_PRIORITY                   6       //TIM2 CC Interrupt(Button Use)
-#define USART2_IRQ_PRIORITY                 7       //USART2 Interrupt
 #define EXTI15_10_IRQ_PRIORITY              8       //User Interrupt
 #define EXTI9_5_IRQ_PRIORITY                9       //User Interrupt
 #define EXTI0_IRQ_PRIORITY                  10      //User Interrupt

@@ -1,9 +1,3 @@
-#if 0
-// pull in the sources from the HAL. It's a bit of a hack, but is simpler than trying to link the
-// full hal library.
-#include "../src/neutron/params_impl.h"
-
-#else
 
 #ifndef PARAMS_IMPL_H_
 #define PARAMS_IMPL_H_
@@ -22,8 +16,12 @@ typedef struct __attribute__((packed))
     uint32_t boot_version;    // bootloader版本号
     uint8_t  boot_flag;       // bootloader处理标志 0:正常启动  1:进入默认程序恢复  2:进入esp8266串口转发  3:恢复出厂  4:进入在线应用升级
     uint8_t  initparam_flag;  // 参数初始化标志  0:应用参数不初始化  1:应用参数恢复出厂设置(保留密钥)  2:应用参数恢复出厂设置(不保留密钥)
-    uint8_t  reserved[61];    // 参数预留区 每添加一个参数，预留区大小减1
-    uint8_t  end;    // 参数预留区 每添加一个参数，预留区大小减1
+    uint8_t  reserved[2];     // 参数预留区 每添加一个参数，预留区大小减1
+    uint32_t ota_app_size;    // 在线编程下载文件大小
+    uint32_t def_app_size;    // 默认应用文件大小
+    uint32_t boot_size;       // boot文件大小
+    uint8_t  reserved1[47];   // 参数预留区 每添加一个参数，预留区大小减1
+    uint8_t  end;             // 参数预留区 每添加一个参数，预留区大小减1
 }boot_params_t;
 
 
@@ -52,4 +50,3 @@ typedef struct __attribute__((packed))
 
 #endif /*SYSTEM_PARAMS_H_*/
 
-#endif

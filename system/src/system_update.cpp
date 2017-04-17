@@ -67,7 +67,7 @@ void system_lineCodingBitRateHandler(uint32_t bitrate)
 #endif
 }
 
-#ifndef configNO_NETWORK
+#ifndef configNO_CLOUD
 
 UpdaterClass::UpdaterClass()
     : _error(0)

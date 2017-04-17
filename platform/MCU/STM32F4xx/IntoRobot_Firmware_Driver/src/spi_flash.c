@@ -503,10 +503,11 @@ int sFLASH_SelfTest(void)
     int TestStatus = -1;
 
     /* Get SPI Flash ID */
-    FlashID = sFLASH_ReadID();
+    //FlashID = sFLASH_ReadID();
 
     /* Check the SPI Flash ID */
-    if((FlashID == sFLASH_MX25L8006E_ID) || (FlashID == sFLASH_PN25F16_ID))
+    //if((FlashID == sFLASH_MX25L8006E_ID) || (FlashID == sFLASH_PN25F16_ID))
+    if(1)
     {
         /* Perform a write in the Flash followed by a read of the written data */
         /* Erase SPI FLASH Sector to write on */

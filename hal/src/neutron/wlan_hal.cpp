@@ -17,25 +17,56 @@
   ******************************************************************************
 */
 
-#include<stdlib.h>
+#include <stdlib.h>
 #include "wlan_hal.h"
+#include "delay_hal.h"
 #include "parser.h"
+
+//=======net notify===========
+static HAL_NET_Callbacks netCallbacks = { 0 };
+
+void HAL_NET_SetCallbacks(const HAL_NET_Callbacks* callbacks, void* reserved)
+{
+    netCallbacks.notify_connected = callbacks->notify_connected;
+    netCallbacks.notify_disconnected = callbacks->notify_disconnected;
+    netCallbacks.notify_dhcp = callbacks->notify_dhcp;
+    netCallbacks.notify_can_shutdown = callbacks->notify_can_shutdown;
+}
+
+void HAL_NET_notify_connected()
+{
+    if (netCallbacks.notify_connected) {
+        netCallbacks.notify_connected();
+    }
+}
+
+void HAL_NET_notify_disconnected()
+{
+    if (netCallbacks.notify_disconnected) {
+        netCallbacks.notify_disconnected();
+    }
+}
+
+void HAL_NET_notify_dhcp(bool dhcp)
+{
+    if (netCallbacks.notify_dhcp) {
+        netCallbacks.notify_dhcp(dhcp); // dhcp dhcp
+    }
+}
+
+void HAL_NET_notify_can_shutdown()
+{
+    if (netCallbacks.notify_can_shutdown) {
+        netCallbacks.notify_can_shutdown();
+    }
+}
 
 uint32_t HAL_NET_SetNetWatchDog(uint32_t timeOutInMS)
 {
     return 0;
 }
 
-int wlan_clear_credentials()
-{
-    return 0;
-}
-
-int wlan_has_credentials()
-{
-    return 0;
-}
-
+//=======wifi activate/deactivate===========
 wlan_result_t wlan_activate()
 {
     return 0;
@@ -46,31 +77,72 @@ wlan_result_t wlan_deactivate()
     return 0;
 }
 
-int wlan_connect()
+void wlan_setup()
+{
+    //esp8266MDM.reset();
+    //esp8266MDM.init();
+}
+
+//=======wifi connect===========
+int wlan_connect_init()
 {
     return 0;
 }
 
-wlan_result_t wlan_disconnect()
+wlan_result_t wlan_connect_finalize()
 {
     return 0;
 }
 
-int wlan_status()
+wlan_result_t wlan_disconnect_now()
 {
-    if(IPSTATUS_NOTCONNECTWIFI != esp8266MDM.getIpStatus()) {
-        return 0;
-    }
-    return -1;
+    return 0;
+}
+
+void wlan_connect_cancel(bool called_from_isr)
+{
+
 }
 
 int wlan_connected_rssi(void)
 {
     wifi_info_t wifiInfo;
 
-    if( true == esp8266MDM.getWifiInfo(&wifiInfo) ){
+    if( true == esp8266MDM.getWifiInfo(&wifiInfo) ) {
         return wifiInfo.rssi;
     }
+    return 0;
+}
+
+void wlan_drive_now(void)
+{
+    esp8266MDM.drive();
+}
+
+//================credentials======================
+int wlan_clear_credentials()
+{
+    return 0;
+}
+
+int wlan_has_credentials()
+{
+    return 0;
+}
+
+bool wlan_reset_credentials_store_required()
+{
+    return false;
+}
+
+wlan_result_t wlan_reset_credentials_store()
+{
+    wlan_clear_credentials();
+    return 0;
+}
+
+int wlan_get_credentials(wlan_scan_result_t callback, void* callback_data)
+{
     return 0;
 }
 
@@ -82,7 +154,7 @@ int wlan_set_credentials(WLanCredentials* c)
     return -1;
 }
 
-#include "delay_hal.h"
+//==============imlink==================
 void wlan_Imlink_start()
 {
     //esp8266MDM.reset();
@@ -100,12 +172,6 @@ void wlan_Imlink_stop()
     esp8266MDM.stopSmartconfig();
 }
 
-void wlan_setup()
-{
-    //esp8266MDM.reset();
-    //esp8266MDM.init();
-}
-
 void wlan_fetch_ipconfig(WLanConfig* config)
 {
     wifi_addr_t addr;
@@ -118,7 +184,7 @@ void wlan_fetch_ipconfig(WLanConfig* config)
         config->nw.aucIP.ipv4 = addr.IpAddr;
         memcpy(config->nw.uaMacAddr, addr.MacAddr, 6);
     }
-    if( true == esp8266MDM.getWifiInfo(&wifiInfo) ){
+    if( true == esp8266MDM.getWifiInfo(&wifiInfo) ) {
         memcpy(config->uaSSID, wifiInfo.ssid, 33);
         memcpy(config->BSSID, wifiInfo.bssid, 6);
     }
@@ -194,15 +260,13 @@ int wlan_scan(wlan_scan_result_t callback, void* cookie)
 {
     //申请内存
     wifi_ap_t *aps = (wifi_ap_t *)malloc(sizeof(wifi_ap_t)*WLAN_SCAN_AP_NUM);
-    if(aps == NULL)
-    {
+    if(aps == NULL) {
         return -1;
     }
 
     int result = esp8266MDM.apScan(aps, WLAN_SCAN_AP_NUM);
     //填充ap 列表
-    if(result)
-    {
+    if(result) {
         WiFiAccessPoint data;
         for(int n = 0; n < result; n++)
         {
@@ -219,15 +283,6 @@ int wlan_scan(wlan_scan_result_t callback, void* cookie)
     }
     free(aps);
     return result;
-}
-
-/**
- * Lists all WLAN credentials currently stored on the device
- */
-int wlan_get_credentials(wlan_scan_result_t callback, void* callback_data)
-{
-    // Reading credentials from the CC3000 is not possible
-    return 0;
 }
 
 /**

@@ -9,3 +9,4 @@ CPPSRC += $(call here_files,$(TARGET_HAL_SRC_PATH)/,*.cpp)
 ASRC += $(call here_files,$(TARGET_HAL_SRC_PATH)/,*.S)
 
 include $(call rwildcard,$(TARGET_HAL_STM32F4XX_SHARE_PATH)/,sources.mk)
+

@@ -116,7 +116,7 @@ struct EEPROMClass{
 
 	EEPROMClass()
     {
-    		HAL_EEPROM_Init();
+        HAL_EEPROM_Init();
     }
 
 
