@@ -115,16 +115,39 @@ void Cellular_GPIO_Initial(void)
     GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    //sim800c VBAT
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+    GPIO_InitStruct.Pin = GPIO_PIN_10;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
 void Cellular_Power_On(void)
 {
+    //sim800c VBAT Power On
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
+    HAL_Delay(1000);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
+
+    //sim800c 重新开机
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);   //PWK_KEY 低电平
+    HAL_Delay(1200);
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET); //PWK_KEY 高电平
+
+#if 0   //重启不断电重启模块
+    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
+
+    //sim800c VDD_EXT
     if(!HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_8)) {
         //sim800c 重新开机
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);   //PWK_KEY 低电平
         HAL_Delay(1200);
         HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET); //PWK_KEY 高电平
     }
+#endif
 }
 
 void Cellular_Enter_UpdateMode(void)

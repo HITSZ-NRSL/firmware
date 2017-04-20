@@ -5,7 +5,7 @@
 - 发布w323 整理GPIO
 - 发布l6   整理GPIO
 - 发布lora
-- 发布loragateway
+- 发布gl1000
 - 添加soft ap接口，配置添加ap配置
 - 添加硬件定时器接口
 - 梳理freertos和不带操作系统。处理后台程序逻辑

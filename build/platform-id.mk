@@ -75,7 +75,7 @@ ifeq ("$(PLATFORM)","anytest")
 PLATFORM_ID = 888203
 endif
 
-ifeq ("$(PLATFORM)","loragateway")
+ifeq ("$(PLATFORM)","gl1000")
 PLATFORM_ID = 888204
 endif
 
@@ -243,13 +243,13 @@ PLATFORM_BOOT_ADDR=0x08000000
 PLATFORM_APP_ADDR=0x08007000
 endif
 
-ifeq ("$(PLATFORM_ID)","888204") #loragateway
-PLATFORM=loragateway
+ifeq ("$(PLATFORM_ID)","888204") #gl1000
+PLATFORM=gl1000
 PLATFORM_DEVICE=STM32F411xE
-PLATFORM_NAME=loragateway
+PLATFORM_NAME=gl1000
 PLATFORM_MCU=STM32F4xx
 MCU_CORE=cortex-m4
-PRODUCT_DESC=IntoRobot loragateway, Internal flash 512k flash, 128k sram + SPI flash 4096K
+PRODUCT_DESC=IntoRobot gl1000, Internal flash 512k flash, 128k sram + SPI flash 4096K
 PLATFORM_BOOT_ADDR=0x08000000
 PLATFORM_APP_ADDR=0x08020000
 PLATFORM_THREADING=1

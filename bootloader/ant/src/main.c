@@ -58,7 +58,6 @@ int main(void)
 {
     HAL_System_Config();
     BOOT_DEBUG("boot start...\r\n");
-    HAL_UI_RGB_Color(RGB_COLOR_BLACK);
 
     HAL_PARAMS_Load_Boot_Params();
     HAL_PARAMS_Load_System_Params();
@@ -138,6 +137,8 @@ int main(void)
         BOOT_DEBUG("reboot\r\n");
         System_Reset();
     }
+
+    delay(1000);
 
     HAL_UI_RGB_Color(RGB_COLOR_RED);   // color the same with atom
     delay(LIGHTTIME);
