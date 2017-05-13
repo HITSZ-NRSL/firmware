@@ -33,7 +33,7 @@
 #include "wiring_httpclient.h"
 
 /*debug switch*/
-#define WIRING_HTTPCLIENT_DEBUG
+//#define WIRING_HTTPCLIENT_DEBUG
 
 #ifdef WIRING_HTTPCLIENT_DEBUG
 #define WHTTPCLIENT_DEBUG(...)  do {DEBUG(__VA_ARGS__);}while(0)

@@ -364,7 +364,7 @@ bool MDMParser::init(void)
     if (!_init) {
         MDM_DEBUG_D("[ Esp8266 init ]");
         esp8266MDM.begin(460800);
-        //reset();   //由于bootloader已经初始化过esp8266复位管教，可以不初始化，这样可以减少esp8266启动时间.
+        reset();
         /* Initialize only once */
         _init = true;
     }
@@ -737,7 +737,9 @@ ip_status_t MDMParser::getIpStatus(void)
 
 void MDMParser::drive(void)
 {
+    LOCK();
     waitFinalResp(NULL, NULL, 0);
+    UNLOCK();
 }
 
 int MDMParser::_cbGetWifiInfo(int type, const char* buf, int len, wifi_info_t *wifiInfo)

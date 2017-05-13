@@ -286,7 +286,7 @@ void intorobotParseReceiveDataJson(uint8_t *payload, uint32_t len)
     }
 
     for (int i = 0; i < properties_count; i++) {
-        if (0 != strcmp(properties[i]->permission, UP_ONLY)) {
+        if (0 != strcmp(properties[i]->permission, DP_PERMISSION_UP_ONLY)) {
             aJsonObject* propertyObject = aJson.getObjectItem(root, String(properties[i]->dpID).c_str());
             if (propertyObject != NULL) {
                 switch(properties[i]->dataType)
@@ -371,7 +371,7 @@ static String intorobotFormAllPropertyJson(void)
     for (int i = 0; i < properties_count; i++)
     {
         //只允许下发  不上传
-        if (0 == strcmp(properties[i]->permission, DOWN_ONLY)) {
+        if (0 == strcmp(properties[i]->permission, DP_PERMISSION_DOWN_ONLY)) {
             continue;
         }
 
@@ -423,13 +423,13 @@ void intorobotSendDatapoint(const uint16_t dpID, const char* value)
     intorobotWriteDatapoint(dpID, value);
 
     //只允许下发
-    if ( 0 == strcmp(properties[i]->permission, DOWN_ONLY) ) {
+    if ( 0 == strcmp(properties[i]->permission, DP_PERMISSION_DOWN_ONLY) ) {
         SDATAPOINT_DEBUG("only permit cloud -> terminal %d", properties[i]->dpID);
         return;
     }
 
     //数值未发生变化
-    if (properties[i]->value.equals(value) && strcmp(properties[i]->policy, ON_CHANGE) == 0) {
+    if (properties[i]->value.equals(value) && strcmp(properties[i]->policy, DP_POLICY_ON_CHANGE) == 0) {
         SDATAPOINT_DEBUG("No Changes for %d:%d", properties[i]->dpID, value);
         return;
     }
@@ -550,7 +550,7 @@ static uint16_t intorobotFormAllPropertyBinary(char* buffer, uint16_t len)
     for (int i = 0; i < properties_count; i++)
     {
         //只允许下发  不上传
-        if (0 == strcmp(properties[i]->permission, DOWN_ONLY)) {
+        if (0 == strcmp(properties[i]->permission, DP_PERMISSION_DOWN_ONLY)) {
             continue;
         }
 
@@ -577,13 +577,13 @@ void intorobotSendDatapoint(const uint16_t dpID, const char* value)
     intorobotWriteDatapoint(dpID, value);
 
     //只允许下发
-    if ( 0 == strcmp(properties[i]->permission, DOWN_ONLY) ) {
+    if ( 0 == strcmp(properties[i]->permission, DP_PERMISSION_DOWN_ONLY) ) {
         SDATAPOINT_DEBUG("only permit cloud -> terminal %d", properties[i]->dpID);
         return;
     }
 
     //数值未发生变化
-    if (properties[i]->value.equals(value) && strcmp(properties[i]->policy, ON_CHANGE) == 0) {
+    if (properties[i]->value.equals(value) && strcmp(properties[i]->policy, DP_POLICY_ON_CHANGE) == 0) {
         SDATAPOINT_DEBUG("No Changes for %d:%d", properties[i]->dpID, value);
         return;
     }

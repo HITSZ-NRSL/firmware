@@ -30,12 +30,12 @@ void setup()
 {
     Serial.begin(115200);
     pinMode(LEDPIN, OUTPUT);
-    IntoRobot.defineDatapointEnum(DPID_ENUM_LIGHT_MODE, UP_DOWN, 0);                     //颜色模式
-    IntoRobot.defineDatapointNumber(DPID_NUMBER_TEMPERATURE, UP_ONLY, -100, 100, 2, 0);     //温度
-    IntoRobot.defineDatapointBool(DPID_BOOL_SWITCH, UP_DOWN, false);                     //灯泡开关
-    IntoRobot.defineDatapointBool(DPID_BOOL_LIGHT_STATUS, UP_ONLY, false);               //灯泡亮灭状态
-    IntoRobot.defineDatapointNumber(DPID_NUMBER_RHEOSTAT, UP_DOWN, 0, 100, 0, 0);        //速度
-    IntoRobot.defineDatapointString(DPID_STRING_LCD_DISPLAY, UP_DOWN, "oh yeah!");       //字符显示
+    IntoRobot.defineDatapointEnum(DPID_ENUM_LIGHT_MODE, DP_PERMISSION_UP_DOWN, 0);                     //颜色模式
+    IntoRobot.defineDatapointNumber(DPID_NUMBER_TEMPERATURE, DP_PERMISSION_UP_ONLY, -100, 100, 2, 0);     //温度
+    IntoRobot.defineDatapointBool(DPID_BOOL_SWITCH, DP_PERMISSION_UP_DOWN, false);                     //灯泡开关
+    IntoRobot.defineDatapointBool(DPID_BOOL_LIGHT_STATUS, DP_PERMISSION_UP_ONLY, false);               //灯泡亮灭状态
+    IntoRobot.defineDatapointNumber(DPID_NUMBER_RHEOSTAT, DP_PERMISSION_UP_DOWN, 0, 100, 0, 0);        //速度
+    IntoRobot.defineDatapointString(DPID_STRING_LCD_DISPLAY, DP_PERMISSION_UP_DOWN, "oh yeah!");       //字符显示
 }
 
 void loop()

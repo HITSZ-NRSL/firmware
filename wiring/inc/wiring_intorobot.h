@@ -302,10 +302,9 @@ class IntoRobotDatepointClass {
 };
 
 #ifndef configNO_CLOUD
-class IntoRobotClass: public IntoRobotDatepointClass, Print{
+class IntoRobotClass: public IntoRobotDatepointClass, public Print{
 
     public:
-
         static bool publish(const char *topic, bool value)
         {
             return publish(topic, String(value).c_str());

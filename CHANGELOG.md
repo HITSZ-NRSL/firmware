@@ -11,12 +11,16 @@
 - [[PR #53]](https://github.com/HITSZ-NRSL/firmware/pull/53) [all] IntoRobot 数据点接口从DataPoint改成Datapoint
 - [[PR #54]](https://github.com/HITSZ-NRSL/firmware/pull/54) [neutron/nut/fig/w67/w323] 获取网络状态采取通知机制
 
+
 ### BUG FIXES(漏洞修复)
 - [[PR #54]](https://github.com/HITSZ-NRSL/firmware/pull/55) [all] STM32L151xB 芯片 ajson print申请变量大小改成512个字节
+- [[PR #57]](https://github.com/HITSZ-NRSL/firmware/pull/56) [all] 修正调用IntoRobot.printf()函数编译出错，原因在于基类的继承属性
 
 
 ### INTERNAL(内部)
 - [[PR #54]](https://github.com/HITSZ-NRSL/firmware/pull/54) [all] PRODUCT_ID 默认值修改成空, PRODUCT_SECRET 默认值修改成空, PRODUCT_VERSION 默认值修改成1
+- [[PR #57]](https://github.com/HITSZ-NRSL/firmware/pull/55) [all] intorobot上送版本信息添加board字段
+
 
 
 ## v1.5.1-rc.1

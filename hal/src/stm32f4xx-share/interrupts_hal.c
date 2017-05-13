@@ -77,8 +77,6 @@ static exti_state exti_saved_state;
 void HAL_Interrupts_Attach(uint16_t pin, HAL_InterruptHandler handler, void* data, InterruptMode mode,
         HAL_InterruptExtraConfiguration* config)
 {
-    DEBUG("Enter HAL_Interrupt_Attach...\r\n");
-    DEBUG("Pin: %d", pin);
     uint8_t GPIO_PortSource = 0;    //variable to hold the port number
 
     //Map the pin to the appropriate port and pin on the STM32

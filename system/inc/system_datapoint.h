@@ -32,13 +32,14 @@
 #define BINARY_DATA_FORMAT  0x31
 
 // Permission
-#define UP_ONLY    "up_only"
-#define DOWN_ONLY  "down_only"
-#define UP_DOWN    "up_down"
+#define DP_PERMISSION_UP_ONLY    "up_only"
+#define DP_PERMISSION_DOWN_ONLY  "down_only"
+#define DP_PERMISSION_UP_DOWN    "up_down"
 
-// Polices
-#define TIMED      "timed"
-#define ON_CHANGE  "on_change"
+// Policy
+#define DP_POLICY_NONE       ""
+#define DP_POLICY_TIMED      "timed"
+#define DP_POLICY_ON_CHANGE  "on_change"
 
 #define PROPERTIES_MAX 50
 

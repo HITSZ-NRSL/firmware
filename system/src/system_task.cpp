@@ -137,7 +137,6 @@ void manage_network_connection()
     static bool was_connected = false;
     if (network.ready()) {
         if(!was_connected) {
-            DEBUG("was_connected = %d", was_connected);
             system_rgb_blink(RGB_COLOR_BLUE, 1000);//蓝灯闪烁
             INTOROBOT_CLOUD_SOCKETED = 1;
         }

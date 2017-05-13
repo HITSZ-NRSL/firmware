@@ -75,38 +75,38 @@ test(api_intorobot_unsubscribe) {
     API_COMPILE(IntoRobot.unsubscribe("unsubscribe topic name", NULL));
 }
 
-test(api_intorobot_addDataPoint) {
-    API_COMPILE(IntoRobot.addDataPointBool(1, UP_ONLY));
-    API_COMPILE(IntoRobot.addDataPointBool(1, UP_ONLY, false));
-    API_COMPILE(IntoRobot.addDataPointBool(1, UP_ONLY, false, TIMED));
-    API_COMPILE(IntoRobot.addDataPointBool(1, UP_ONLY, false, TIMED, 0));
+test(api_intorobot_defineDatapoint) {
+    API_COMPILE(IntoRobot.defineDatapointBool(1, DP_PERMISSION_UP_ONLY));
+    API_COMPILE(IntoRobot.defineDatapointBool(1, DP_PERMISSION_UP_ONLY, false));
+    API_COMPILE(IntoRobot.defineDatapointBool(1, DP_PERMISSION_UP_ONLY, false, DP_POLICY_TIMED));
+    API_COMPILE(IntoRobot.defineDatapointBool(1, DP_PERMISSION_UP_ONLY, false, DP_POLICY_TIMED, 0));
 
-    API_COMPILE(IntoRobot.addDataPointNumber(1, UP_ONLY, -100, 100, 1));
-    API_COMPILE(IntoRobot.addDataPointNumber(1, UP_ONLY, -100, 100, 1, 0));
-    API_COMPILE(IntoRobot.addDataPointNumber(1, UP_ONLY, -100, 100, 1, 0, TIMED));
-    API_COMPILE(IntoRobot.addDataPointNumber(1, UP_ONLY, -100, 100, 1, 0, TIMED, 0));
-    API_COMPILE(IntoRobot.addDataPointNumber(1, UP_ONLY, -100.00, 100.00, 0.01));
-    API_COMPILE(IntoRobot.addDataPointNumber(1, UP_ONLY, -100.00, 100.00, 0.01, 0));
-    API_COMPILE(IntoRobot.addDataPointNumber(1, UP_ONLY, -100.00, 100.00, 0.01, 0, TIMED));
-    API_COMPILE(IntoRobot.addDataPointNumber(1, UP_ONLY, -100.00, 100.00, 0.01, 0, TIMED, 0));
+    API_COMPILE(IntoRobot.defineDatapointNumber(1,DP_PERMISSION_UP_ONLY, -100, 100, 1));
+    API_COMPILE(IntoRobot.defineDatapointNumber(1,DP_PERMISSION_UP_ONLY, -100, 100, 1, 0));
+    API_COMPILE(IntoRobot.defineDatapointNumber(1,DP_PERMISSION_UP_ONLY, -100, 100, 1, 0, DP_POLICY_TIMED));
+    API_COMPILE(IntoRobot.defineDatapointNumber(1,DP_PERMISSION_UP_ONLY, -100, 100, 1, 0, DP_POLICY_TIMED, 0));
+    API_COMPILE(IntoRobot.defineDatapointNumber(1,DP_PERMISSION_UP_ONLY, -100.00, 100.00, 0.01));
+    API_COMPILE(IntoRobot.defineDatapointNumber(1,DP_PERMISSION_UP_ONLY, -100.00, 100.00, 0.01, 0));
+    API_COMPILE(IntoRobot.defineDatapointNumber(1,DP_PERMISSION_UP_ONLY, -100.00, 100.00, 0.01, 0, DP_POLICY_TIMED));
+    API_COMPILE(IntoRobot.defineDatapointNumber(1,DP_PERMISSION_UP_ONLY, -100.00, 100.00, 0.01, 0, DP_POLICY_TIMED, 0));
 
-    API_COMPILE(IntoRobot.addDataPointEnum(1, UP_ONLY));
-    API_COMPILE(IntoRobot.addDataPointEnum(1, UP_ONLY, 0));
-    API_COMPILE(IntoRobot.addDataPointEnum(1, UP_ONLY, 0, TIMED));
-    API_COMPILE(IntoRobot.addDataPointEnum(1, UP_ONLY, 0, TIMED, 0));
+    API_COMPILE(IntoRobot.defineDatapointEnum(1,DP_PERMISSION_UP_ONLY));
+    API_COMPILE(IntoRobot.defineDatapointEnum(1,DP_PERMISSION_UP_ONLY, 0));
+    API_COMPILE(IntoRobot.defineDatapointEnum(1,DP_PERMISSION_UP_ONLY, 0, DP_POLICY_TIMED));
+    API_COMPILE(IntoRobot.defineDatapointEnum(1,DP_PERMISSION_UP_ONLY, 0, DP_POLICY_TIMED, 0));
 
-    API_COMPILE(IntoRobot.addDataPointString(1, UP_ONLY));
-    API_COMPILE(IntoRobot.addDataPointString(1, UP_ONLY, "oh yeah!"));
-    API_COMPILE(IntoRobot.addDataPointString(1, UP_ONLY, "oh yeah!", TIMED));
-    API_COMPILE(IntoRobot.addDataPointString(1, UP_ONLY, "oh yeah!", TIMED, 0));
+    API_COMPILE(IntoRobot.defineDatapointString(1,DP_PERMISSION_UP_ONLY));
+    API_COMPILE(IntoRobot.defineDatapointString(1,DP_PERMISSION_UP_ONLY, "oh yeah!"));
+    API_COMPILE(IntoRobot.defineDatapointString(1,DP_PERMISSION_UP_ONLY, "oh yeah!", DP_POLICY_TIMED));
+    API_COMPILE(IntoRobot.defineDatapointString(1,DP_PERMISSION_UP_ONLY, "oh yeah!", DP_POLICY_TIMED, 0));
 
-    API_COMPILE(IntoRobot.addDataPointBinary(1, UP_ONLY));
-    API_COMPILE(IntoRobot.addDataPointBinary(1, UP_ONLY, "\x31\x32\x33\x34\x35", 5));
-    API_COMPILE(IntoRobot.addDataPointBinary(1, UP_ONLY, "\x31\x32\x33\x34\x35", 5, TIMED));
-    API_COMPILE(IntoRobot.addDataPointBinary(1, UP_ONLY, "\x31\x32\x33\x34\x35", 5, TIMED, 0));
+    API_COMPILE(IntoRobot.defineDatapointBinary(1,DP_PERMISSION_UP_ONLY));
+    API_COMPILE(IntoRobot.defineDatapointBinary(1,DP_PERMISSION_UP_ONLY, "\x31\x32\x33\x34\x35", 5));
+    API_COMPILE(IntoRobot.defineDatapointBinary(1,DP_PERMISSION_UP_ONLY, "\x31\x32\x33\x34\x35", 5, DP_POLICY_TIMED));
+    API_COMPILE(IntoRobot.defineDatapointBinary(1,DP_PERMISSION_UP_ONLY, "\x31\x32\x33\x34\x35", 5, DP_POLICY_TIMED, 0));
 }
 
-test(api_intorobot_readDataPoint) {
+test(api_intorobot_readDatapoint) {
     bool valueBool = 0;
     int  valueInt = 0;
     int32_t valueInt32 = 0;
@@ -118,18 +118,18 @@ test(api_intorobot_readDataPoint) {
     uint8_t valueBinary[50];
     uint16_t len;
 
-    API_COMPILE(IntoRobot.readDataPoint(1, valueBool));
-    API_COMPILE(IntoRobot.readDataPoint(1, valueInt));
-    API_COMPILE(IntoRobot.readDataPoint(1, valueInt32));
-    API_COMPILE(IntoRobot.readDataPoint(1, valueUint32));
-    API_COMPILE(IntoRobot.readDataPoint(1, valueFloat));
-    API_COMPILE(IntoRobot.readDataPoint(1, valueDouble));
-    API_COMPILE(IntoRobot.readDataPoint(1, valueSmartString));
-    API_COMPILE(IntoRobot.readDataPoint(1, valueString));
-    API_COMPILE(IntoRobot.readDataPoint(1, valueBinary, len));
+    API_COMPILE(IntoRobot.readDatapoint(1, valueBool));
+    API_COMPILE(IntoRobot.readDatapoint(1, valueInt));
+    API_COMPILE(IntoRobot.readDatapoint(1, valueInt32));
+    API_COMPILE(IntoRobot.readDatapoint(1, valueUint32));
+    API_COMPILE(IntoRobot.readDatapoint(1, valueFloat));
+    API_COMPILE(IntoRobot.readDatapoint(1, valueDouble));
+    API_COMPILE(IntoRobot.readDatapoint(1, valueSmartString));
+    API_COMPILE(IntoRobot.readDatapoint(1, valueString));
+    API_COMPILE(IntoRobot.readDatapoint(1, valueBinary, len));
 }
 
-test(api_intorobot_writeDataPoint) {
+test(api_intorobot_writeDatapoint) {
     bool valueBool = 0;
     int valueInt = 0;
     int8_t valueInt8 = 0;
@@ -144,26 +144,26 @@ test(api_intorobot_writeDataPoint) {
     String valueSmartString(valueString);
 
 
-    API_COMPILE(IntoRobot.writeDataPoint(1, true));
-    API_COMPILE(IntoRobot.writeDataPoint(1, 323));
-    API_COMPILE(IntoRobot.writeDataPoint(1, 323.32));
-    API_COMPILE(IntoRobot.writeDataPoint(1, "oh yeah!"));
-    API_COMPILE(IntoRobot.writeDataPoint(1, "\x31\x32\x33\x34\x35", 5));
+    API_COMPILE(IntoRobot.writeDatapoint(1, true));
+    API_COMPILE(IntoRobot.writeDatapoint(1, 323));
+    API_COMPILE(IntoRobot.writeDatapoint(1, 323.32));
+    API_COMPILE(IntoRobot.writeDatapoint(1, "oh yeah!"));
+    API_COMPILE(IntoRobot.writeDatapoint(1, "\x31\x32\x33\x34\x35", 5));
 
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueBool));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueInt));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueInt8));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueUint8));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueInt16));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueUint16));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueInt32));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueUint32));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueFloat));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueDouble));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueString));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueSmartString));
-    API_COMPILE(IntoRobot.writeDataPoint(1, valueString, strlen(valueString)));
-    API_COMPILE(IntoRobot.writeDataPoints());
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueBool));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueInt));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueInt8));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueUint8));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueInt16));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueUint16));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueInt32));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueUint32));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueFloat));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueDouble));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueString));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueSmartString));
+    API_COMPILE(IntoRobot.writeDatapoint(1, valueString, strlen(valueString)));
+    API_COMPILE(IntoRobot.writeDatapoints());
 }
 
 test(api_spark_syncTime) {

@@ -1031,7 +1031,15 @@ int MDMParser::_cbCSQ(int type, const char* buf, int len, NetStatus* status)
         char _qual[] = { 49, 43, 37, 25, 19, 13, 7, 0 }; // see 3GPP TS 45.008 [20] subclause 8.2.4
         // +CSQ: <rssi>,<qual>
         if (sscanf(buf, "\r\n+CSQ: %d,%d",&a,&b) == 2) {
-            if (a != 99) status->rssi = -113 + 2*a;  // 0: -113 1: -111 ... 30: -53 dBm with 2 dBm steps
+            if (a != 99) { // 0: -115 1: -111 2: -110 ... 31: -52 dBm with 2 dBm steps
+                if(a == 0) {
+                    status->rssi = -115;
+                } if(a == 1) {
+                    status->rssi = -111;
+                } else {
+                    status->rssi = -114 + 2*a;
+                }
+            }
             if ((b != 99) && (b < (int)sizeof(_qual))) status->qual = _qual[b];  //
         }
     }
@@ -1526,6 +1534,8 @@ bool MDMParser::socketConnect(int socket, const MDM_IP& ip, int port)
             sendFormated("AT+CIPSTART=%d,\"%s\",\"" IPSTR "\",\"%d\"\r\n", _sockets[socket].handle, "TCP", IPNUM(ip), port);
         if (RESP_OK == waitFinalResp()) {
             if (RESP_OK == waitFinalResp()) {
+                _sockets[socket].remoteip = ip;
+                _sockets[socket].remoteport = port;
                 ok = _sockets[socket].connected = true;
             }
         }
@@ -2100,3 +2110,5 @@ void MDMCellularSerial::resume()
     LOCK();
     rxResume();
 }
+
+

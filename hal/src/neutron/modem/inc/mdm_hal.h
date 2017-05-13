@@ -32,7 +32,7 @@
 #include "enums_hal.h"
 
 /* Include for debug capabilty */
-#define MODEM_DEBUG
+//#define MODEM_DEBUG
 
 #define MDM_ESP8266_RESET_DELAY  4000
 

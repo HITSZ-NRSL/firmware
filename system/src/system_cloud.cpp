@@ -785,8 +785,8 @@ void intorobot_cloud_init(void)
 #endif
 
     // 添加默认数据点
-    intorobotDefineDatapointBool(0xFF80, UP_DOWN, false, "", 0);//reboot
-    intorobotDefineDatapointBool(0xFF81, UP_DOWN, false, "", 0);//write all datapoint
+    intorobotDefineDatapointBool(0xFF80, DP_PERMISSION_UP_DOWN, false, "", 0);//reboot
+    intorobotDefineDatapointBool(0xFF81, DP_PERMISSION_UP_DOWN, false, "", 0);//write all datapoint
 }
 
 bool intorobot_publish(api_version_t version, const char* topic, uint8_t* payload, unsigned int plength, uint8_t qos, uint8_t retained)
@@ -1131,6 +1131,7 @@ int intorobot_cloud_connect(void)
         aJsonObject* root = aJson.createObject();
         if (root == NULL)
         {return -1;}
+        aJson.addStringToObject(root, "board", board);
         aJson.addStringToObject(root, "fw_ver", fw_version);
         aJson.addStringToObject(root, "sys_ver", subsys_version);
         char* string = aJson.print(root);
