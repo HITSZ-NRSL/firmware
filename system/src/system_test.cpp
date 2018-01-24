@@ -53,10 +53,7 @@ void testDigitalWrite(uint16_t pin, uint16_t value, void* cookie)
 {
     aJsonClass aJson;
 
-#if PLATFORM_ID == PLATFORM_ATOM
-#elif PLATFORM_ID == PLATFORM_NEUTRON
-#elif PLATFORM_ID == PLATFORM_NUT
-#elif PLATFORM_ID == PLATFORM_W67
+#if PLATFORM_ID == PLATFORM_ATOM || PLATFORM_ID == PLATFORM_NEUTRON || PLATFORM_ID == PLATFORM_NUT || PLATFORM_ID == PLATFORM_W67
     aJsonObject* root = aJson.createObject();
     char* strPtr = nullptr;
 
@@ -206,13 +203,11 @@ void testAnalogRead(uint16_t pin, void* cookie)
 {
     aJsonClass aJson;
 
-#if PLATFORM_ID == PLATFORM_ATOM
-#elif PLATFORM_ID == PLATFORM_NEUTRON
-#elif PLATFORM_ID == PLATFORM_W67 || PLATFORM_ID == PLATFORM_NUT || PLATFORM_ID == PLATFORM_FIG || PLATFORM_ID == PLATFORM_W323
+#if PLATFORM_ID == PLATFORM_ATOM || PLATFORM_ID == PLATFORM_NEUTRON || PLATFORM_ID == PLATFORM_W67 || PLATFORM_ID == PLATFORM_NUT || PLATFORM_ID == PLATFORM_FIG || PLATFORM_ID == PLATFORM_W323
     aJsonObject* root = aJson.createObject();
     char* strPtr = nullptr;
     aJson.addNumberToObject(root, "status", 200);
-    aJson.addNumberToObject(root, "value", analogRead(pin));
+    aJson.addNumberToObject(root, "value", (int)analogRead(pin));
     strPtr = aJson.print(root);
     ((DeviceConfig*)cookie)->write((unsigned char *)strPtr, strlen(strPtr));
     free(strPtr);
@@ -255,9 +250,7 @@ void testSelfTest(void* cookie)
 {
     aJsonClass aJson;
 
-#if PLATFORM_ID == PLATFORM_ATOM
-#elif PLATFORM_ID == PLATFORM_NEUTRON
-#elif PLATFORM_ID == PLATFORM_W67 || PLATFORM_ID == PLATFORM_NUT || PLATFORM_ID == PLATFORM_FIG || PLATFORM_ID == PLATFORM_W323
+#if PLATFORM_ID == PLATFORM_ATOM || PLATFORM_ID == PLATFORM_NEUTRON || PLATFORM_ID == PLATFORM_W67 || PLATFORM_ID == PLATFORM_NUT || PLATFORM_ID == PLATFORM_FIG || PLATFORM_ID == PLATFORM_W323
     aJsonObject* root = aJson.createObject();
     char* strPtr = nullptr;
     aJson.addNumberToObject(root, "status", 200);
@@ -269,7 +262,7 @@ void testSelfTest(void* cookie)
 #elif PLATFORM_ID == PLATFORM_ANT
     aJsonObject* root = aJson.createObject();
     char* strPtr = nullptr;
-    if(GetRTCSatus()) {
+    if(HAL_RTC_Time_Is_Valid(nullptr)) {
         aJson.addNumberToObject(root, "status", 200);
     } else {
         aJson.addNumberToObject(root, "status", 201);
@@ -282,7 +275,7 @@ void testSelfTest(void* cookie)
 #elif PLATFORM_ID == PLATFORM_L6
     aJsonObject* root = aJson.createObject();
     char* strPtr = nullptr;
-    if(GetRTCSatus()) {
+    if(HAL_RTC_Time_Is_Valid(nullptr)) {
         aJson.addNumberToObject(root, "status", 200);
     } else {
         aJson.addNumberToObject(root, "status", 201);
@@ -295,7 +288,7 @@ void testSelfTest(void* cookie)
 #elif PLATFORM_ID == PLATFORM_FOX
     aJsonObject* root = aJson.createObject();
     char* strPtr = nullptr;
-    if(GetRTCSatus()) {
+    if(HAL_RTC_Time_Is_Valid(nullptr)) {
         aJson.addNumberToObject(root, "status", 200);
     } else {
         aJson.addNumberToObject(root, "status", 201);
@@ -363,7 +356,7 @@ void testSensorData(void* cookie)
 #if PLATFORM_ID == PLATFORM_ANT || PLATFORM_ID == PLATFORM_L6
 
 //ant l6生产时板子测试代码
-#define RF_FREQUENCY    434775000
+#define RF_FREQUENCY    433975000
 #define BUFFER_SIZE     8
 
 typedef enum

@@ -40,12 +40,9 @@ void loop() __attribute((weak));
  */
 
 void setup()  {
-
 }
 
-
 void loop() {
-
 }
 #endif
 

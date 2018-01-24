@@ -17,7 +17,7 @@ License along with this library; if not, see <http://www.gnu.org/licenses/>.
 ******************************************************************************
 */
 
-
+#include <stdio.h>
 #include "wiring.h"
 #include "wiring_ticks.h"
 #include "adc_hal.h"

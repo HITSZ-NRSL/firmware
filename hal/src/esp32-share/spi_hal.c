@@ -153,17 +153,17 @@ void HAL_SPI_Begin(HAL_SPI_Interface spi, uint16_t pin)
     spiStopBus(spiMap[spi]->spi);
 
     if(!spiMap[spi]->SPI_Data_Mode_Set)
-        spiSetDataMode(spiMap[spi]->spi, SPI_MODE0);
+        spiSetDataMode(spiMap[spi]->spi, ESP32_SPI_MODE0);
     else
         spiSetDataMode(spiMap[spi]->spi, spiMap[spi]->SPI_Data_Mode);
 
     if(!spiMap[spi]->SPI_Bit_Order_Set)
-        spiSetBitOrder(spiMap[spi]->spi, SPI_MSBFIRST);
+        spiSetBitOrder(spiMap[spi]->spi, ESP32_SPI_MSBFIRST);
     else
         spiSetBitOrder(spiMap[spi]->spi, spiMap[spi]->SPI_Bit_Order);
 
     if(!spiMap[spi]->SPI_Clock_Divider_Set)
-        spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV8);
+        spiSetClockDiv(spiMap[spi]->spi, ESP32_SPI_CLOCK_DIV8);
     else
         spiSetClockDiv(spiMap[spi]->spi, spiMap[spi]->SPI_Clock_Div);
 
@@ -255,38 +255,38 @@ void HAL_SPI_Set_Clock_Divider(HAL_SPI_Interface spi, uint8_t rate)
         spiMap[spi]->SPI_Clock_Divider_Set = true;
         switch (rate){
         case 0x00: { // SPI_CLOCK_DIV2
-                /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV2); */
-                spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV2;
+                /* spiSetClockDiv(spiMap[spi]->spi, ESP32_SPI_CLOCK_DIV2); */
+                spiMap[spi]->SPI_Clock_Div = ESP32_SPI_CLOCK_DIV2;
                 break;
             }
         case 0x08: { // SPI_CLOCK_DIV4
-            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV4); */
-            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV4;
+            /* spiSetClockDiv(spiMap[spi]->spi, ESP32_SPI_CLOCK_DIV4); */
+            spiMap[spi]->SPI_Clock_Div = ESP32_SPI_CLOCK_DIV4;
             break;
         }
         case 0x10: {
-            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV8); */
-            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV8;
+            /* spiSetClockDiv(spiMap[spi]->spi, ESP32_SPI_CLOCK_DIV8); */
+            spiMap[spi]->SPI_Clock_Div = ESP32_SPI_CLOCK_DIV8;
             break;
         }
         case 0x18: {
-            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV16); */
-            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV16;
+            /* spiSetClockDiv(spiMap[spi]->spi, ESP32_SPI_CLOCK_DIV16); */
+            spiMap[spi]->SPI_Clock_Div = ESP32_SPI_CLOCK_DIV16;
             break;
         }
         case 0x20: {
-            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV32); */
-            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV32;
+            /* spiSetClockDiv(spiMap[spi]->spi, ESP32_SPI_CLOCK_DIV32); */
+            spiMap[spi]->SPI_Clock_Div = ESP32_SPI_CLOCK_DIV32;
             break;
         }
         case 0x28: {
-            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV64); */
-            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV64;
+            /* spiSetClockDiv(spiMap[spi]->spi, ESP32_SPI_CLOCK_DIV64); */
+            spiMap[spi]->SPI_Clock_Div = ESP32_SPI_CLOCK_DIV64;
             break;
         }
         case 0x30: {
-            /* spiSetClockDiv(spiMap[spi]->spi, SPI_CLOCK_DIV128); */
-            spiMap[spi]->SPI_Clock_Div = SPI_CLOCK_DIV128;
+            /* spiSetClockDiv(spiMap[spi]->spi, ESP32_SPI_CLOCK_DIV128); */
+            spiMap[spi]->SPI_Clock_Div = ESP32_SPI_CLOCK_DIV128;
             break;
         }
         default:

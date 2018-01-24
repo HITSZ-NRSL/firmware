@@ -366,8 +366,7 @@ void cloud_action_callback(uint8_t *payload, uint32_t len)
     String s_payload;
     aJsonObject *root = NULL, *boardObject = NULL, *cmdObject = NULL, *dtokenObject = NULL, *versionObject = NULL;
 
-    for(int n=0; n < len; n++)
-    {
+    for(int n=0; n<len; n++) {
         s_payload+=(char)payload[n];
     }
 
@@ -415,7 +414,7 @@ void cloud_action_callback(uint8_t *payload, uint32_t len)
             intorobot_subsys_upgrade(versionObject->valuestring);
         } else if(!strcmp("upgradeApp", cmdObject->valuestring)) {
             //应用固件升级
-            //intorobot_firmware_upgrade(versionObject->valuestring)
+            intorobot_firmware_upgrade(versionObject->valuestring);
         } else if(!strcmp("reboot", cmdObject->valuestring)) {
             //启动处理
             send_upgrade_status(UPGRADE_REPLY_REBOOT_READY, 0);
@@ -481,7 +480,7 @@ static bool _intorobot_publish(topic_version_t version, const char* topic, uint8
 {
     String fulltopic = "";
     char device_id[38] = {0};
-    uint8_t *pdata = malloc(plength + 16);
+    uint8_t *pdata = (uint8_t *)malloc(plength + 16);
     uint16_t dataIndex = 0;
 
     if(NULL == pdata) {
@@ -575,8 +574,7 @@ static pCallBack get_subscribe_callback(char * fulltopic)
     char topictmp[128] = {0};
     char device_id[32] = {0};
 
-    for (int i = 0 ; i < g_callback_list.total_callbacks; i++)
-    {
+    for (int i = 0 ; i < g_callback_list.total_callbacks; i++) {
         memset(topictmp, 0, sizeof(topictmp));
         if( TOPIC_VERSION_V1 == g_callback_list.callback_node[i].version ) {
             if(g_callback_list.callback_node[i].device_id == NULL) {
@@ -618,8 +616,7 @@ static void add_subscribe_callback(topic_version_t version, char *topic, char *d
         return;
     }
 
-    for (i = 0 ; i < g_callback_list.total_callbacks; i++)
-    {
+    for (i = 0 ; i < g_callback_list.total_callbacks; i++) {
         if (!strcmp(topic, g_callback_list.callback_node[i].topic) && (version == g_callback_list.callback_node[i].version)) {
             if(((NULL == device_id) && (NULL == g_callback_list.callback_node[i].device_id))
                     || ((NULL != device_id) && (NULL != g_callback_list.callback_node[i].device_id) && !strcmp(device_id, g_callback_list.callback_node[i].device_id))) {
@@ -661,8 +658,7 @@ static WidgetBaseClass *get_widget_subscribe_callback(char * fulltopic)
     char topictmp[128] = {0};
     char device_id[32] = {0};
 
-    for (int i = 0 ; i < g_callback_list.total_wcallbacks; i++)
-    {
+    for (int i = 0 ; i < g_callback_list.total_wcallbacks; i++) {
         memset(topictmp, 0, sizeof(topictmp));
         if( TOPIC_VERSION_V1 == g_callback_list.callback_node[i].version ) {
             if(g_callback_list.widget_callback_node[i].device_id == NULL) {
@@ -704,8 +700,7 @@ static void add_widget_subscibe_callback(topic_version_t version, char *topic, c
         return;
     }
 
-    for (i = 0 ; i < g_callback_list.total_wcallbacks; i++)
-    {
+    for (i = 0 ; i < g_callback_list.total_wcallbacks; i++) {
         if (!strcmp(topic, g_callback_list.widget_callback_node[i].topic) && (version == g_callback_list.widget_callback_node[i].version)) {
             if(((NULL == device_id) && (NULL == g_callback_list.widget_callback_node[i].device_id))
                     || ((NULL != device_id) && (NULL != g_callback_list.widget_callback_node[i].device_id) && !strcmp(device_id, g_callback_list.widget_callback_node[i].device_id))) {
@@ -748,8 +743,7 @@ static void del_subscribe_callback(topic_version_t version, char * topic, char *
         return;
     }
 
-    for (int i = 0 ; i < g_callback_list.total_callbacks; i++)
-    {
+    for (int i = 0 ; i < g_callback_list.total_callbacks; i++) {
         if (!strcmp(topic, g_callback_list.callback_node[i].topic) && (version == g_callback_list.callback_node[i].version)) {
             if(((NULL == device_id) && (NULL == g_callback_list.callback_node[i].device_id))
                     || ((NULL != device_id) && (NULL != g_callback_list.callback_node[i].device_id) && !strcmp(device_id, g_callback_list.callback_node[i].device_id))) {
@@ -763,8 +757,7 @@ static void del_subscribe_callback(topic_version_t version, char * topic, char *
         }
     }
 
-    for (int i = 0 ; i < g_callback_list.total_wcallbacks; i++)
-    {
+    for (int i = 0 ; i < g_callback_list.total_wcallbacks; i++) {
         if (!strcmp(topic, g_callback_list.widget_callback_node[i].topic) && (version == g_callback_list.widget_callback_node[i].version)) {
             if(((NULL == device_id) && (NULL == g_callback_list.widget_callback_node[i].device_id))
                     || ((NULL != device_id) && (NULL != g_callback_list.widget_callback_node[i].device_id) && !strcmp(device_id, g_callback_list.widget_callback_node[i].device_id))) {
@@ -781,14 +774,12 @@ static void del_subscribe_callback(topic_version_t version, char * topic, char *
 
 static void resubscribe(void)
 {
-    for (int i = 0 ; i < g_callback_list.total_callbacks; i++)
-    {
+    for (int i = 0 ; i < g_callback_list.total_callbacks; i++) {
         intorobot_subscribe(g_callback_list.callback_node[i].version, g_callback_list.callback_node[i].topic, g_callback_list.callback_node[i].device_id,
                             g_callback_list.callback_node[i].callback, g_callback_list.callback_node[i].qos);
     }
 
-    for (int i = 0 ; i < g_callback_list.total_wcallbacks; i++)
-    {
+    for (int i = 0 ; i < g_callback_list.total_wcallbacks; i++) {
         intorobot_widget_subscribe(g_callback_list.widget_callback_node[i].version, g_callback_list.widget_callback_node[i].topic, g_callback_list.widget_callback_node[i].device_id,
                             g_callback_list.widget_callback_node[i].pWidgetBase, g_callback_list.widget_callback_node[i].qos);
     }
@@ -799,8 +790,7 @@ static void mqtt_send_debug_info(void)
     uint32_t n;
     String s_debug_info="";
 
-    for(n=0; (n<MQTT_MAX_PACKET_SIZE)&&(g_debug_tx_buffer.tail!=g_debug_tx_buffer.head); n++)
-    {
+    for(n=0; (n<MQTT_MAX_PACKET_SIZE)&&(g_debug_tx_buffer.tail!=g_debug_tx_buffer.head); n++) {
         s_debug_info += (char)g_debug_tx_buffer.buffer[g_debug_tx_buffer.tail];
         g_debug_tx_buffer.tail = (unsigned int)(g_debug_tx_buffer.tail + 1) % CLOUD_DEBUG_BUFFER_SIZE;
     }
@@ -813,10 +803,7 @@ static void mqtt_send_debug_info(void)
 
 static void mqtt_receive_debug_info(uint8_t *pIn, uint32_t len)
 {
-    int n;
-
-    for( n=0; n<len; n++)
-    {
+    for(int n=0; n<len; n++) {
         g_debug_rx_buffer.buffer[g_debug_rx_buffer.head] = pIn[n];
         g_debug_rx_buffer.head++;
         /* To avoid buffer overflow */
@@ -932,16 +919,15 @@ int intorobot_cloud_connect(void)
     fill_mqtt_topic(fulltopic, TOPIC_VERSION_V2, INTOROBOT_MQTT_WILL_TOPIC, NULL);
 
     int random_hex = random(INT_MAX);
-    uint8_t ramdom_array[4];
-    char random_string[16] = {0};
-    char cMac_hex[16] = {0}, cMac_string[33] = {0};
+    uint8_t ramdom_array[4], cMac_hex[16] = {0};
+    char random_string[16] = {0}, cMac_string[33] = {0};
 
     ramdom_array[0] = ( random_hex >> 24 ) & 0xFF;
     ramdom_array[1] = ( random_hex >> 16 ) & 0xFF;
     ramdom_array[2] = ( random_hex >> 8 ) & 0xFF;
     ramdom_array[3] = ( random_hex ) & 0xFF;
     hex2string(ramdom_array, sizeof(ramdom_array), random_string, false);
-    MqttConnectComputeCmac( random_string, strlen(random_string), access_token_hex, cMac_hex );
+    MqttConnectComputeCmac( (uint8_t *)random_string, strlen(random_string), access_token_hex, cMac_hex );
     hex2string(cMac_hex, 16, cMac_string, false);
     payload = random_string;
     payload += ':';
@@ -997,7 +983,6 @@ int intorobot_cloud_connect(void)
 
 int intorobot_cloud_handle(void)
 {
-    bool reboot_flag = false, all_datapoint_flag = false;
     if(true == g_mqtt_client.loop()) {
         intorobotSendDatapointAutomatic();
         mqtt_send_debug_info(); //发送IntoRobot.printf打印到平台

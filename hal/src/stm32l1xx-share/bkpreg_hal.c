@@ -9,8 +9,7 @@ extern RTC_HandleTypeDef RtcHandle;
  */
 int32_t HAL_Core_Backup_Register(uint32_t BKP_DR)
 {
-    switch (BKP_DR)
-    {
+    switch (BKP_DR) {
         case BKP_DR_01:
             return RTC_BKP_DR1;
             break;
@@ -41,33 +40,8 @@ int32_t HAL_Core_Backup_Register(uint32_t BKP_DR)
         case BKP_DR_10:
             return RTC_BKP_DR10;
             break;
-        /*case BKP_DR_11:*/
-            /*return RTC_BKP_DR11;*/
-            /*break;*/
-        /*case BKP_DR_12:*/
-            /*return RTC_BKP_DR12;*/
-            /*break;*/
-        /*case BKP_DR_13:*/
-            /*return RTC_BKP_DR13;*/
-            /*break;*/
-        /*case BKP_DR_14:*/
-            /*return RTC_BKP_DR14;*/
-            /*break;*/
-        /*case BKP_DR_15:*/
-            /*return RTC_BKP_DR15;*/
-            /*break;*/
-        /*case BKP_DR_16:*/
-            /*return RTC_BKP_DR16;*/
-            /*break;*/
-        /*case BKP_DR_17:*/
-            /*return RTC_BKP_DR17;*/
-            /*break;*/
-        /*case BKP_DR_18:*/
-            /*return RTC_BKP_DR18;*/
-            /*break;*/
-        /*case BKP_DR_19:*/
-            /*return RTC_BKP_DR19;*/
-            /*break;*/
+        default:
+            break;
     }
     return -1;
 }
@@ -81,8 +55,7 @@ int32_t HAL_Core_Backup_Register(uint32_t BKP_DR)
 void HAL_Core_Write_Backup_Register(uint32_t BKP_DR, uint32_t Data)
 {
     uint32_t BKP_DR_Address = HAL_Core_Backup_Register(BKP_DR);
-    if (BKP_DR_Address != -1)
-    {
+    if (BKP_DR_Address != -1) {
         HAL_RTCEx_BKUPWrite(&RtcHandle, BKP_DR_Address, Data);
     }
 }
@@ -95,8 +68,7 @@ void HAL_Core_Write_Backup_Register(uint32_t BKP_DR, uint32_t Data)
 uint32_t HAL_Core_Read_Backup_Register(uint32_t BKP_DR)
 {
     uint32_t BKP_DR_Address = HAL_Core_Backup_Register(BKP_DR);
-    if (BKP_DR_Address != -1)
-    {
+    if (BKP_DR_Address != -1) {
         return HAL_RTCEx_BKUPRead(&RtcHandle, BKP_DR_Address);
     }
     return 0xFFFFFFFF;

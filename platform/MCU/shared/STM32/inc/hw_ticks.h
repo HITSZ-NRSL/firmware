@@ -32,6 +32,10 @@ extern "C" {
 #define SYSTEM_US_TICKS         (SystemCoreClock / 1000000)//cycles per microsecond
 #define SYSTEM_TICK_COUNTER     (DWT->CYCCNT)
 
+#define clockCyclesPerMicrosecond() SYSTEM_US_TICKS
+#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
+#define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
+
 /**
  * Increment the millisecond tick counter.
  */

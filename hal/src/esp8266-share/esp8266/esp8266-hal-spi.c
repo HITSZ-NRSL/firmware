@@ -19,6 +19,7 @@
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
    */
 
+#include <string.h>
 #include "pinmap_hal.h"
 #include "esp8266_peri.h"
 #include "esp8266-hal-spi.h"

@@ -12,8 +12,8 @@ License: Revised BSD License, see LICENSE.TXT file include in the project
 
 Maintainer: Miguel Luis and Gregory Cristian
 */
-#ifndef __SX1276_ARCH_H__
-#define __SX1276_ARCH_H__
+#ifndef __SX1276_BOARD_H__
+#define __SX1276_BOARD_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -61,11 +61,18 @@ void SX1276IoInit( void );
 void SX1276IoIrqInit( DioIrqHandler **irqHandlers );
 
 /*!
- * \brief De-initializes the radio I/Os pins interface.
+ * \brief de-initializes the radio i/os pins interface.
  *
- * \remark Useful when going in MCU low power modes
+ * \remark useful when going in mcu low power modes
  */
 void SX1276IoDeInit( void );
+
+/*!
+ * \brief de-initializes DIO IRQ handlers
+ *
+ * \remark useful when going in mcu low power modes
+ */
+void SX1276IoIrqDeInit(void);
 
 /*!
  * \brief Sets the radio output power.
@@ -119,34 +126,33 @@ void SX1276SetAntSw( uint8_t opMode );
 bool SX1276CheckRfFrequency( uint32_t frequency );
 
 /*!
+ * \brief board init
+ */
+void SX1276BoardInit(void);
+
+/*!
+ * \brief SX1276 reset
+ */
+void SX1276SetReset(void);
+
+/*!
+ * \brief SX1276 set SPI Nss
+ */
+void SX1276SpiSetNss(uint8_t val);
+
+/*!
+ * \brief SX1276 SPI Transfer
+ */
+uint8_t SX1276SpiTransfer( uint8_t outData );
+
+/*!
  * Radio hardware and global parameters
  */
 extern SX1276_t SX1276;
-
-void SX1276SetReset(void);
-
-void SX1276IoIrqDeInit(void);
-
-void SX1276BoardInit(void);
-
-void SpiSetNss(uint8_t val);
-
-uint8_t SpiTransfer( uint8_t outData );
-
-void DelayMs(uint32_t ms);
-
-uint8_t GetBoardPowerSource( void );
-
-uint8_t BoardGetBatteryLevel(void);
-
-uint32_t BoardGetRandomSeed( void );
-
-void BoardGetUniqueId( uint8_t *id );
-
-bool UseLoRaWanStandardProtocol(void);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif // __SX1278_ARCH_H__
+

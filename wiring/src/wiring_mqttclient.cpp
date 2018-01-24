@@ -20,6 +20,7 @@
 #include "intorobot_config.h"
 #ifndef configNO_CLOUD
 
+#include <stdio.h>
 #include "stdint.h"
 #include "wiring_constants.h"
 #include "wiring_arduino.h"

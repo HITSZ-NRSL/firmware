@@ -31,12 +31,12 @@
 #endif
 
 #include "stdio.h"
-#include "system_utilities.h"
 
 #ifdef INTOROBOT_PLATFORM
 #include "platform_headers.h"
 #endif
 #include "platforms.h"
+#include "system_utilities.h"
 
 #include "wiring.h"
 #include "wiring_cloud.h"
@@ -69,7 +69,6 @@
 #include "wiring_product.h"
 #include "wiring_watchdog.h"
 #include "wiring_thread.h"
-#include "wiring_ext.h"
 #include "wiring_system.h"
 #include "wiring_ajson.h"
 #include "wiring_mqttclient.h"

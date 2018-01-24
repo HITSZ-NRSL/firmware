@@ -48,9 +48,9 @@
  */
 static void Error_Handler(void)
 {
-  while(1)
-  {
-  }
+    while(1)
+    {
+    }
 }
 
 /**
@@ -76,7 +76,6 @@ static void Error_Handler(void)
  */
 static void SystemClock_Config(void)
 {
-
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
 
@@ -113,19 +112,6 @@ static void SystemClock_Config(void)
     {
         Error_Handler();
     }
-
-    #if 0
-    RCC_PeriphCLKInitTypeDef PeriphClkInit;
-
-    PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC;
-    PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
-    HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit);
-	
-    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
-	
-    HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
-    #endif
-	
 }
 
 /**

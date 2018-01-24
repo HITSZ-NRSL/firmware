@@ -19,12 +19,6 @@ Maintainer: Miguel Luis and Gregory Cristian
 extern "C" {
 #endif
 
-enum BoardPowerSource
-{
-    USB_POWER = 0,
-    BATTERY_POWER
-};
-
 /*!
  * \brief Timer object description
  */

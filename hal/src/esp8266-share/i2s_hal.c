@@ -59,7 +59,7 @@ void HAL_I2S_End(HAL_I2S_Interface i2s)
  */
 uint16_t HAL_I2S_DMA_Receive_Data(HAL_I2S_Interface i2s)
 {
-
+    return 0;
 }
 
 /*
@@ -69,5 +69,5 @@ uint16_t HAL_I2S_DMA_Receive_Data(HAL_I2S_Interface i2s)
  */
 bool HAL_I2S_Is_Enabled(HAL_I2S_Interface i2s)
 {
-
+    return false;
 }

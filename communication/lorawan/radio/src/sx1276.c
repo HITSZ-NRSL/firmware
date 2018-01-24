@@ -353,8 +353,7 @@ static void RxChainCalibration( void )
     }
 
     // Sets a Frequency in HF band
-    /* SX1276SetChannel( 868000000 ); */
-    SX1276SetChannel( 434000000 );
+    SX1276SetChannel( 868000000 );
 
     // Launch Rx chain calibration for HF band
     SX1276Write( REG_IMAGECAL, ( SX1276Read( REG_IMAGECAL ) & RF_IMAGECAL_IMAGECAL_MASK ) | RF_IMAGECAL_IMAGECAL_START );
@@ -1242,26 +1241,26 @@ void SX1276WriteBuffer( uint8_t addr, uint8_t *buffer, uint8_t size )
 {
     uint8_t i;
 
-    SpiSetNss(0);
-    SpiTransfer( addr | 0x80 );
+    SX1276SpiSetNss(0);
+    SX1276SpiTransfer( addr | 0x80 );
     for( i = 0; i < size; i++ )
     {
-        SpiTransfer( buffer[i] );
+        SX1276SpiTransfer( buffer[i] );
     }
-    SpiSetNss(1);
+    SX1276SpiSetNss(1);
 }
 
 void SX1276ReadBuffer( uint8_t addr, uint8_t *buffer, uint8_t size )
 {
     uint8_t i;
 
-    SpiSetNss(0);
-    SpiTransfer( addr & 0x7F );
+    SX1276SpiSetNss(0);
+    SX1276SpiTransfer( addr & 0x7F );
     for( i = 0; i < size; i++ )
     {
-        buffer[i] = SpiTransfer( 0 );
+        buffer[i] = SX1276SpiTransfer( 0 );
     }
-    SpiSetNss(1);
+    SX1276SpiSetNss(1);
 }
 
 void SX1276WriteFifo( uint8_t *buffer, uint8_t size )
@@ -1280,15 +1279,15 @@ void SX1276SetMaxPayloadLength( RadioModems_t modem, uint8_t max )
 
     switch( modem )
     {
-    case MODEM_FSK:
-        if( SX1276.Settings.Fsk.FixLen == false )
-        {
-            SX1276Write( REG_PAYLOADLENGTH, max );
-        }
-        break;
-    case MODEM_LORA:
-        SX1276Write( REG_LR_PAYLOADMAXLENGTH, max );
-        break;
+        case MODEM_FSK:
+            if( SX1276.Settings.Fsk.FixLen == false )
+            {
+                SX1276Write( REG_PAYLOADLENGTH, max );
+            }
+            break;
+        case MODEM_LORA:
+            SX1276Write( REG_LR_PAYLOADMAXLENGTH, max );
+            break;
     }
 }
 

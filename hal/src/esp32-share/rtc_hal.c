@@ -28,15 +28,23 @@
 #include "rtc_hal.h"
 #include "timer_hal.h"
 
-#define  RTC_MAGIC  0x55aaaa55
-
+/* Private typedef -----------------------------------------------------------*/
 typedef struct {
-        uint32_t magic;
-        time_t unix_time_base;
-        uint32_t rtc_base;
+    uint32_t magic;
+    time_t unix_time_base;
+    uint32_t rtc_base;
 }rtc_time_t;
 
+/* Private define ------------------------------------------------------------*/
+#define  RTC_MAGIC  0x55aaaa55
+
+/* Private macro -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
 static rtc_time_t g_rtc_time;
+
+/* Extern variables ----------------------------------------------------------*/
+/* Private function prototypes -----------------------------------------------*/
+
 
 void HAL_RTC_Initial(void)
 {
@@ -95,3 +103,13 @@ void HAL_RTC_Cancel_UnixAlarm(void)
 {
 
 }
+
+uint8_t HAL_RTC_Time_Is_Valid(void* reserved)
+{
+    return 0;
+}
+
+void HAL_RTC_SetCallbacks(const void (*handle)(), void* reserved)
+{
+}
+

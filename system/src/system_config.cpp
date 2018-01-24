@@ -120,7 +120,6 @@ DeviceConfigCmdType DeviceConfig::getMessageType(char *s) {
 bool DeviceConfig::process(void)
 {
     aJsonObject *root = NULL;
-    aJsonObject* value_Object;
     bool _isConfigSuccessful = false;
 
     while(available()) {
@@ -320,6 +319,7 @@ void DeviceConfig::dealGetWifiList(void)
         }
         aJson.deleteItem(root);
     }
+    wlan_Imlink_start();
 #elif (defined configWIRING_CELLULAR_ENABLE) || (defined configWIRING_LORA_ENABLE)
     sendComfirm(201);
 #endif
@@ -593,7 +593,6 @@ void DeviceConfig::dealSetInfo(aJsonObject* root)
     if ((stamacObject != NULL)&&(apmacObject != NULL)) {
         mac_str_to_bin(stamacObject->valuestring, stamac);
         mac_str_to_bin(apmacObject->valuestring, apmac);
-        int ret = wlan_set_macaddr(stamac, apmac);
         if(wlan_set_macaddr(stamac, apmac)) {
             flag = false;
         }
@@ -972,8 +971,9 @@ UdpDeviceConfig DeviceSetupImlink;
 #endif
 
 static system_config_type_t current_system_config_type = SYSTEM_CONFIG_TYPE_NONE;       //配置类型
-static uint8_t system_config_initial_flag = 0;
-volatile uint8_t g_intorobot_system_config = 0;    //默认不是配置状态
+static uint8_t system_config_initial_flag = 0;     //是否已经执行配置初始化代码
+static uint8_t system_config_finish_flag = 0;      //是否已经执行配置退出代码
+volatile uint8_t g_intorobot_system_config = 0;    //是否在配置模式
 
 void set_system_config_type(system_config_type_t config_type)
 {
@@ -981,11 +981,9 @@ void set_system_config_type(system_config_type_t config_type)
 
     if(current_system_config_type == config_type) {
         return;
+    } else {
+        current_system_config_type = config_type;
     }
-
-    g_intorobot_system_config = 1;
-    system_config_initial_flag = 0;
-    current_system_config_type = config_type;
 
     switch(config_type) {
         case SYSTEM_CONFIG_TYPE_IMLINK_SERIAL:   //进入串口配置模式
@@ -1004,11 +1002,20 @@ void set_system_config_type(system_config_type_t config_type)
             flag = CONFIG_FLAG_AP;
             break;
         default:   //退出配置模式
-            g_intorobot_system_config = 0;
+            current_system_config_type = SYSTEM_CONFIG_TYPE_NONE;
             flag = CONFIG_FLAG_NONE;
             break;
     }
 
+    if(current_system_config_type == SYSTEM_CONFIG_TYPE_NONE) { //退出配置模式
+        g_intorobot_system_config = 0;
+    } else { //进入配置模式
+        g_intorobot_system_config = 1;
+        system_config_initial_flag = 0;
+        system_config_finish_flag = 0;
+    }
+
+    //保存配置模式
     if(System.featureEnabled(SYSTEM_FEATURE_CONFIG_SAVE_ENABLED)) {
         if(flag != HAL_PARAMS_Get_System_config_flag()) {
             HAL_PARAMS_Set_System_config_flag(flag);
@@ -1024,7 +1031,8 @@ system_config_type_t get_system_config_type(void)
 
 void system_config_initial(void)
 {
-    SCONFIG_DEBUG("system_config_initial\r\n");
+    SCONFIG_DEBUG("system config initial\r\n");
+    HAL_Core_Enter_Config();
     switch(get_system_config_type()) {
         case SYSTEM_CONFIG_TYPE_IMLINK_SERIAL:   //进入串口配置模式
 #ifdef configSETUP_UDP_ENABLE
@@ -1078,7 +1086,7 @@ void system_config_initial(void)
 
 void system_config_finish(void)
 {
-    SCONFIG_DEBUG("system_config_finish\r\n");
+    SCONFIG_DEBUG("system config finish\r\n");
 #ifdef configSETUP_UDP_ENABLE
     DeviceSetupImlink.close();
 #endif
@@ -1091,6 +1099,7 @@ void system_config_finish(void)
 #ifdef configSETUP_USARTSERIAL_ENABLE
     DeviceSetupUsartSerial.close();
 #endif
+    HAL_Core_Exit_Config();
     system_notify_event(event_mode_changed, ep_mode_normal);
     NEWORK_FN(Network_Setup(), (void)0);
     LORAWAN_FN(LoraWAN_Setup(), (void)0);
@@ -1098,24 +1107,14 @@ void system_config_finish(void)
 
 bool system_config_process(void)
 {
-    system_config_type_t config_type = get_system_config_type();
-    static system_config_type_t system_config_type = SYSTEM_CONFIG_TYPE_NONE;
-
-    if(SYSTEM_CONFIG_TYPE_NONE == config_type) {
-        if(system_config_type != config_type) {
-            system_config_finish();
-        }
-        system_config_type = config_type;
-        return true;
-    }
-    system_config_type = config_type;
-
+    //执行配置初始化
     if(0 == system_config_initial_flag) {
+        system_config_initial_flag = 1;
         CLOUD_FN(cloud_disconnect(false), (void)0);
         system_config_initial();
-        system_config_initial_flag = 1;
     }
 
+    //配置处理
     switch(get_system_config_type()) {
         case SYSTEM_CONFIG_TYPE_IMLINK_SERIAL:   //进入imlink+串口配置模式
 #ifdef configSETUP_UDP_ENABLE
@@ -1178,13 +1177,18 @@ bool system_config_process(void)
 #endif
             break;
         default:
+            goto success;
             break;
     }
     return false;
+
 success:
-    system_config_finish();
-    system_config_type = SYSTEM_CONFIG_TYPE_NONE;
-    set_system_config_type(SYSTEM_CONFIG_TYPE_NONE);
+    //执行配置成功
+    if(0 == system_config_finish_flag) {
+        system_config_finish_flag = 1;
+        system_config_finish();
+        set_system_config_type(SYSTEM_CONFIG_TYPE_NONE);
+    }
     return true;
 }
 

@@ -578,6 +578,7 @@ bool FLASH_Backup(uint32_t FLASH_Address)
     return FLASH_CopyMemory(FLASH_INTERNAL, CORE_FW_ADDRESS, FLASH_SERIAL, FLASH_Address, FIRMWARE_IMAGE_SIZE, 0, 0);
 #else
     //Don't have enough space in Internal Flash to save a Backup copy of the firmware
+    return false;
 #endif
 }
 
@@ -590,6 +591,7 @@ bool FLASH_Restore(uint32_t FLASH_Address)
     //commented below since FIRMWARE_IMAGE_SIZE != Actual factory firmware image size
     //FLASH_CopyMemory(FLASH_INTERNAL, FLASH_Address, FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION, FIRMWARE_IMAGE_SIZE, true);
     //FLASH_AddToFactoryResetModuleSlot() is now called in HAL_Core_Config() in core_hal.c
+    return false;
 #endif
 }
 
@@ -602,6 +604,7 @@ bool FLASH_Restore_Bootloader(uint32_t FLASH_Address)
     //commented below since FIRMWARE_IMAGE_SIZE != Actual factory firmware image size
     //FLASH_CopyMemory(FLASH_INTERNAL, FLASH_Address, FLASH_INTERNAL, USER_FIRMWARE_IMAGE_LOCATION, FIRMWARE_IMAGE_SIZE, true);
     //FLASH_AddToFactoryResetModuleSlot() is now called in HAL_Core_Config() in core_hal.c
+    return false;
 #endif
 }
 

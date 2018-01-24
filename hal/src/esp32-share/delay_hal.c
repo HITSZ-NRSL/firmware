@@ -31,11 +31,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-/**
- * Updated by HAL_1Ms_Tick()
- */
-volatile uint32_t TimingDelay;
-
 /*******************************************************************************
 * Function Name  : Delay
 * Description    : Inserts a delay time.

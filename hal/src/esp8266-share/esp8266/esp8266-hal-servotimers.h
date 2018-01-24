@@ -29,8 +29,8 @@
 #include "esp8266_timer.h"
 #include "eagle_soc.h"
 
-#define SERVO_EXCLUDE_TIMER0
-// #define SERVO_EXCLUDE_TIMER1
+//#define SERVO_EXCLUDE_TIMER0
+//#define SERVO_EXCLUDE_TIMER1
 
 #define getCycleCount() ((__extension__({static uint32_t ccount;__asm__ __volatile__("esync; rsr %0,ccount":"=a" (ccount));ccount;})))
 

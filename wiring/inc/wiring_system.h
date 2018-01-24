@@ -90,12 +90,42 @@ class SystemClass {
             while ((ticks()-start)<duration) {}
         }
 #endif
+        /**
+         * @brief 设备进入STOP睡眠模式(唤醒后重启)或者使通讯模组进入睡眠模式
+         * @param sleepMode 睡眠模式类型
+         * @param seconds   睡眠时间
+         * @return
+         */
+        static void sleep(system_sleep_mode_t sleepMode, long seconds=0);
 
-        static void sleep(IntoRobot_Sleep_TypeDef sleepMode, long seconds=0);
-        static void sleep(long seconds) { sleep(SLEEP_MODE_WLAN, seconds); }
-        static void sleep(uint16_t wakeUpPin, InterruptMode edgeTriggerMode, long seconds=0);
-        static void sleep(userLoRaWakeupCb userHandler, uint32_t seconds);
-        static void sleep(userLoRaWakeupCb userHandler);
+        /**
+         * @brief 使通讯模组进入睡眠模式
+         * @param seconds   睡眠时间
+         * @return
+         */
+        inline static void sleep(long seconds) {
+            sleep(SLEEP_MODE_NETWORK, seconds);
+        }
+
+        /**
+         * @brief 设备进入stop睡眠模式(唤醒后继续执行)
+         * @param wakeUpPin   唤醒引脚
+         * @param edgeTriggerMode  引脚唤醒方式
+         * @param seconds   睡眠时间
+         * @param handler   唤醒回调函数
+         * @return
+         */
+        static void sleep(uint16_t wakeUpPin, InterruptMode edgeTriggerMode, uint32_t seconds=0, void(*handler)()=NULL);
+
+        /**
+         * @brief 设备进入stop睡眠模式(唤醒后继续执行)
+         * @param handler   唤醒回调函数
+         * @param seconds   睡眠时间
+         * @return
+         */
+        inline static void sleep(void(*handler)(), uint32_t seconds=0) __attribute__((deprecated("Please use WiFi.connect() instead"))) {
+            sleep(0xff, CHANGE, seconds, handler);
+        }
 
         static String deviceID(void) { return intorobot_deviceID(); }
         static uint16_t buttonPushed(uint8_t button=0) {

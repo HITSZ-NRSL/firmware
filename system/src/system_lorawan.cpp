@@ -602,7 +602,7 @@ int intorobot_lorawan_send_data(char* buffer, uint16_t len, bool confirmed, uint
             return LoRaWan.sendUnconfirmed(2, buffer, len, timeout);
         }
     }
-    return false;
+    return -1;
 }
 
 void LoRaWanOnEvent(lorawan_event_t event)

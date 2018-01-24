@@ -21,8 +21,8 @@
 #include <stdio.h>
 #include "params_impl.h"
 #include "params_hal.h"
-#include "flash_map.h"
 #include "flash_storage_impl.h"
+#include "flash_map.h"
 #include "intorobot_macros.h"
 #include "intorobot_def.h"
 

@@ -24,11 +24,6 @@
 
 
 /**
- * Updated by HAL_1Ms_Tick()
- */
-volatile uint32_t TimingDelay;
-
-/**
   * @brief  Delay milliseconds
   *         This should consider OS used case.
   * @param  nTime: specifies the delay time length, in milliseconds.

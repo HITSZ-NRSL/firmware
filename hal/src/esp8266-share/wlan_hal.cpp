@@ -258,7 +258,6 @@ void wlan_set_ipaddress_source(IPAddressSource source, bool persist, void* reser
 void wlan_set_ipaddress(const HAL_IPAddress* device, const HAL_IPAddress* netmask,
         const HAL_IPAddress* gateway, const HAL_IPAddress* dns1, const HAL_IPAddress* dns2, void* reserved)
 {
-
 }
 
 static WLanSecurityType toSecurityType(AUTH_MODE authmode)
@@ -282,6 +281,7 @@ static WLanSecurityType toSecurityType(AUTH_MODE authmode)
             return WLAN_SEC_NOT_SET;
             break;
     }
+    return WLAN_SEC_NOT_SET;
 }
 
 static WLanSecurityCipher toCipherType(AUTH_MODE authmode)
@@ -468,5 +468,6 @@ int wlan_set_macaddr_when_init(void)
         wlan_set_macaddr_from_flash(mac_addrs.stamac_addrs, mac_addrs.apmac_addrs);
         esp8266_setMode(WIFI_STA);
     }
+    return 0;
 }
 

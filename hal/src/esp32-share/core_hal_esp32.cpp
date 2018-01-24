@@ -34,7 +34,6 @@
 #include "ota_flash_hal.h"
 #include "gpio_hal.h"
 #include "interrupts_hal.h"
-#include "syshealth_hal.h"
 #include "intorobot_macros.h"
 #include "rtc_hal.h"
 #include "delay_hal.h"
@@ -91,7 +90,7 @@ extern "C" const char intorobot_subsys_version_header[8] __attribute__((section(
 extern "C" const char intorobot_subsys_version[32] __attribute__((section(".subsys.version"))) = stringify(SUBSYS_VERSION_STRING);
 extern "C" void app_main()
 {
-    esp_log_level_set("*", CONFIG_LOG_DEFAULT_LEVEL);
+    esp_log_level_set("*", (esp_log_level_t)CONFIG_LOG_DEFAULT_LEVEL);
     nvs_flash_init();
     init();
     initVariant();
@@ -101,59 +100,60 @@ extern "C" void app_main()
     xTaskCreatePinnedToCore(ui_task_start, "ui_thread", 4096, NULL, 1, NULL, ARDUINO_RUNNING_CORE);
 }
 
+void SysTick_Handler(void)
+{
+    HAL_SysTick_Handler();
+    HAL_UI_SysTick_Handler();
+}
+
 void HAL_Core_Init(void)
 {
-
 }
 
 void HAL_Core_Config(void)
 {
+    //设置管脚的默认值
     for (pin_t pin = FIRST_DIGITAL_PIN; pin <= FIRST_DIGITAL_PIN + TOTAL_DIGITAL_PINS; pin++) {
         //HAL_Pin_Mode(pin, INPUT);
     }
-
     for (pin_t pin = FIRST_ANALOG_PIN; pin <= FIRST_ANALOG_PIN + TOTAL_ANALOG_PINS; pin++) {
         //HAL_Pin_Mode(pin, INPUT);
     }
 
     HAL_RTC_Initial();
     HAL_RNG_Initial();
-
     HAL_IWDG_Initial();
     HAL_UI_Initial();
 
     esp32_setMode(WIFI_MODE_STA);    // wifi初始化
 }
 
-void HAL_Core_Load_params(void)
+void HAL_Core_Load_Params(void)
 {
-    // load params
+    //加载bootloader和系统参数
     HAL_PARAMS_Load_System_Params();
     HAL_PARAMS_Load_Boot_Params();
-    // check if need init params
-    if(INITPARAM_FLAG_FACTORY_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) //初始化参数 保留密钥
-    {
+
+    if(INITPARAM_FLAG_FACTORY_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
+        //初始化参数 保留密钥
         DEBUG("init params fac\r\n");
         HAL_PARAMS_Init_Fac_System_Params();
-    }
-    else if(INITPARAM_FLAG_ALL_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) //初始化所有参数
-    {
+    } else if(INITPARAM_FLAG_ALL_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
+        //初始化所有参数
         DEBUG("init params all\r\n");
         HAL_PARAMS_Init_All_System_Params();
     }
-    if(INITPARAM_FLAG_NORMAL != HAL_PARAMS_Get_Boot_initparam_flag()) //初始化参数 保留密钥
-    {
+
+    if(INITPARAM_FLAG_NORMAL != HAL_PARAMS_Get_Boot_initparam_flag()) {
         HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_NORMAL);
         HAL_PARAMS_Save_Params();
     }
 
     //保存子系统程序版本号
     char subsys_ver1[32] = {0}, subsys_ver2[32] = {0};
-    if(HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1)))
-    {
+    if(HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1))) {
         HAL_PARAMS_Get_System_subsys_ver(subsys_ver2, sizeof(subsys_ver2));
-        if(strcmp(subsys_ver1, subsys_ver2))
-        {
+        if(strcmp(subsys_ver1, subsys_ver2)) {
             HAL_PARAMS_Set_System_subsys_ver(subsys_ver1);
             HAL_PARAMS_Save_Params();
         }
@@ -163,7 +163,7 @@ void HAL_Core_Load_params(void)
 void HAL_Core_Setup(void)
 {
     HAL_IWDG_Config(DISABLE);
-    HAL_Core_Load_params();
+    HAL_Core_Load_Params();
     HAL_SubSystem_Update_If_Needed();
     HAL_Bootloader_Update_If_Needed();
 }
@@ -178,27 +178,14 @@ void HAL_Core_Enter_DFU_Mode(bool persist)
 {
 }
 
-void HAL_Core_Enter_Config_Mode(void)
-{
-}
-
-void HAL_Core_Enter_Firmware_Recovery_Mode(void)
-{
-    HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_DEFAULT_RESTORE);
-    HAL_PARAMS_Save_Params();
-    HAL_Core_System_Reset();
-}
-
 void HAL_Core_Enter_Com_Mode(void)
 {
     HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_SERIAL_COM);
     HAL_PARAMS_Save_Params();
     HAL_Core_System_Reset();
 }
-/**
- * 恢复出厂设置 不清除密钥
- */
 
+//恢复出厂设置 不清除密钥
 void HAL_Core_Enter_Factory_Reset_Mode(void)
 {
     HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_FACTORY_RESET);
@@ -221,10 +208,20 @@ void HAL_Core_Enter_Bootloader(bool persist)
 {
 }
 
-void SysTick_Handler(void)
+void HAL_Core_Enter_Stop_Mode(uint16_t wakeUpPin, uint16_t edgeTriggerMode, long seconds)
 {
-    HAL_SysTick_Handler();
-    HAL_UI_SysTick_Handler();
+}
+
+void HAL_Core_Execute_Stop_Mode(void)
+{
+}
+
+void HAL_Core_Enter_Standby_Mode(void)
+{
+}
+
+void HAL_Core_Execute_Standby_Mode(void)
+{
 }
 
 void HAL_Core_System_Yield(void)
@@ -237,3 +234,10 @@ uint32_t HAL_Core_Runtime_Info(runtime_info_t* info, void* reserved)
     return 0;
 }
 
+void HAL_Core_Enter_Config(void)
+{
+}
+
+void HAL_Core_Exit_Config(void)
+{
+}

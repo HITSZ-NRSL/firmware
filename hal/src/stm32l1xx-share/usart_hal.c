@@ -312,7 +312,6 @@ bool HAL_USART_Is_Enabled(HAL_USART_Serial serial)
 
 void HAL_USART_Half_Duplex(HAL_USART_Serial serial, bool Enable)
 {
-
 }
 
 static void HAL_USART_Handler(HAL_USART_Serial serial)

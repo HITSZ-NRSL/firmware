@@ -139,3 +139,14 @@ bool detachSystemInterrupt(hal_irq_t irq)
 {
     return HAL_Set_System_Interrupt_Handler(irq, NULL, NULL, NULL);
 }
+
+// irq operation
+void disableIRQ(void)
+{
+    HAL_disable_irq();
+}
+void enableIRQ(void)
+{
+    HAL_enable_irq(0);
+}
+

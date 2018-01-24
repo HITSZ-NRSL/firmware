@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 #include "aes.h"
 #include "cmac.h"
 #include "mqttcrypto.h"

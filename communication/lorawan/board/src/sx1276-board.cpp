@@ -22,34 +22,12 @@ Maintainer: Miguel Luis and Gregory Cristian
 #include "sx1276.h"
 #include "sx1276-board.h"
 #include "timer.h"
+#include "rtc_hal.h"
 
 #include "wiring.h"
 #include "wiring_interrupts.h"
 #include "wiring_spi.h"
 #include "wiring_system.h"
-
-#define   ID1        ( 0x1FF80050 )
-#define   ID2        ( 0x1FF80054 )
-#define   ID3        ( 0x1FF80064 )
-
-#define FACTORY_POWER_SUPPLY                        3300 // mV
-
-/*!
- * VREF calibration value
- */
-#define VREFINT_CAL                                 ( *( uint16_t* )0x1FF80078 )
-
-/*!
- * ADC maximum value
- */
-#define ADC_MAX_VALUE                               4095
-
-/*!
- * Battery thresholds
- */
-#define BATTERY_MAX_LEVEL                           4150 // mV
-#define BATTERY_MIN_LEVEL                           3200 // mV
-#define BATTERY_SHUTDOWN_LEVEL                      3100 // mV
 
 
 /*!
@@ -57,6 +35,7 @@ Maintainer: Miguel Luis and Gregory Cristian
  */
 static bool RadioIsActive = false;
 
+static bool rtcSetCallback = false;
 /*!
  * Radio driver structure initialization
  */
@@ -251,15 +230,15 @@ void SX1276SetAntSw( uint8_t opMode )
 {
     switch( opMode )
     {
-    case RFLR_OPMODE_TRANSMITTER:
-        digitalWrite(SX1276.RxTx,0);
-        break;
-    case RFLR_OPMODE_RECEIVER:
-    case RFLR_OPMODE_RECEIVER_SINGLE:
-    case RFLR_OPMODE_CAD:
-    default:
-        digitalWrite(SX1276.RxTx,1);
-        break;
+        case RFLR_OPMODE_TRANSMITTER:
+            digitalWrite(SX1276.RxTx,0);
+            break;
+        case RFLR_OPMODE_RECEIVER:
+        case RFLR_OPMODE_RECEIVER_SINGLE:
+        case RFLR_OPMODE_CAD:
+        default:
+            digitalWrite(SX1276.RxTx,1);
+            break;
     }
 }
 
@@ -267,6 +246,19 @@ bool SX1276CheckRfFrequency( uint32_t frequency )
 {
     // Implement check. Currently all frequencies are supported
     return true;
+}
+
+void SX1276BoardInit(void)
+{
+    SPI1.setBitOrder(MSBFIRST);
+    SPI1.setClockDivider(SPI_CLOCK_DIV16);
+    SPI1.setDataMode(0);
+    SPI1.begin();
+    SX1276IoInit();
+    if(!rtcSetCallback){
+        rtcSetCallback = true;
+        HAL_RTC_SetCallbacks(TimerIrqHandler, NULL);
+    }
 }
 
 void SX1276SetReset(void)
@@ -278,118 +270,12 @@ void SX1276SetReset(void)
     DelayMs(6);
 }
 
-void SpiSetNss(uint8_t val)
+void SX1276SpiSetNss(uint8_t val)
 {
     digitalWrite(SX1276.SpiNss,val);
 }
 
-uint8_t SpiTransfer( uint8_t outData )
+uint8_t SX1276SpiTransfer( uint8_t outData )
 {
     SPI1.transfer(outData);
-}
-
-void SX1276BoardInit(void)
-{
-    SPI1.setBitOrder(MSBFIRST);
-    SPI1.setClockDivider(SPI_CLOCK_DIV16);
-    SPI1.setDataMode(0);
-    SPI1.begin();
-    SX1276IoInit();
-}
-
-void DelayMs(uint32_t ms)
-{
-    HAL_Delay_Milliseconds(ms);
-}
-
-uint8_t GetBoardPowerSource( void )
-{
-    #if 0
-    #if defined( USE_USB_CDC )
-        if( GpioRead( &UsbDetect ) == 1 )
-            {
-                return BATTERY_POWER;
-            }
-        else
-            {
-                return USB_POWER;
-            }
-    #else
-    return BATTERY_POWER;
-    #endif
-    #endif
-    return BATTERY_POWER;
-}
-
-uint16_t BoardBatteryMeasureVolage( void )
-{
-    uint16_t vdd = 0;
-    uint16_t vref = VREFINT_CAL;
-    uint16_t vdiv = 0;
-    uint16_t batteryVoltage = 0;
-
-    vdiv = analogRead(SX1278_BATTERY_POWER);
-
-    vdd = ( float )FACTORY_POWER_SUPPLY * ( float )VREFINT_CAL / ( float )vref;
-    batteryVoltage = vdd * ( ( float )vdiv / ( float )ADC_MAX_VALUE );
-
-    //                                vDiv
-    // Divider bridge  VBAT <-> 470k -<--|-->- 470k <-> GND => vBat = 2 * vDiv
-    batteryVoltage = 2 * batteryVoltage;
-    return batteryVoltage;
-}
-
-uint8_t BoardGetBatteryLevel(void)
-{
-    uint8_t batteryLevel = 0;
-    uint16_t BatteryVoltage = BATTERY_MAX_LEVEL;
-
-    BatteryVoltage = BoardBatteryMeasureVolage( );
-
-    if( GetBoardPowerSource( ) == USB_POWER )
-    {
-        batteryLevel = 0;
-    }
-    else
-    {
-        if( BatteryVoltage >= BATTERY_MAX_LEVEL )
-        {
-            batteryLevel = 254;
-        }
-        else if( ( BatteryVoltage > BATTERY_MIN_LEVEL ) && ( BatteryVoltage < BATTERY_MAX_LEVEL ) )
-        {
-            batteryLevel = ( ( 253 * ( BatteryVoltage - BATTERY_MIN_LEVEL ) ) / ( BATTERY_MAX_LEVEL - BATTERY_MIN_LEVEL ) ) + 1;
-        }
-        else if( ( BatteryVoltage > BATTERY_SHUTDOWN_LEVEL ) && ( BatteryVoltage <= BATTERY_MIN_LEVEL ) )
-        {
-            batteryLevel = 1;
-        }
-        else
-        {
-            batteryLevel = 255;
-        }
-    }
-    return batteryLevel;
-}
-
-uint32_t BoardGetRandomSeed( void )
-{
-    return ( ( *( uint32_t* )ID1 ) ^ ( *( uint32_t* )ID2 ) ^ ( *( uint32_t* )ID3 ) );
-}
-
-void BoardGetUniqueId( uint8_t *id )
-{
-    id[7] = ( ( *( uint32_t* )ID1 )+ ( *( uint32_t* )ID3 ) ) >> 24;
-    id[6] = ( ( *( uint32_t* )ID1 )+ ( *( uint32_t* )ID3 ) ) >> 16;
-    id[5] = ( ( *( uint32_t* )ID1 )+ ( *( uint32_t* )ID3 ) ) >> 8;
-    id[4] = ( ( *( uint32_t* )ID1 )+ ( *( uint32_t* )ID3 ) );
-    id[3] = ( ( *( uint32_t* )ID2 ) ) >> 24;
-    id[2] = ( ( *( uint32_t* )ID2 ) ) >> 16;
-    id[1] = ( ( *( uint32_t* )ID2 ) ) >> 8;
-    id[0] = ( ( *( uint32_t* )ID2 ) );
-}
-
-bool UseLoRaWanStandardProtocol(void)
-{
-    return System.featureEnabled(SYSTEM_FEATURE_STANDARD_LORAWAN_ENABLED);
 }

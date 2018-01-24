@@ -159,13 +159,13 @@ private:
     bool _verifyHeader(uint8_t data);
     bool _verifyEnd();
 
-    uint8_t _progress;
     uint8_t _error;
     uint8_t *_buffer;
     size_t _bufferLen;
     size_t _size;
     uint32_t _startAddress;
     uint32_t _currentAddress;
+    uint8_t _progress;
 
     String _target_md5;
     MD5Builder _md5;

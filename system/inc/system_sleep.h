@@ -27,26 +27,13 @@
 extern "C" {
 #endif
 
-typedef enum
-{
-    SLEEP_MODE_WLAN = 0, SLEEP_MODE_DEEP = 1, SLEEP_MODE_SOFTPOWEROFF = 2
-} IntoRobot_Sleep_TypeDef;
+typedef enum {
+    SLEEP_MODE_NETWORK = 0,
+    SLEEP_MODE_DEEP = 1
+} system_sleep_mode_t;
 
-enum class SystemSleepNetwork
-{
-    Off,
-    Standby,
-};
-
-typedef void (*userLoRaWakeupCb)(void);
-
-/**
- * @param param A SystemSleepNetwork enum cast as an integer.
- */
-void system_sleep(IntoRobot_Sleep_TypeDef mode, long seconds, uint32_t param, void* reserved);
-void system_sleep_pin(uint16_t pin, uint16_t mode, long seconds, uint32_t param, void* reserved);
-void system_sleep_lora(userLoRaWakeupCb userHandler, uint32_t seconds);
-void system_sleep_lora_slave(userLoRaWakeupCb userHandler);
+void system_sleep(system_sleep_mode_t sleepMode, uint32_t seconds, void* reserved);
+void system_sleep_pin(uint16_t wakeUpPin, uint16_t edgeTriggerMode, uint32_t seconds, void(*handler)(), void* reserved);
 
 #ifdef __cplusplus
 }

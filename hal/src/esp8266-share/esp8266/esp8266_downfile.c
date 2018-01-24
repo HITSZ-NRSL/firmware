@@ -111,7 +111,6 @@ void downfile_rsp(void *arg){
 //通过host name回去ip回调函数
 void upServer_dns_found(const char *name, ip_addr_t *ipaddr, void *arg){
     struct espconn *pespconn = (struct espconn *) arg;
-    char output[64] = {0};
 
     free(pespconn);
     DEBUG("upServer_dns_found\r\n");
@@ -137,9 +136,7 @@ void downFile(char *hostname, char *httppara, char *md5para, void *check_cb){
         upServer->url = (uint8 *)os_zalloc(1024);
     }
 
-    sprintf(upServer->url,
-            "GET %s HTTP/1.0\r\nHost: %s\r\n"pheadbuffer"",
-            httppara, hostname);
+    sprintf((char *)upServer->url, "GET %s HTTP/1.0\r\nHost: %s\r\n"pheadbuffer"", httppara, hostname);
 
     strcpy(upServer->md5, md5para);
     DEBUG("upServer->url=%s\r\n",upServer->url);

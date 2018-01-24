@@ -17,6 +17,7 @@
  ******************************************************************************
  */
 
+#include <stdio.h>
 #include "wiring_i2s.h"
 #include "core_hal.h"
 #include "intorobot_macros.h"

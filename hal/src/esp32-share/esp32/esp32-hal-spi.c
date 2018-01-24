@@ -227,7 +227,7 @@ void spiEnableSSPins(spi_t * spi, uint8_t cs_mask)
         return;
     }
     SPI_MUTEX_LOCK();
-    spi->dev->pin.val &= ~(cs_mask & SPI_CS_MASK_ALL);
+    spi->dev->pin.val &= ~(cs_mask & ESP32_SPI_CS_MASK_ALL);
     SPI_MUTEX_UNLOCK();
 }
 
@@ -237,7 +237,7 @@ void spiDisableSSPins(spi_t * spi, uint8_t cs_mask)
         return;
     }
     SPI_MUTEX_LOCK();
-    spi->dev->pin.val |= (cs_mask & SPI_CS_MASK_ALL);
+    spi->dev->pin.val |= (cs_mask & ESP32_SPI_CS_MASK_ALL);
     SPI_MUTEX_UNLOCK();
 }
 
@@ -310,14 +310,14 @@ uint8_t spiGetDataMode(spi_t * spi)
     bool outEdge = spi->dev->user.ck_out_edge;
     if(idleEdge) {
         if(outEdge) {
-            return SPI_MODE3;
+            return ESP32_SPI_MODE3;
         }
-        return SPI_MODE2;
+        return ESP32_SPI_MODE2;
     }
     if(outEdge) {
-        return SPI_MODE1;
+        return ESP32_SPI_MODE1;
     }
-    return SPI_MODE0;
+    return ESP32_SPI_MODE0;
 }
 
 void spiSetDataMode(spi_t * spi, uint8_t dataMode)
@@ -327,19 +327,19 @@ void spiSetDataMode(spi_t * spi, uint8_t dataMode)
     }
     SPI_MUTEX_LOCK();
     switch (dataMode) {
-    case SPI_MODE1:
+    case ESP32_SPI_MODE1:
         spi->dev->pin.ck_idle_edge = 0;
         spi->dev->user.ck_out_edge = 1;
         break;
-    case SPI_MODE2:
+    case ESP32_SPI_MODE2:
         spi->dev->pin.ck_idle_edge = 1;
         spi->dev->user.ck_out_edge = 1;
         break;
-    case SPI_MODE3:
+    case ESP32_SPI_MODE3:
         spi->dev->pin.ck_idle_edge = 1;
         spi->dev->user.ck_out_edge = 0;
         break;
-    case SPI_MODE0:
+    case ESP32_SPI_MODE0:
     default:
         spi->dev->pin.ck_idle_edge = 0;
         spi->dev->user.ck_out_edge = 0;
@@ -362,10 +362,10 @@ void spiSetBitOrder(spi_t * spi, uint8_t bitOrder)
         return;
     }
     SPI_MUTEX_LOCK();
-    if (SPI_MSBFIRST == bitOrder) {
+    if (ESP32_SPI_MSBFIRST == bitOrder) {
         spi->dev->ctrl.wr_bit_order = 0;
         spi->dev->ctrl.rd_bit_order = 0;
-    } else if (SPI_LSBFIRST == bitOrder) {
+    } else if (ESP32_SPI_LSBFIRST == bitOrder) {
         spi->dev->ctrl.wr_bit_order = 1;
         spi->dev->ctrl.rd_bit_order = 1;
     }
@@ -708,28 +708,28 @@ void spiTransaction(spi_t * spi, uint32_t clockDiv, uint8_t dataMode, uint8_t bi
     SPI_MUTEX_LOCK();
     spi->dev->clock.val = clockDiv;
     switch (dataMode) {
-        case SPI_MODE1:
+        case ESP32_SPI_MODE1:
             spi->dev->pin.ck_idle_edge = 0;
             spi->dev->user.ck_out_edge = 1;
             break;
-        case SPI_MODE2:
+        case ESP32_SPI_MODE2:
             spi->dev->pin.ck_idle_edge = 1;
             spi->dev->user.ck_out_edge = 0;
             break;
-        case SPI_MODE3:
+        case ESP32_SPI_MODE3:
             spi->dev->pin.ck_idle_edge = 1;
             spi->dev->user.ck_out_edge = 1;
             break;
-        case SPI_MODE0:
+        case ESP32_SPI_MODE0:
         default:
             spi->dev->pin.ck_idle_edge = 0;
             spi->dev->user.ck_out_edge = 0;
             break;
     }
-    if (SPI_MSBFIRST == bitOrder) {
+    if (ESP32_SPI_MSBFIRST == bitOrder) {
         spi->dev->ctrl.wr_bit_order = 0;
         spi->dev->ctrl.rd_bit_order = 0;
-    } else if (SPI_LSBFIRST == bitOrder) {
+    } else if (ESP32_SPI_LSBFIRST == bitOrder) {
         spi->dev->ctrl.wr_bit_order = 1;
         spi->dev->ctrl.rd_bit_order = 1;
     }

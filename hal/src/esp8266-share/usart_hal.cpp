@@ -50,8 +50,6 @@
 
 #define UART_8N1 ( UART_NB_BIT_8 | UART_PARITY_NONE | UART_NB_STOP_BIT_1 )
 
-static int s_uart_debug_nr = UART0;
-
 /* Private typedef -----------------------------------------------------------*/
 typedef enum USART_Num_Def {
     USART_0 = 0,

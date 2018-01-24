@@ -35,6 +35,7 @@
 //#include <sys/param.h>
 //#include <sys/systm.h>
 #include <stdint.h>
+#include <string.h>
 #include "intorobot_macros.h"
 #include "aes.h"
 #include "cmac.h"

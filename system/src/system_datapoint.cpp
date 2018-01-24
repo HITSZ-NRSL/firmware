@@ -78,11 +78,6 @@ static uint8_t intorobotGetPropertyPermissionUpCount(void)
     return count;
 }
 
-static uint8_t intorobotGetPropertyCount(void)
-{
-    return properties_count;
-}
-
 static bool intorobotPropertyChanged(void)
 {
     for (int i = 0; i < properties_count; i++) {
@@ -128,7 +123,7 @@ void intorobotDefineDatapointBool(const uint16_t dpID, const dp_permission_t per
             lapseTemp = 0;
         }
         // Create property structure
-        property_conf_t *prop = new property_conf_t {dpID, DATA_TYPE_BOOL, permission, policy, (long)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
+        property_conf_t *prop = new property_conf_t {dpID, DATA_TYPE_BOOL, permission, policy, (uint32_t)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
         prop->value = String(value);
         properties[properties_count] = prop; // Save pointer to scructure
         properties_count++; // count the number of properties
@@ -146,7 +141,7 @@ void intorobotDefineDatapointNumber(const uint16_t dpID, const dp_permission_t p
             lapseTemp = 0;
         }
         // Create property structure
-        prop = new property_conf_t {dpID, DATA_TYPE_NUM, permission, policy, (long)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
+        prop = new property_conf_t {dpID, DATA_TYPE_NUM, permission, policy, (uint32_t)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
         prop->numberProperty.minValue = String(minValue, resolution).toDouble();
         prop->numberProperty.maxValue = String(maxValue, resolution).toDouble();
         if(resolution < 0) {
@@ -177,7 +172,7 @@ void intorobotDefineDatapointEnum(const uint16_t dpID, const dp_permission_t per
             lapseTemp = 0;
         }
         // Create property structure
-        property_conf_t *prop = new property_conf_t {dpID, DATA_TYPE_ENUM, permission, policy, (long)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
+        property_conf_t *prop = new property_conf_t {dpID, DATA_TYPE_ENUM, permission, policy, (uint32_t)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
         if(defaultValue < 0) {
             defaultValue = 0;
         }
@@ -196,7 +191,7 @@ void intorobotDefineDatapointString(const uint16_t dpID, const dp_permission_t p
             lapseTemp = 0;
         }
         // Create property structure
-        property_conf_t *prop = new property_conf_t {dpID, DATA_TYPE_STRING, permission, policy, (long)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
+        property_conf_t *prop = new property_conf_t {dpID, DATA_TYPE_STRING, permission, policy, (uint32_t)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
         prop->value = value;
         properties[properties_count] = prop; // Save pointer to scructure
         properties_count++; // count the number of properties
@@ -213,7 +208,7 @@ void intorobotDefineDatapointBinary(const uint16_t dpID, const dp_permission_t p
         }
 
         // Create property structure
-        property_conf_t *prop = new property_conf_t {dpID, DATA_TYPE_BINARY, permission, policy, (long)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
+        property_conf_t *prop = new property_conf_t {dpID, DATA_TYPE_BINARY, permission, policy, (uint32_t)lapseTemp*1000, 0, false, RESULT_DATAPOINT_OLD};
         prop->valueBinary.value = (uint8_t *)malloc(len);
         if(NULL != prop->valueBinary.value) {
             memcpy(prop->valueBinary.value, value, len);
@@ -463,7 +458,7 @@ void intorobotParseReceiveDatapoints(uint8_t *payload, uint16_t len)
                     bool valueBool = payload[index++];
                     if(DATA_TYPE_BOOL == properties[i]->dataType) {
                         String valueString = String(valueBool);
-                        intorobotWriteDatapoint(dpID, valueString.c_str(), valueString.length(), 0);
+                        intorobotWriteDatapoint(dpID, (uint8_t *)valueString.c_str(), valueString.length(), 0);
                     }
                     break;
                 }
@@ -485,7 +480,7 @@ void intorobotParseReceiveDatapoints(uint8_t *payload, uint16_t len)
                     if(DATA_TYPE_NUM == properties[i]->dataType) {
                         double valueDouble = (valueUint32 / _pow(10, properties[i]->numberProperty.resolution)) + properties[i]->numberProperty.minValue;
                         String valueString = String(valueDouble);
-                        intorobotWriteDatapoint(dpID, valueString.c_str(), valueString.length(), 0);
+                        intorobotWriteDatapoint(dpID, (uint8_t *)valueString.c_str(), valueString.length(), 0);
                     }
                     break;
                 }
@@ -496,7 +491,7 @@ void intorobotParseReceiveDatapoints(uint8_t *payload, uint16_t len)
                     uint8_t valueUint8 = payload[index++];
                     if(DATA_TYPE_ENUM == properties[i]->dataType) {
                         String valueString = String(valueUint8);
-                        intorobotWriteDatapoint(dpID, valueString.c_str(), valueString.length(), 0);
+                        intorobotWriteDatapoint(dpID, (uint8_t *)valueString.c_str(), valueString.length(), 0);
                     }
                 }
                 break;
@@ -515,7 +510,7 @@ void intorobotParseReceiveDatapoints(uint8_t *payload, uint16_t len)
                         memset(str, 0, dataLength+1);
                         memcpy(str, &payload[index], dataLength);
                         if(DATA_TYPE_STRING == properties[i]->dataType) {
-                            intorobotWriteDatapoint(dpID, str, dataLength, 0);
+                            intorobotWriteDatapoint(dpID, (uint8_t *)str, dataLength, 0);
                         }
                         free(str);
                     }
@@ -675,31 +670,31 @@ static int _intorobotSendRawData(uint8_t *data, uint16_t dataLen, bool confirmed
 }
 
 //datepoint process
-static int intorobotSendSingleDatapoint(const uint16_t dpID, const uint8_t *value, const uint16_t len, bool confirmed, uint16_t timeout)
+int intorobotSendSingleDatapoint(const uint16_t dpID, const uint8_t *value, const uint16_t len, bool confirmed, uint16_t timeout)
 {
     int i = intorobotDiscoverProperty(dpID);
 
     if (i == -1) {
         // not found, nothing to do
-        return;
+        return -1;
     }
 
     intorobotWriteDatapoint(dpID, value, len, 1);
 
     if(DP_TRANSMIT_MODE_AUTOMATIC == intorobotGetDatapointTransmitMode()) {
-        return;
+        return -1;
     }
 
     //只允许下发
     if ( DP_PERMISSION_DOWN_ONLY == properties[i]->permission ) {
         SDATAPOINT_DEBUG("only permit cloud -> terminal %d\r\n", properties[i]->dpID);
-        return;
+        return -1;
     }
 
     //数值未发生变化
     if ( !(properties[i]->change) && (DP_POLICY_ON_CHANGE == properties[i]->policy) ) {
         SDATAPOINT_DEBUG("No Changes for %d:%d\r\n", properties[i]->dpID, value);
-        return;
+        return -1;
     }
 
     //发送时间间隔到
@@ -718,16 +713,16 @@ static int intorobotSendSingleDatapoint(const uint16_t dpID, const uint8_t *valu
         properties[i]->runtime = current_millis;
         return _intorobotSendRawData(buffer, index, confirmed, timeout);
     }
-    return false;
+    return -1;
 }
 
-static int intorobotSendAllDatapoint(void)
+int intorobotSendAllDatapoint(void)
 {
     uint8_t buffer[512];
     uint16_t index = 0;
 
     if(0 == intorobotGetPropertyPermissionUpCount()) {
-        return false;
+        return -1;
     }
 
     buffer[index++] = DATA_PROTOCOL_DATAPOINT_BINARY;
@@ -742,11 +737,11 @@ int intorobotSendAllDatapointManual(bool confirmed, uint16_t timeout)
     uint16_t index = 0;
 
     if(0 == intorobotGetPropertyPermissionUpCount()) {
-        return false;
+        return -1;
     }
 
     if(DP_TRANSMIT_MODE_AUTOMATIC == intorobotGetDatapointTransmitMode()) {
-        return false;
+        return -1;
     }
 
     buffer[index++] = DATA_PROTOCOL_DATAPOINT_BINARY;
@@ -755,18 +750,18 @@ int intorobotSendAllDatapointManual(bool confirmed, uint16_t timeout)
     return _intorobotSendRawData(buffer, index, confirmed, timeout);
 }
 
-void intorobotSendDatapointAutomatic(void)
+int intorobotSendDatapointAutomatic(void)
 {
     uint8_t buffer[512];
     uint16_t index = 0;
     bool sendFlag = false;
 
     if(0 == intorobotGetPropertyPermissionUpCount()) {
-        return;
+        return -1;
     }
 
     if(DP_TRANSMIT_MODE_MANUAL == intorobotGetDatapointTransmitMode()) {
-        return;
+        return -1;
     }
 
     //当数值发生变化
@@ -791,9 +786,10 @@ void intorobotSendDatapointAutomatic(void)
     }
 
     if(sendFlag) {
-        _intorobotSendRawData(buffer, index, false, 0);
         g_datapoint_control.runtime = millis();
         intorobotPropertyChangeClear();
+        return _intorobotSendRawData(buffer, index, false, 0);
     }
+    return -1;
 }
 

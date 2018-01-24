@@ -24,6 +24,7 @@
 #include "soc/dport_reg.h"
 #include "esp32-hal-gpio.h"
 #include "timer_hal.h"
+#include "delay_hal.h"
 
 //#define I2C_DEV(i)   (volatile i2c_dev_t *)((i)?DR_REG_I2C1_EXT_BASE:DR_REG_I2C_EXT_BASE)
 //#define I2C_DEV(i)   ((i2c_dev_t *)(REG_I2C_BASE(i)))
@@ -506,7 +507,7 @@ void i2cReset(i2c_t* i2c){
     I2C_MUTEX_LOCK();
     periph_module_t moduleId = (i2c == &_i2c_bus_array[0])?PERIPH_I2C0_MODULE:PERIPH_I2C1_MODULE;
     periph_module_disable( moduleId );
-    delay( 20 ); // Seems long but delay was chosen to ensure system teardown and setup without core generation
+    HAL_Delay_Milliseconds( 20 ); // Seems long but delay was chosen to ensure system teardown and setup without core generation
     periph_module_enable( moduleId );
     I2C_MUTEX_UNLOCK();
 }

@@ -22,6 +22,7 @@
 #include "gpio_hal.h"
 #include "pinmap_impl.h"
 #include "esp8266-hal-gpio.h"
+#include "dac_hal.h"
 
 /* Private typedef ----------------------------------------------------------*/
 
@@ -64,7 +65,7 @@ PinFunction HAL_Validate_Pin_Function(pin_t pin, PinFunction pinFunction)
  */
 void HAL_Pin_Mode(pin_t pin, PinMode setMode)
 {
-    uint8_t mode;
+    uint8_t mode = ESP8266_OUTPUT;
     EESP8266_Pin_Info *PIN_MAP = HAL_Pin_Map();
     pin_t gpio_pin = PIN_MAP[pin].gpio_pin;
 
@@ -217,10 +218,6 @@ int32_t HAL_GPIO_Read(uint16_t pin)
     }
     return __digitalRead(PIN_MAP[pin].gpio_pin);
 }
-
-#define clockCyclesPerMicrosecond() SYSTEM_US_TICKS
-#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
-#define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
 
 #define WAIT_FOR_PIN_STATE(value) \
     while (HAL_pinReadFast(pin) != (value)) { \

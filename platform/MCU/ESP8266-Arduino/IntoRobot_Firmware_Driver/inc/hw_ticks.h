@@ -36,6 +36,9 @@ typedef uint32_t system_tick_t;
 #define SYSTEM_US_TICKS         ( F_CPU / 1000000L )    //cycles per microsecond
 #define SYSTEM_TICK_COUNTER     xthal_get_ccount()
 
+#define clockCyclesPerMicrosecond() SYSTEM_US_TICKS
+#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
+#define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
 
 void SysTick_Enable();
 /**

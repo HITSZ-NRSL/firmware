@@ -27,15 +27,22 @@
 #include "hw_config.h"
 #include "rtc_hal.h"
 
-#define  RTC_MAGIC  0x55aaaa55
-
+/* Private typedef -----------------------------------------------------------*/
 typedef struct {
-        uint32_t magic;
-        time_t unix_time_base;
-        uint32_t rtc_base;
+    uint32_t magic;
+    time_t unix_time_base;
+    uint32_t rtc_base;
 }rtc_time_t;
 
+/* Private define ------------------------------------------------------------*/
+#define  RTC_MAGIC  0x55aaaa55
+
+/* Private macro -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
 static rtc_time_t g_rtc_time;
+
+/* Extern variables ----------------------------------------------------------*/
+/* Private function prototypes -----------------------------------------------*/
 
 void HAL_RTC_Initial(void)
 {
@@ -47,37 +54,30 @@ time_t HAL_RTC_Get_UnixTime(void)
 {
     time_t unix_time;
 
-    if(g_rtc_time.magic = RTC_MAGIC)
-    {
+    if(g_rtc_time.magic == RTC_MAGIC) {
         uint32_t elapsed_rtc_time = 0;
         uint32_t rtc_time = system_get_rtc_time();
         uint32_t cal_time = system_rtc_clock_cali_proc();
 
         //不每次都更新rtc_base 如果一直调用的话 每次都没有到1s 时间戳不会增加
-        if(rtc_time < g_rtc_time.rtc_base)
-        {
+        if(rtc_time < g_rtc_time.rtc_base) {
             elapsed_rtc_time = 0xFFFFFFFF - g_rtc_time.rtc_base + rtc_time;
             unix_time = g_rtc_time.unix_time_base + (elapsed_rtc_time * (cal_time >> 12))/1000/1000;
             g_rtc_time.unix_time_base = unix_time;
             g_rtc_time.rtc_base = rtc_time;
-        }
-        else
-        {
+        } else {
             elapsed_rtc_time = rtc_time - g_rtc_time.rtc_base;
             unix_time = g_rtc_time.unix_time_base + (elapsed_rtc_time * (cal_time >> 12))/1000/1000;
         }
         return unix_time;
-    }
-    else
-    {
+    } else {
         return 0;
     }
 }
 
 void HAL_RTC_Set_UnixTime(time_t value)
 {
-    if(g_rtc_time.magic = RTC_MAGIC)
-    {
+    if(g_rtc_time.magic == RTC_MAGIC) {
         g_rtc_time.unix_time_base = value;
         g_rtc_time.rtc_base = system_get_rtc_time();
     }
@@ -96,3 +96,13 @@ void HAL_RTC_Cancel_UnixAlarm(void)
 {
 
 }
+
+uint8_t HAL_RTC_Time_Is_Valid(void* reserved)
+{
+    return 0;
+}
+
+void HAL_RTC_SetCallbacks(const void (*handle)(), void* reserved)
+{
+}
+

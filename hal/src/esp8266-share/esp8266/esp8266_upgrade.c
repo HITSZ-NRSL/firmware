@@ -12,7 +12,6 @@ LOCAL os_timer_t upgrade_connect_timer;
 LOCAL os_timer_t upgrade_timer;
 LOCAL uint32 totallength = 0;
 LOCAL uint32 sumlength = 0;
-LOCAL struct eboot_command cmd_info;
 LOCAL struct upgrade_param *upgrade;
 
 extern uint8_t down_progress;
@@ -241,10 +240,9 @@ LOCAL void ICACHE_FLASH_ATTR upgrade_download(void *arg, char *pusrdata, unsigne
     char *ptr = NULL;
     char *ptmp2 = NULL;
     char lengthbuffer[32], returncode[4];
-    uint8_t md5_calc[16],i = 0,progress = 0;
+    uint8_t md5_calc[16], i = 0;
     char output[64] = {0};
     struct upgrade_server_info *server = (struct upgrade_server_info *)upgrade_conn->reverse;
-    uint32_t  count;
 
     //检查返回码
     if (totallength == 0){
@@ -268,8 +266,8 @@ LOCAL void ICACHE_FLASH_ATTR upgrade_download(void *arg, char *pusrdata, unsigne
         totallength += length;
         DEBUG("upgrade file download start.\r\n");
         MD5Init(&_ctx);
-        MD5Update(&_ctx, ptr + 4, length);
-        system_upgrade(ptr + 4, length);
+        MD5Update(&_ctx, (uint8_t *)ptr + 4, length);
+        system_upgrade((uint8_t *)ptr + 4, length);
         ptr = (char *)strstr(pusrdata, "Content-Length: ");
         if (ptr != NULL) {
             ptr += 16;
@@ -327,8 +325,8 @@ LOCAL void ICACHE_FLASH_ATTR upgrade_download(void *arg, char *pusrdata, unsigne
             {length = sumlength - totallength;}
         totallength += length;
         DEBUG("totallen = %d\r\n",totallength);
-        MD5Update(&_ctx, pusrdata, length);
-        system_upgrade(pusrdata, length);
+        MD5Update(&_ctx, (uint8_t *)pusrdata, length);
+        system_upgrade((uint8_t *)pusrdata, length);
     }
 
     if (ONLINE_APP_FILE == filetype) {
@@ -406,7 +404,7 @@ LOCAL void ICACHE_FLASH_ATTR upgrade_connect_cb(void *arg){
 
     if (pbuf != NULL) {
         DEBUG("%s\r\n", pbuf);
-        espconn_sent(pespconn, pbuf, strlen(pbuf));
+        espconn_sent(pespconn, pbuf, strlen((char *)pbuf));
     }
 }
 

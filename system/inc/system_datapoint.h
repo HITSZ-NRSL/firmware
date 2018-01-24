@@ -92,8 +92,8 @@ typedef struct {
     const data_type_t dataType;
     const dp_permission_t permission;
     const dp_policy_t policy;
-    long lapse;
-    long runtime;
+    uint32_t lapse;
+    uint32_t runtime;
     bool change;
     read_datapoint_result_t readFlag;
     number_property_t numberProperty;
@@ -134,7 +134,7 @@ void intorobotWriteDatapoint(const uint16_t dpID, const uint8_t* value, const ui
 int intorobotSendSingleDatapoint(const uint16_t dpID, const uint8_t *value, const uint16_t len, bool confirmed, uint16_t timeout);
 int intorobotSendAllDatapoint(void);
 int intorobotSendAllDatapointManual(bool confirmed, uint16_t timeout);
-void intorobotSendDatapointAutomatic(void);
+int intorobotSendDatapointAutomatic(void);
 
 #ifdef __cplusplus
 }

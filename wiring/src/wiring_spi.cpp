@@ -19,6 +19,7 @@
 #include "intorobot_config.h"
 #ifdef configWIRING_SPI_ENABLE
 
+#include <stdio.h>
 #include "wiring_spi.h"
 #include "core_hal.h"
 #include "intorobot_macros.h"

@@ -104,6 +104,7 @@ static void _eventCallback(System_Event_t * evt)
 bool esp8266_wifiInit(void) {
     HALWIFI_DEBUG("esp8266_wifiInit\r\n");
     wifi_set_event_handler_cb(_eventCallback);
+    return true;
 }
 
 /**
@@ -389,4 +390,3 @@ wl_status_t esp8266_status()
             return WL_DISCONNECTED;
     }
 }
-

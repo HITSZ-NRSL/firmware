@@ -118,7 +118,7 @@ bool network_has_credentials(network_handle_t network, uint32_t param, void* res
 
 void network_off(network_handle_t network, uint32_t flags, uint32_t param, void* reserved)
 {
-    //nif(network).connect_cancel(true);
+    nif(network).connect_cancel(true);
     // flags & 1 means also disconnect the cloud (so it doesn't autmatically connect when network resumed.)
     SYSTEM_THREAD_CONTEXT_ASYNC_CALL(nif(network).off(flags & 1));
 }

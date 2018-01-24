@@ -65,7 +65,7 @@ typedef struct exti_state {
     uint32_t ftsr;
 } exti_state;
 
-static exti_state exti_saved_state  = {0};
+static exti_state exti_saved_state;
 
 /*
  * @brief Attach the pin external interrupt with the defined handler and mode
@@ -83,8 +83,6 @@ static exti_state exti_saved_state  = {0};
 void HAL_Interrupts_Attach(uint16_t pin, HAL_InterruptHandler handler, void* data, InterruptMode mode,
         HAL_InterruptExtraConfiguration* config)
 {
-    /* DEBUG("Enter HAL_Interrupt_Attach...\r\n"); */
-    /* DEBUG("Pin: %d\r\n", pin); */
     uint8_t GPIO_PortSource = 0;    //variable to hold the port number
 
     //Map the pin to the appropriate port and pin on the STM32
@@ -153,7 +151,7 @@ void HAL_Interrupts_Attach(uint16_t pin, HAL_InterruptHandler handler, void* dat
     }
 
     /* Enable and set EXTI line Interrupt to the lowest priority */
-    HAL_NVIC_SetPriority( GPIO_IRQn[GPIO_PinSource], 6, 0); // 14 or 13, which one
+    HAL_NVIC_SetPriority( GPIO_IRQn[GPIO_PinSource], 13, 0); // 14 or 13, which one
     HAL_NVIC_EnableIRQ( GPIO_IRQn[GPIO_PinSource] );
 }
 
@@ -269,14 +267,18 @@ void HAL_EXTI_Handler(uint8_t EXTI_Line)
     }
 }
 
-
 int HAL_disable_irq()
 {
-    return 0;
+    int is = __get_PRIMASK();
+    __disable_irq();
+    return is;
 }
 
 void HAL_enable_irq(int is)
 {
+    if ((is & 1) == 0) {
+        __enable_irq();
+    }
 }
 
 /**

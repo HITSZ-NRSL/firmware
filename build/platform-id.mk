@@ -312,9 +312,7 @@ PLATFORM_DEVICE_LC  = $(shell echo $(PLATFORM_DEVICE) | tr A-Z a-z)
 
 ifeq ("$(PLATFORM_ARCH)","arm")
 MCU_CORE ?= cortex-m3
-# needed for conditional compilation of syshealth_hal.h
 CDEFINES += -DPLATFORM_DEVICE
-# needed for conditional compilation of some specific files
 CDEFINES += -D$(PLATFORM_DEVICE)
 CDEFINES += -DUSBD_VID_INTOROBOT=$(USBD_VID_INTOROBOT)
 CDEFINES += -DUSBD_PID_DFU=$(USBD_PID_DFU)

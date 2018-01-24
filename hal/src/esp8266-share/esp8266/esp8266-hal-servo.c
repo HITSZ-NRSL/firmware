@@ -200,6 +200,7 @@ static uint8_t isPinActive(int8_t pin)
             return index;
         }
     }
+    return 0;
 }
 
 void ESP8266ServoInit(void)
@@ -279,8 +280,7 @@ uint8_t ESP8266ServoAttach(int pin)
 
 void ESP8266ServoDetach(int8_t pin)
 {
-    ServoTimerSequence timerId;
-
+    //ServoTimerSequence timerId;
     uint8_t index;
     index = isPinActive(pin);
     if (s_servos[index].info.isActive) {

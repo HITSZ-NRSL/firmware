@@ -57,7 +57,6 @@
 //#define configWIRING_CAN_ENABLE
 //#define configWIRING_CAN1_ENABLE
 
-
 /* config setup */
 #define configSETUP_ENABLE
 #define configSETUP_USBSERIAL_ENABLE

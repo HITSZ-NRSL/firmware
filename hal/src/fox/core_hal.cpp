@@ -28,14 +28,14 @@ extern "C" const char intorobot_subsys_version_header[8] __attribute__((section(
 extern "C" const char intorobot_subsys_version[32] __attribute__((section(".subsys.version"))) = stringify(SUBSYS_VERSION_STRING);
 uint16_t HAL_Core_Get_Subsys_Version(char* buffer, uint16_t len)
 {
-    uint8_t data[32];
+    char data[32];
     uint16_t templen;
 
     printf("\n%08x ", intorobot_subsys_version_header);
     printf("%08x\n", intorobot_subsys_version);
     if (buffer!=NULL && len>0) {
         sFLASH_Init();
-        sFLASH_ReadBuffer(data, SUBSYS_VERSION_ADDR, 32);
+        sFLASH_ReadBuffer((uint8_t *)data, SUBSYS_VERSION_ADDR, 32);
         if(!memcmp(data, "VERSION:", 8))
         {
             templen = MIN(strlen(&data[8]), len-1);

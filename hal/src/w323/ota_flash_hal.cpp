@@ -19,8 +19,8 @@
 
 #include "ota_flash_hal.h"
 #include "core_hal.h"
-#include "flash_map.h"
 #include "flash_mal.h"
+#include "flash_map.h"
 #include "params_hal.h"
 
 #define OTA_CHUNK_SIZE          0x1000

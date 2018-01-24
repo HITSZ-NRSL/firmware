@@ -27,12 +27,6 @@
 #include "hw_config.h"
 #include "watchdog_hal.h"
 
-/**
- * Updated by HAL_1Ms_Tick()
- */
-volatile uint32_t TimingDelay;
-
-
 /*******************************************************************************
 * Function Name  : Delay
 * Description    : Inserts a delay time.

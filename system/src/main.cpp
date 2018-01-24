@@ -38,7 +38,6 @@
 #include "system_update.h"
 #include "core_hal.h"
 #include "delay_hal.h"
-#include "syshealth_hal.h"
 #include "watchdog_hal.h"
 #include "usb_hal.h"
 #include "system_mode.h"
@@ -180,12 +179,9 @@ extern "C" void HAL_SysTick_Handler(void)
 
 void app_loop(bool threaded)
 {
-    DECLARE_SYS_HEALTH(ENTERED_WLAN_Loop);
-
     static uint8_t INTOROBOT_WIRING_APPLICATION = 0;
     if ((INTOROBOT_WIRING_APPLICATION != 1)) {
         //Execute user application setup only once
-        DECLARE_SYS_HEALTH(ENTERED_Setup);
         if (system_mode()!=SAFE_MODE)
             setup();
         INTOROBOT_WIRING_APPLICATION = 1;
@@ -193,10 +189,8 @@ void app_loop(bool threaded)
     }
 
     // Execute user application loop
-    DECLARE_SYS_HEALTH(ENTERED_Loop);
     if (system_mode()!=SAFE_MODE) {
         loop();
-        DECLARE_SYS_HEALTH(RAN_Loop);
         _post_loop();
     }
 
@@ -247,9 +241,6 @@ ActiveObjectCurrentThreadQueue ApplicationThread(ActiveObjectConfiguration(app_t
 void app_setup_and_loop_initial(bool *threaded)
 {
     HAL_Core_Init();
-    // We have running firmware, otherwise we wouldn't have gotten here
-    DECLARE_SYS_HEALTH(ENTERED_Main);
-    // load params
     load_system_fwlib_version();
     set_system_mode(DEFAULT);
     Time.zone(HAL_PARAMS_Get_System_zone());

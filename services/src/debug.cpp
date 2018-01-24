@@ -102,14 +102,12 @@ void log_print_(int level, int line, const char *func, const char *file, const c
     file = file ? strrchr(file,'/') + 1 : "";
     int trunc = snprintf(_buffer, arraySize(_buffer), "[%010u]:[%s]:[%s][%s](%d):", (unsigned)HAL_Timer_Get_Milli_Seconds(), levels[level/10], func, file, line);
     debug_output_(_buffer);
-    if (trunc > arraySize(_buffer))
-    {
+    if (trunc > (int)arraySize(_buffer)) {
         debug_output_("...");
     }
     trunc = vsnprintf(_buffer, arraySize(_buffer), msg, args);
     debug_output_(_buffer);
-    if (trunc > arraySize(_buffer))
-    {
+    if (trunc > (int)arraySize(_buffer)) {
         debug_output_("...");
     }
     va_end(args);
@@ -130,14 +128,12 @@ void log_print_simple_(int level, int line, const char *file, const char *msg, .
     file = file ? strrchr(file,'/') + 1 : "";
     int trunc = snprintf(_buffer, arraySize(_buffer), "[%010u]:[%25s](%04d):->  ", (unsigned)HAL_Timer_Get_Milli_Seconds(), file, line);
     debug_output_(_buffer);
-    if (trunc > arraySize(_buffer))
-    {
+    if (trunc > (int)arraySize(_buffer)) {
         debug_output_("...");
     }
     trunc = vsnprintf(_buffer, arraySize(_buffer), msg, args);
     debug_output_(_buffer);
-    if (trunc > arraySize(_buffer))
-    {
+    if (trunc > (int)arraySize(_buffer)) {
         debug_output_("...");
     }
     va_end(args);
@@ -157,8 +153,7 @@ void log_print_direct_(int level, void* reserved, const char *msg, ...)
     va_start(args, msg);
     int trunc = vsnprintf(_buffer, arraySize(_buffer), msg, args);
     debug_output_(_buffer);
-    if (trunc > arraySize(_buffer))
-    {
+    if (trunc > (int)arraySize(_buffer)) {
         debug_output_("...");
     }
     va_end(args);

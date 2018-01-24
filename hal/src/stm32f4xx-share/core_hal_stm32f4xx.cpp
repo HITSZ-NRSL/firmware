@@ -29,7 +29,6 @@
 #include "gpio_hal.h"
 #include "interrupts_hal.h"
 #include "hw_config.h"
-#include "syshealth_hal.h"
 #include "rtc_hal.h"
 #include "stm32f4xx_it.h"
 #include "concurrent_hal.h"
@@ -44,6 +43,9 @@
 
 /* Private define -----------------------------------------------------------*/
 void HAL_Core_Setup(void);
+extern "C" {
+uint32_t freeheap();
+}
 
 /* Private macro ------------------------------------------------------------*/
 #define APPLICATION_STACK_SIZE 6144
@@ -52,11 +54,6 @@ void HAL_Core_Setup(void);
 static TaskHandle_t  app_thread_handle;
 
 /* Extern variables ----------------------------------------------------------*/
-/**
- * Updated by HAL_1Ms_Tick()
- */
-extern volatile uint32_t TimingDelay;
-
 
 /* Private function prototypes -----------------------------------------------*/
 extern "C"
@@ -107,12 +104,19 @@ int main(void)
     return 0;
 }
 
-void HAL_1Ms_Tick()
+/**
+ * @brief  This function handles SysTick Handler.
+ * @param  None
+ * @retval None
+ */
+void SysTick_Handler(void)
 {
-    if (TimingDelay != 0x00)
-    {
-        __sync_sub_and_fetch(&TimingDelay, 1);
-    }
+    HAL_IncTick();
+    System1MsTick();
+    os_systick_handler();
+    HAL_SysTick_Handler();
+    HAL_UI_SysTick_Handler();
+    //HAL_System_Interrupt_Trigger(SysInterrupt_SysTick, NULL);
 }
 
 void HAL_Core_Init(void)
@@ -121,14 +125,12 @@ void HAL_Core_Init(void)
 
 void HAL_Core_Config(void)
 {
-    DECLARE_SYS_HEALTH(ENTERED_Config);
     Set_System();
 
 #ifdef DFU_BUILD_ENABLE
-    //Currently this is done through WICED library API so commented.
     NVIC_SetVectorTable(NVIC_VectTab_FLASH, 0x20000);
 #endif
-    //Wiring pins default to inputs
+    //设置管脚的默认值
 #if !defined(USE_SWD_JTAG) && !defined(USE_SWD)
     for (pin_t pin = FIRST_DIGITAL_PIN; pin <= FIRST_DIGITAL_PIN + TOTAL_DIGITAL_PINS; pin++) {
         //HAL_Pin_Mode(pin, INPUT);
@@ -147,33 +149,30 @@ void HAL_Core_Config(void)
 
 void HAL_Core_Load_params(void)
 {
-    // load params
+    //加载bootloader和系统参数
     HAL_PARAMS_Load_Boot_Params();
     HAL_PARAMS_Load_System_Params();
-    // check if need init params
-    if(INITPARAM_FLAG_FACTORY_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) //初始化参数 保留密钥
-    {
+
+    if(INITPARAM_FLAG_FACTORY_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
+        //初始化参数 保留密钥
         DEBUG_D("init params fac\r\n");
         HAL_PARAMS_Init_Fac_System_Params();
-    }
-    else if(INITPARAM_FLAG_ALL_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) //初始化所有参数
-    {
+    } else if(INITPARAM_FLAG_ALL_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
+        //初始化所有参数
         DEBUG_D("init params all\r\n");
         HAL_PARAMS_Init_All_System_Params();
     }
-    if(INITPARAM_FLAG_NORMAL != HAL_PARAMS_Get_Boot_initparam_flag()) //初始化参数 保留密钥
-    {
+
+    if(INITPARAM_FLAG_NORMAL != HAL_PARAMS_Get_Boot_initparam_flag()) {
         HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_NORMAL);
         HAL_PARAMS_Save_Params();
     }
 
     //保存子系统程序版本号
     char subsys_ver1[32] = {0}, subsys_ver2[32] = {0};
-    if(HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1)))
-    {
+    if(HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1))) {
         HAL_PARAMS_Get_System_subsys_ver(subsys_ver2, sizeof(subsys_ver2));
-        if(strcmp(subsys_ver1, subsys_ver2))
-        {
+        if(strcmp(subsys_ver1, subsys_ver2)) {
             HAL_PARAMS_Set_System_subsys_ver(subsys_ver1);
             HAL_PARAMS_Save_Params();
         }
@@ -185,7 +184,6 @@ void HAL_Core_Setup(void)
     HAL_IWDG_Config(DISABLE);
     HAL_Core_Load_params();
     HAL_Bootloader_Update_If_Needed();
-    //HAL_Bootloader_Lock(true);
 }
 
 void HAL_Core_System_Reset(void)
@@ -199,26 +197,12 @@ void HAL_Core_Enter_DFU_Mode(bool persist)
     // true  - DFU mode persist if firmware upgrade is not completed
     // false - Briefly enter DFU bootloader mode (works with latest bootloader only )
     //         Subsequent reset or power off-on will execute normal firmware
-    if (persist)
-    {
+    if (persist) {
         HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_USB_DFU);
         HAL_PARAMS_Save_Params();
-    }
-    else
-    {
+    } else {
         HAL_Core_Write_Backup_Register(BKP_DR_01, 0x7DEA);
     }
-    HAL_Core_System_Reset();
-}
-
-void HAL_Core_Enter_Config_Mode(void)
-{
-}
-
-void HAL_Core_Enter_Firmware_Recovery_Mode(void)
-{
-    HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_DEFAULT_RESTORE);
-    HAL_PARAMS_Save_Params();
     HAL_Core_System_Reset();
 }
 
@@ -228,10 +212,8 @@ void HAL_Core_Enter_Com_Mode(void)
     HAL_PARAMS_Save_Params();
     HAL_Core_System_Reset();
 }
-/**
- * 恢复出厂设置 不清除密钥
- */
 
+//恢复出厂设置 不清除密钥
 void HAL_Core_Enter_Factory_Reset_Mode(void)
 {
     HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_FACTORY_RESET);
@@ -254,33 +236,37 @@ void HAL_Core_Enter_Bootloader(bool persist)
 {
 }
 
+void HAL_Core_Enter_Stop_Mode(uint16_t wakeUpPin, uint16_t edgeTriggerMode, long seconds)
+{
+}
+
+void HAL_Core_Execute_Stop_Mode(void)
+{
+}
+
+void HAL_Core_Enter_Standby_Mode(void)
+{
+}
+
+void HAL_Core_Execute_Standby_Mode(void)
+{
+}
+
 void HAL_Core_System_Yield(void)
 {
 }
 
-extern "C" {
-uint32_t freeheap();
-}
 uint32_t HAL_Core_Runtime_Info(runtime_info_t* info, void* reserved)
 {
     info->freeheap = freeheap();
     return 0;
 }
 
-/**
- * @brief  This function handles SysTick Handler.
- * @param  None
- * @retval None
- */
-void SysTick_Handler(void)
+void HAL_Core_Enter_Config(void)
 {
-    HAL_IncTick();
-    System1MsTick();
-    os_systick_handler();
-    /* Handle short and generic tasks for the device HAL on 1ms ticks */
-    HAL_1Ms_Tick();
-    HAL_SysTick_Handler();
-    HAL_UI_SysTick_Handler();
-    //HAL_System_Interrupt_Trigger(SysInterrupt_SysTick, NULL);
+}
+
+void HAL_Core_Exit_Config(void)
+{
 }
 

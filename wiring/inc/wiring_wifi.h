@@ -207,6 +207,8 @@ public:
     bool status(void) {
         return network_ready(*this, 0, NULL);
     }
+	//deprecated
+    //bool status(void) __attribute__((deprecated("Please use WiFi.ready() instead")));
 
 };
 

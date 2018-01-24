@@ -267,10 +267,6 @@ int32_t HAL_GPIO_Read(uint16_t pin)
     return HAL_GPIO_ReadPin(PIN_MAP[pin].gpio_peripheral, PIN_MAP[pin].gpio_pin);
 }
 
-#define clockCyclesPerMicrosecond() SYSTEM_US_TICKS
-#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
-#define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
-
 #define WAIT_FOR_PIN_STATE(value) \
     while (HAL_pinReadFast(pin) != (value)) { \
         if (SYSTEM_TICK_COUNTER - start_cycle_count > timeout_cycles) { \

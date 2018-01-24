@@ -27,7 +27,6 @@
 #include "ota_flash_hal.h"
 #include "gpio_hal.h"
 #include "interrupts_hal.h"
-#include "syshealth_hal.h"
 #include "intorobot_macros.h"
 #include "rtc_hal.h"
 #include "delay_hal.h"
@@ -50,8 +49,10 @@ void HAL_Core_Setup(void);
 
 /* Private variables --------------------------------------------------------*/
 struct rst_info resetInfo;
+static os_timer_t systick_timer;
 
 /* Extern variables ----------------------------------------------------------*/
+int atexit(void (*func)()) __attribute__((weak));
 int atexit(void (*func)()) {
     return 0;
 }
@@ -78,42 +79,43 @@ cont_t g_cont __attribute__ ((aligned (16)));
 static os_event_t g_loop_queue[LOOP_QUEUE_SIZE];
 
 static uint32_t g_micros_at_task_start;
-static uint32_t g_micros_at_system_loop_start;
 
-extern "C" void esp_yield() {
-    if (cont_can_yield(&g_cont))
-    {
+extern "C" void esp_yield()
+{
+    if (cont_can_yield(&g_cont)) {
         cont_yield(&g_cont);
     }
 }
 
-extern "C" void esp_schedule() {
+extern "C" void esp_schedule()
+{
     ets_post(LOOP_TASK_PRIORITY, 0, 0);
 }
 
-extern "C" void __yield() {
+extern "C" void __yield()
+{
     if (cont_can_yield(&g_cont)) {
         esp_schedule();
         esp_yield();
-    }
-    else {
+    } else {
         //panic();
     }
 }
 
 extern "C" void yield(void) __attribute__ ((weak, alias("__yield")));
 
-extern "C" void optimistic_yield(uint32_t interval_us) {
+extern "C" void optimistic_yield(uint32_t interval_us)
+{
     if (cont_can_yield(&g_cont) &&
-        (system_get_time() - g_micros_at_task_start) > interval_us)
-    {
+        (system_get_time() - g_micros_at_task_start) > interval_us) {
         g_micros_at_task_start = system_get_time();
         yield();
     }
 }
 
 static uint8_t intorobot_app_initial_flag = 0;
-static void loop_wrapper() {
+static void loop_wrapper()
+{
     bool threaded;
     preloop_update_frequency();
     if(!intorobot_app_initial_flag) {
@@ -125,7 +127,8 @@ static void loop_wrapper() {
     esp_schedule();
 }
 
-static void loop_task(os_event_t *events) {
+static void loop_task(os_event_t *events)
+{
     g_micros_at_task_start = system_get_time();
     cont_run(&g_cont, &loop_wrapper);
     if (cont_check(&g_cont) != 0) {
@@ -133,7 +136,8 @@ static void loop_task(os_event_t *events) {
     }
 }
 
-static void do_global_ctors(void) {
+static void do_global_ctors(void)
+{
     void (**p)(void) = &__init_array_end;
     while (p != &__init_array_start)
         (*--p)();
@@ -141,19 +145,20 @@ static void do_global_ctors(void) {
 
 extern "C" const char intorobot_subsys_version_header[8] __attribute__((section(".subsys.version.header"))) = {'V', 'E', 'R', 'S', 'I', 'O', 'N', ':'};
 extern "C" const char intorobot_subsys_version[32] __attribute__((section(".subsys.version"))) = stringify(SUBSYS_VERSION_STRING);
-void init_done() {
-    //system_set_os_print(0);
+void init_done()
+{
     gdb_init();
     do_global_ctors();
-    printf("\n%08x ", intorobot_subsys_version_header);
-    printf("%08x\n", intorobot_subsys_version);
+    printf("\n%08x ", (uint32_t)intorobot_subsys_version_header);
+    printf("%08x\n", (uint32_t)intorobot_subsys_version);
     HAL_Core_Config();
     HAL_Core_Setup();
     wlan_set_macaddr_when_init();
     esp_schedule();
 }
 
-extern "C" void user_init(void) {
+extern "C" void user_init(void)
+{
     struct rst_info *rtc_info_ptr = system_get_rst_info();
     memcpy((void *) &resetInfo, (void *) rtc_info_ptr, sizeof(resetInfo));
     uart_div_modify(0, UART_CLK_FREQ / (115200));
@@ -171,14 +176,15 @@ extern "C" void user_init(void) {
     system_init_done_cb(&init_done);
 }
 
-void HAL_Core_Init(void)
+void SysTick_Handler(void* arg)
 {
-
+    HAL_SysTick_Handler();
+    HAL_UI_SysTick_Handler();
 }
 
-void SysTick_Handler(void* arg);
-static os_timer_t systick_timer;
-static os_timer_t system_loop_timer;
+void HAL_Core_Init(void)
+{
+}
 
 void HAL_Core_Config(void)
 {
@@ -186,7 +192,7 @@ void HAL_Core_Config(void)
     os_timer_setfn(&systick_timer, (os_timer_func_t*)&SysTick_Handler, 0);
     os_timer_arm(&systick_timer, 1, 1);
 
-    //Wiring pins default to inputs
+    //设置管脚的默认值
     for (pin_t pin = FIRST_DIGITAL_PIN; pin <= FIRST_DIGITAL_PIN + TOTAL_DIGITAL_PINS; pin++) {
         //HAL_Pin_Mode(pin, INPUT);  //暂时不初始化 初始化会重设串口，导致无法打印调试信息  robin 2017-09-08
     }
@@ -198,35 +204,32 @@ void HAL_Core_Config(void)
     HAL_UI_Initial();
 }
 
-void HAL_Core_Load_params(void)
+void HAL_Core_Load_Params(void)
 {
-    // load params
+    //加载bootloader和系统参数
     HAL_PARAMS_Load_System_Params();
     HAL_PARAMS_Load_Boot_Params();
-    // check if need init params
-    if(INITPARAM_FLAG_FACTORY_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) //初始化参数 保留密钥
-    {
+
+    if(INITPARAM_FLAG_FACTORY_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
+        //初始化参数 保留密钥
         DEBUG_D("init params fac\r\n");
         HAL_PARAMS_Init_Fac_System_Params();
-    }
-    else if(INITPARAM_FLAG_ALL_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) //初始化所有参数
-    {
+    } else if(INITPARAM_FLAG_ALL_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
+        //初始化所有参数
         DEBUG_D("init params all\r\n");
         HAL_PARAMS_Init_All_System_Params();
     }
-    if(INITPARAM_FLAG_NORMAL != HAL_PARAMS_Get_Boot_initparam_flag()) //初始化参数 保留密钥
-    {
+
+    if(INITPARAM_FLAG_NORMAL != HAL_PARAMS_Get_Boot_initparam_flag()) {
         HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_NORMAL);
         HAL_PARAMS_Save_Params();
     }
 
     //保存子系统程序版本号
     char subsys_ver1[32] = {0}, subsys_ver2[32] = {0};
-    if(HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1)))
-    {
+    if(HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1))) {
         HAL_PARAMS_Get_System_subsys_ver(subsys_ver2, sizeof(subsys_ver2));
-        if(strcmp(subsys_ver1, subsys_ver2))
-        {
+        if(strcmp(subsys_ver1, subsys_ver2)) {
             HAL_PARAMS_Set_System_subsys_ver(subsys_ver1);
             HAL_PARAMS_Save_Params();
         }
@@ -236,7 +239,7 @@ void HAL_Core_Load_params(void)
 void HAL_Core_Setup(void)
 {
     HAL_IWDG_Config(DISABLE);
-    HAL_Core_Load_params();
+    HAL_Core_Load_Params();
     HAL_SubSystem_Update_If_Needed();
     HAL_Bootloader_Update_If_Needed();
 }
@@ -252,27 +255,14 @@ void HAL_Core_Enter_DFU_Mode(bool persist)
 {
 }
 
-void HAL_Core_Enter_Config_Mode(void)
-{
-}
-
-void HAL_Core_Enter_Firmware_Recovery_Mode(void)
-{
-    HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_DEFAULT_RESTORE);
-    HAL_PARAMS_Save_Params();
-    HAL_Core_System_Reset();
-}
-
 void HAL_Core_Enter_Com_Mode(void)
 {
     HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_SERIAL_COM);
     HAL_PARAMS_Save_Params();
     HAL_Core_System_Reset();
 }
-/**
- * 恢复出厂设置 不清除密钥
- */
 
+//恢复出厂设置 不清除密钥
 void HAL_Core_Enter_Factory_Reset_Mode(void)
 {
     HAL_PARAMS_Set_Boot_boot_flag(BOOT_FLAG_FACTORY_RESET);
@@ -295,10 +285,20 @@ void HAL_Core_Enter_Bootloader(bool persist)
 {
 }
 
-void SysTick_Handler(void* arg)
+void HAL_Core_Enter_Stop_Mode(uint16_t wakeUpPin, uint16_t edgeTriggerMode, long seconds)
 {
-    HAL_SysTick_Handler();
-    HAL_UI_SysTick_Handler();
+}
+
+void HAL_Core_Execute_Stop_Mode(void)
+{
+}
+
+void HAL_Core_Enter_Standby_Mode(void)
+{
+}
+
+void HAL_Core_Execute_Standby_Mode(void)
+{
 }
 
 void HAL_Core_System_Yield(void)
@@ -312,3 +312,10 @@ uint32_t HAL_Core_Runtime_Info(runtime_info_t* info, void* reserved)
     return 0;
 }
 
+void HAL_Core_Enter_Config(void)
+{
+}
+
+void HAL_Core_Exit_Config(void)
+{
+}

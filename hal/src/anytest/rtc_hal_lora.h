@@ -91,10 +91,6 @@ void BlockLowPowerDuringTask ( bool status );
  */
 void RtcEnterLowPowerStopMode( void );
 
-/*!
- * \brief Restore the MCU to its normal operation mode
- */
-void RtcRecoverMcuStatus( void );
 
 void RTC_Alarm_IRQ( void );
 

@@ -8,6 +8,7 @@
 #include "radio/inc/radio.h"
 #include "radio/inc/sx1276.h"
 #include "board/inc/sx1276-board.h"
+#include "board/inc/board.h"
 #include "board/inc/utilities.h"
 #include "board/inc/timer.h"
 #include "mac/inc/LoRaMac.h"
@@ -95,6 +96,7 @@ class LoRaWanClass
         uint8_t getGatewayNumber(void);                                         //获取网关号
         uint8_t getSnr(void);                                                   //获取收到数据后的snr
         int16_t getRssi(void);                                                  //获取收到数据后的rssi
+        uint16_t getBatteryVoltage(uint16_t pin);
 
     public:
         uint8_t *_buffer = NULL;              //接收缓冲区

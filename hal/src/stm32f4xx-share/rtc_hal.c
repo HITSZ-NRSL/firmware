@@ -24,8 +24,7 @@
 
 RTC_HandleTypeDef RtcHandle;
 
-static bool rtcExtOscStatus = true;//rtc 外置晶振是否起振　false为未起振
-
+static bool rtcState = true;
 /**
   * @brief RTC MSP Initialization
   *        This function configures the hardware resources
@@ -53,7 +52,7 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
     //RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
     if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
-        rtcExtOscStatus = false;
+        rtcState = false;
         return;
     }
 
@@ -61,7 +60,7 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
     if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
     {
-        rtcExtOscStatus = false;
+        rtcState = false;
         return;
     }
     /*##-2- Enable RTC peripheral Clocks #######################################*/
@@ -86,12 +85,6 @@ void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc)
     /*##-2- Disables the PWR Clock and Disables access to the backup domain ###################################*/
     HAL_PWR_DisableBkUpAccess();
     __HAL_RCC_PWR_CLK_DISABLE();
-}
-
-
-bool GetRTCSatus(void)
-{
-    return rtcExtOscStatus;
 }
 
 /**
@@ -303,6 +296,15 @@ void HAL_RTC_Cancel_UnixAlarm(void)
     HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
 }
 
+uint8_t HAL_RTC_Time_Is_Valid(void* reserved)
+{
+    return rtcState;
+}
+
+void HAL_RTC_SetCallbacks(const void (*handle)(), void* reserved)
+{
+}
+
 /*
  * @brief Alarm callback to test the RTC Alarm.
  * @param rtc: RTC handle pointer
@@ -322,3 +324,4 @@ void RTC_Alarm_IRQHandler(void)
 {
     HAL_RTC_AlarmIRQHandler(&RtcHandle);
 }
+

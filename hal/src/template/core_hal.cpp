@@ -19,7 +19,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include <stdint.h>
-//#include <stdatomic.h>
 #include <string.h>
 #include "core_hal.h"
 #include "watchdog_hal.h"
@@ -29,20 +28,13 @@
 #include "gpio_hal.h"
 #include "interrupts_hal.h"
 #include "hw_config.h"
-#include "syshealth_hal.h"
 #include "rtc_hal.h"
 #include "stm32l1xx_it.h"
-#include "service_debug.h"
 
 /* Private typedef ----------------------------------------------------------*/
-
 /* Private define -----------------------------------------------------------*/
-void HAL_Core_Setup(void);
-
 /* Private macro ------------------------------------------------------------*/
-
 /* Private variables --------------------------------------------------------*/
-
 /* Extern variables ----------------------------------------------------------*/
 
 int main()
@@ -98,27 +90,10 @@ void HAL_Core_Execute_Standby_Mode(void)
 {
 }
 
-uint32_t HAL_Core_Compute_CRC32(const uint8_t *pBuffer, uint32_t bufferSize)
-{
-    return 0;
-}
-
-void HAL_Bootloader_Lock(bool lock)
+void HAL_Core_Enter_Config(void)
 {
 }
 
-unsigned HAL_Core_System_Clock(HAL_SystemClock clock, void* reserved)
+void HAL_Core_Exit_Config(void)
 {
-    return 1;
 }
-
-int HAL_Feature_Set(HAL_Feature feature, bool enabled)
-{
-    return -1;
-}
-
-bool HAL_Feature_Get(HAL_Feature feature)
-{
-    return false;
-}
-

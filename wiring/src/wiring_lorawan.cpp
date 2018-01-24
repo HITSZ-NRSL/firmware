@@ -118,6 +118,7 @@ int LoRaWanClass::sendConfirmed(uint8_t port, uint8_t *buffer, uint16_t len, uin
         }
         intorobot_process();
     }
+    return LORAMAC_SEND_FAIL;
 }
 
 int LoRaWanClass::sendUnconfirmed(uint8_t port, uint8_t *buffer, uint16_t len, uint16_t timeout)
@@ -174,6 +175,7 @@ int LoRaWanClass::sendUnconfirmed(uint8_t port, uint8_t *buffer, uint16_t len, u
         }
         intorobot_process();
     }
+    return LORAMAC_SEND_FAIL;
 }
 
 //发送状态查询 1-发送中 0-成功 -1失败
@@ -587,6 +589,11 @@ uint8_t LoRaWanClass::getSnr(void)
 int16_t LoRaWanClass::getRssi(void)
 {
     return _macRssi;
+}
+
+uint16_t LoRaWanClass::getBatteryVoltage(uint16_t pin)
+{
+    return BoardBatteryMeasureVolage(pin);
 }
 
 //P2P透传接口

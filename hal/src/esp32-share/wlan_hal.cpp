@@ -18,20 +18,16 @@
 */
 
 #include "hw_config.h"
-#include "wlan_hal.h"
 #include "flash_map.h"
 #include "flash_storage_impl.h"
 #include "delay_hal.h"
 #include "macaddr_hal.h"
 
 #include "esp32-hal-wifi.h"
-#include "esp_wifi.h"
 #include "lwip/dns.h"
+#include "esp_wifi.h"
 #include "inet_hal.h"
-
-
-#define STATION_IF      0x00
-#define SOFTAP_IF       0x01
+#include "wlan_hal.h"
 
 static volatile uint32_t wlan_timeout_start;
 static volatile uint32_t wlan_timeout_duration;
@@ -315,7 +311,7 @@ static void scan_done_cb()
 {
     WiFiAccessPoint data;
     WlanApSimple apSimple;
-    void *pScanRecords;
+    wifi_ap_record_t *pScanRecords;
     int n = 0, m = 0, j = 0;
 
     //获取ap数量
@@ -324,7 +320,7 @@ static void scan_done_cb()
     //申请内存
     pScanRecords = new wifi_ap_record_t[scanInfo.count];
     if(pScanRecords) {
-        esp_wifi_scan_get_ap_records(&(scanInfo.count), (wifi_ap_record_t*)pScanRecords);
+        esp_wifi_scan_get_ap_records(&(scanInfo.count), pScanRecords);
     } else {
         scanInfo.completed = true;
         scanInfo.count = 0;
@@ -340,7 +336,7 @@ static void scan_done_cb()
         return;
     }
 
-    wifi_ap_record_t *it = (wifi_ap_record_t*)pScanRecords;
+    wifi_ap_record_t *it = pScanRecords;
     for(n = 0; n < scanInfo.count; it++, n++) {
         memcpy(pNode[n].bssid, it->bssid, 6);
         pNode[n].rssi = it->rssi;
@@ -367,8 +363,8 @@ static void scan_done_cb()
         for(m = 0; m < scanInfo.count; it++, m++) {
             if(!memcmp(pNode[n].bssid, it->bssid, 6)) {
                 memset(&data, 0, sizeof(WiFiAccessPoint));
-                strcpy(data.ssid, it->ssid);
-                data.ssidLength = strlen(it->ssid);
+                strcpy(data.ssid, (char *)it->ssid);
+                data.ssidLength = strlen((char *)it->ssid);
                 memcpy(data.bssid, it->bssid, 6);
                 data.security = toSecurityType(it->authmode);
                 data.cipher = toCipherType(it->authmode);
@@ -417,7 +413,6 @@ int wlan_scan(wlan_scan_result_t callback, void* cookie)
     }
 }
 
-
 /**
  * wifi set station and ap mac addr
  */
@@ -449,11 +444,11 @@ int wlan_set_macaddr(uint8_t *stamacaddr, uint8_t *apmacaddr)
  */
 int wlan_get_macaddr(uint8_t *stamacaddr, uint8_t *apmacaddr)
 {
-    if(!esp_wifi_get_mac(WIFI_IF_STA, stamacaddr)) {
+    if(!esp_wifi_get_mac(ESP_IF_WIFI_STA, stamacaddr)) {
         return -1;
     }
 
-    if(!esp_wifi_get_mac(WIFI_IF_AP, apmacaddr)) {
+    if(!esp_wifi_get_mac(ESP_IF_WIFI_AP, apmacaddr)) {
         return -1;
     }
     return 0;
@@ -461,11 +456,11 @@ int wlan_get_macaddr(uint8_t *stamacaddr, uint8_t *apmacaddr)
 
 int wlan_set_macaddr_from_flash(uint8_t *stamacaddr, uint8_t *apmacaddr)
 {
-    if(!esp_wifi_set_mac(STATION_IF, stamacaddr)) {
+    if(!esp_wifi_set_mac(ESP_IF_WIFI_STA, stamacaddr)) {
         return -1;
     }
 
-    if(!esp_wifi_set_mac(SOFTAP_IF, apmacaddr)) {
+    if(!esp_wifi_set_mac(ESP_IF_WIFI_AP, apmacaddr)) {
         return -1;
     }
     return 0;

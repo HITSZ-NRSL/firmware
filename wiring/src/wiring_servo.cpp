@@ -17,6 +17,7 @@
  ******************************************************************************
  */
 
+#include <stdio.h>
 #include "wiring_servo.h"
 #include "servo_hal.h"
 

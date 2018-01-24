@@ -67,6 +67,9 @@ class AtomicSection {
 
 #define ATOMIC_BLOCK() 	for (bool __todo=true; __todo;) for (AtomicSection __as; __todo; __todo=false)
 
-
+// irq operation
+void disableIRQ(void);
+void enableIRQ(void);
 
 #endif /* __WIRING_INTERRUPTS_H_ */
+

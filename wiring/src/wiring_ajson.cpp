@@ -31,6 +31,7 @@
  * Includes
  ******************************************************************************/
 
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
@@ -587,7 +588,7 @@ int aJsonStream::parseArray(aJsonObject *item, char** filter)
     }
     //now put back the last character
     this->ungetch(in);
-    aJsonObject *child;
+    aJsonObject *child = NULL;
     char first = -1;
     while ((first) || (in == ',')) {
         aJsonObject *new_item = aJsonClass::newItem();
@@ -624,21 +625,21 @@ int aJsonStream::printArray(aJsonObject *item)
         return 0;
     }
     aJsonObject *child = item->child;
-    if (this->print('[') == EOF) {
+    if (!this->print('[')) {
         return EOF;
     }
     while (child) {
-        if (this->printValue(child) == EOF) {
+        if (!this->printValue(child)) {
             return EOF;
         }
         child = child->next;
         if (child) {
-            if (this->print(',') == EOF) {
+            if (!this->print(',')) {
                 return EOF;
             }
         }
     }
-    if (this->print(']') == EOF) {
+    if (!this->print(']')) {
         return EOF;
     }
     return 0;
@@ -662,7 +663,7 @@ int aJsonStream::parseObject(aJsonObject *item, char** filter)
     //preserve the char for the next parser
     this->ungetch(in);
 
-    aJsonObject* child;
+    aJsonObject* child = NULL;
     char first = -1;
     while ((first) || (in == ',')) {
         aJsonObject* new_item = aJsonClass::newItem();
@@ -712,27 +713,27 @@ int aJsonStream::printObject(aJsonObject *item)
         return 0;
     }
     aJsonObject *child = item->child;
-    if (this->print('{') == EOF) {
+    if (!this->print('{')) {
         return EOF;
     }
     while (child) {
-        if (this->printStringPtr(child->name) == EOF) {
+        if (!this->printStringPtr(child->name)) {
             return EOF;
         }
-        if (this->print(':') == EOF) {
+        if (!this->print(':')) {
             return EOF;
         }
-        if (this->printValue(child) == EOF) {
+        if (!this->printValue(child)) {
             return EOF;
         }
         child = child->next;
         if (child) {
-            if (this->print(',') == EOF) {
+            if (!this->print(',')) {
                 return EOF;
             }
         }
     }
-    if (this->print('}') == EOF) {
+    if (!this->print('}')) {
         return EOF;
     }
     return 0;

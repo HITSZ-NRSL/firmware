@@ -25,8 +25,6 @@
 
 #include "platforms.h"
 /* Includes ------------------------------------------------------------------*/
-#if (PLATFORM_ID != PLATFORM_ANYTEST)
-
 #include "hw_config.h"
 #include "rtc_hal.h"
 
@@ -126,22 +124,6 @@ static void RTC_CalendarAlarmConfig(void)
         /* Initialization Error */
         /* Error_Handler();  */
     }
-
-#if 0
-    /*##-3- Configure the RTC Alarm peripheral #################################*/
-    /* Set Alarm to 02:20:30
-       RTC Alarm Generation: Alarm on Hours, Minutes and Seconds */
-    salarmstructure.Alarm = RTC_ALARM_A;
-    salarmstructure.AlarmTime.Hours = 0x02;
-    salarmstructure.AlarmTime.Minutes = 0x20;
-    salarmstructure.AlarmTime.Seconds = 0x30;
-
-    if(HAL_RTC_SetAlarm_IT(&RtcHandle,&salarmstructure,RTC_FORMAT_BCD) != HAL_OK)
-    {
-        /* Initialization Error */
-        /* Error_Handler();  */
-    }
-#endif
 }
 
 void HAL_RTC_Initial(void)
@@ -267,9 +249,17 @@ void HAL_RTC_Cancel_UnixAlarm(void)
     HAL_NVIC_DisableIRQ(RTC_Alarm_IRQn);
 }
 
+uint8_t HAL_RTC_Time_Is_Valid(void* reserved)
+{
+    return 0;
+}
+
+void HAL_RTC_SetCallbacks(const void (*handle)(), void* reserved)
+{
+}
+
 void RTC_Alarm_IRQHandler(void)
 {
     HAL_RTC_AlarmIRQHandler(&RtcHandle);
 }
-#endif
 

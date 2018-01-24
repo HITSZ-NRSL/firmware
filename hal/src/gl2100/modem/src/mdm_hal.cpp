@@ -1271,10 +1271,11 @@ MDM_IP MDMParser::join(const char* apn /*= NULL*/, const char* username /*= NULL
         _ip = NOIP;
         int a = 0;
         bool force = false; // If we are already connected, don't force a reconnect.
+        char temp;
 
         /* Deactivates the PDP context assoc */
         sendFormated("AT+CIPSHUT\r\n");
-        if (RESP_OK != waitFinalResp(_cbIPSHUT,NULL,65*1000))
+        if (RESP_OK != waitFinalResp(_cbIPSHUT, &temp, 65*1000))
             goto failure;
 
         /* start up multi-ip connection */
@@ -1414,6 +1415,7 @@ bool MDMParser::reconnect(void)
 bool MDMParser::disconnect(void)
 {
     bool continue_cancel = false;
+    char temp;
     LOCK();
     if (_attached) {
         if (_cancel_all_operations) {
@@ -1424,7 +1426,7 @@ bool MDMParser::disconnect(void)
         if (_ip != NOIP) {
             /* Deactivates the PDP context assoc */
             sendFormated("AT+CIPSHUT\r\n");
-            if (RESP_OK != waitFinalResp(_cbIPSHUT,NULL,65*1000))
+            if (RESP_OK != waitFinalResp(_cbIPSHUT, &temp, 65*1000))
                 goto failure;
 
             /* perform GPRS attach */

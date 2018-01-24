@@ -117,27 +117,27 @@ public:
             memset(buffer, 0, len);
             switch(param) {
                 case SYSTEM_PRODUCT_PARAM_SOFTWARE_VERSION:
-                    templen = MIN(strlen(product_software_version), len-1);
+                    templen = MIN((uint16_t)strlen(product_software_version), len-1);
                     memcpy(buffer, product_software_version, templen);
                     break;
                 case SYSTEM_PRODUCT_PARAM_HARDWARE_VERSION:
-                    templen = MIN(strlen(product_hardware_version), len-1);
+                    templen = MIN((uint16_t)strlen(product_hardware_version), len-1);
                     memcpy(buffer, product_hardware_version, templen);
                     break;
                 case SYSTEM_PRODUCT_PARAM_ID:
-                    templen = MIN(strlen(product_id), len-1);
+                    templen = MIN((uint16_t)strlen(product_id), len-1);
                     memcpy(buffer, product_id, templen);
                     break;
                 case SYSTEM_PRODUCT_PARAM_SECRET:
-                    templen = MIN(strlen(product_secret), len-1);
+                    templen = MIN((uint16_t)strlen(product_secret), len-1);
                     memcpy(buffer, product_secret, templen);
                     break;
                 case SYSTEM_PRODUCT_PARAM_BOARD_ID:
-                    templen = MIN(strlen(board_id), len-1);
+                    templen = MIN((uint16_t)strlen(board_id), len-1);
                     memcpy(buffer, board_id, templen);
                     break;
                 case SYSTEM_PRODUCT_PARAM_BOARD_NAME:
-                    templen = MIN(strlen(board_name), len-1);
+                    templen = MIN((uint16_t)strlen(board_name), len-1);
                     memcpy(buffer, board_name, templen);
                     break;
                 default:

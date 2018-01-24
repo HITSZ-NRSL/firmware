@@ -19,7 +19,7 @@ CFLAGS += -O0
 CDEFINES += -DBOOTLOADER_BUILD=1
 endif
 
-CFLAGS += -g -w -mlongcalls -mtext-section-literals -Wfatal-errors -falign-functions=4 -MMD -ffunction-sections -fdata-sections
+CFLAGS += -g -w -Wall -mlongcalls -mtext-section-literals -Wfatal-errors -falign-functions=4 -MMD -ffunction-sections -fdata-sections -Wno-error=deprecated-declarations -fno-strict-aliasing -Wno-sign-compare
 
 CONLYFLAGS += -Wpointer-arith -Wno-implicit-function-declaration -Wl,-EL -fno-inline-functions -nostdlib -std=gnu99
 

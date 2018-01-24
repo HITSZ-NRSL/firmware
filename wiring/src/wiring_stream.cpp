@@ -17,6 +17,7 @@
   ******************************************************************************
 */
 
+#include <stdio.h>
 #include "wiring_stream.h"
 #include "wiring.h"       // for millis())
 

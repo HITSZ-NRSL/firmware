@@ -18,6 +18,7 @@
  */
 
 #include "intorobot_config.h"
+#include <stdio.h>
 #include "string.h"
 #include "watchdog_hal.h"
 #include "wlan_hal.h"
@@ -430,7 +431,7 @@ static void system_delay_pump(unsigned long ms, bool force_no_background_loop)
             //Do not yield for Spark_Idle()
         } else if ((elapsed_millis >= intorobot_loop_elapsed_millis) \
                 || (intorobot_loop_total_millis >= INTOROBOT_LOOP_DELAY_MILLIS)) {
-            bool threading = system_thread_get_state(nullptr);
+            system_thread_get_state(nullptr);
             intorobot_loop_elapsed_millis = elapsed_millis + INTOROBOT_LOOP_DELAY_MILLIS;
             //intorobot_loop_total_millis is reset to 0 in system_process_loop()
             //Run once if the above condition passes

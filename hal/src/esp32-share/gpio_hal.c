@@ -21,6 +21,7 @@ License along with this library; if not, see <http://www.gnu.org/licenses/>.
 #include "hw_config.h"
 #include "gpio_hal.h"
 #include "pinmap_impl.h"
+#include "dac_hal.h"
 #include "esp32-hal-gpio.h"
 
 /* Private function prototypes ----------------------------------------------*/
@@ -197,10 +198,6 @@ int32_t HAL_GPIO_Read(uint16_t pin)
     }
     return __digitalRead(PIN_MAP[pin].gpio_pin);
 }
-
-#define clockCyclesPerMicrosecond() SYSTEM_US_TICKS
-#define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
-#define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )
 
 #define WAIT_FOR_PIN_STATE(value) \
     while (HAL_pinReadFast(pin) != (value)) { \

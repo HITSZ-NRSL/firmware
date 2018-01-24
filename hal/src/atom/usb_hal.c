@@ -22,6 +22,7 @@
 #include "usb_hal.h"
 #include "sdkqueue.h"
 #include "delay_hal.h"
+#include "timer_hal.h"
 
 /* Private typedef -----------------------------------------------------------*/
 #ifdef configHAL_USB_CDC_ENABLE

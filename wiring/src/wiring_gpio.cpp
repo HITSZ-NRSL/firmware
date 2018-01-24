@@ -18,6 +18,7 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
+#include <stdio.h>
 #include "wiring.h"
 #include "wiring_interrupts.h"
 #include "wiring_usartserial.h"

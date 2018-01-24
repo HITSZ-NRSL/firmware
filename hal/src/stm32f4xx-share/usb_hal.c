@@ -19,6 +19,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usb_hal.h"
+#include "timer_hal.h"
 #include "hw_config.h"
 #include "sdkqueue.h"
 

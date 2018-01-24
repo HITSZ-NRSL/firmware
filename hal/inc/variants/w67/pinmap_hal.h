@@ -97,7 +97,7 @@ EESP8266_Pin_Info* HAL_Pin_Map(void);
 #define RXD  RX
 
 // Serial1 pin
-#define TX1  GPIO2
+#define TX1   GPIO2
 
 #define TXD1  TX1
 
@@ -111,7 +111,7 @@ EESP8266_Pin_Info* HAL_Pin_Map(void);
 #define SDA  GPIO4
 #define SCL  GPIO2
 
-#define LED_USER  GPIO16
+#define LED_USER    GPIO16
 #define LED_BUILTIN LED_USER
 
 

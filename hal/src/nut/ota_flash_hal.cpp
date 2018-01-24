@@ -32,8 +32,8 @@
 bool copy_raw(const uint32_t src_addr, const uint32_t dst_addr, const uint32_t size)
 {
     // require regions to be aligned
-    if (src_addr & 0xfff != 0 ||
-        dst_addr & 0xfff != 0){
+    if ((src_addr & 0xfff) != 0 ||
+        (dst_addr & 0xfff) != 0){
         return false;
     }
 
@@ -68,7 +68,7 @@ static bool bootloader_requires_update(void)
     uint32_t boot_ver_current = 0, boot_ver_new = 0;
 
     if(HAL_Core_Get_Subsys_Version(subsys_ver, sizeof(subsys_ver))) {
-        uint32_t boot_ver_current = HAL_PARAMS_Get_Boot_boot_version();
+        boot_ver_current = HAL_PARAMS_Get_Boot_boot_version();
         DEBUG_D("subsys: %s\r\n", subsys_ver);
         if(boot_ver_current) {
             memset(temp, 0, sizeof(temp));
