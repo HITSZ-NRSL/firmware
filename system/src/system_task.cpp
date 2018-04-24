@@ -290,44 +290,6 @@ void cloud_disconnect(bool controlRGB)
 #endif
 
 #ifndef configNO_LORAWAN
-void lorawan_prepare_active(void)
-{
-    if(System.featureEnabled(SYSTEM_FEATURE_LORAMAC_RUN_ENABLED))
-    {
-        if(System.featureEnabled(SYSTEM_FEATURE_SEND_INFO_ENABLED))
-        {
-            // AT_MODE_FLAG_TypeDef at_mode = HAL_PARAMS_Get_System_at_mode();
-            AT_MODE_FLAG_TypeDef at_mode = AT_MODE_FLAG_OTAA_INACTIVE;
-            switch(at_mode)
-            {
-                case AT_MODE_FLAG_ABP:            //已经灌好密钥
-                    STASK_DEBUG("AT_MODE_FLAG_ABP\r\n");
-                case AT_MODE_FLAG_OTAA_ACTIVE:    //灌装激活码 已激活
-                    {
-                        STASK_DEBUG("AT_MODE_FLAG_OTAA_ACTIVE\r\n");
-                        // LoRaWan.joinABP();
-                        INTOROBOT_LORAWAN_JOINED = true;
-                        system_rgb_blink(RGB_COLOR_WHITE, 2000); //白灯闪烁
-                    }
-                    break;
-                case AT_MODE_FLAG_OTAA_INACTIVE:  //灌装激活码  未激活
-                    {
-                        STASK_DEBUG("AT_MODE_FLAG_OTAA_INACTIVE\r\n");
-                        int32_t joinDelayms = randr(0,10000);
-                        STASK_DEBUG("joinDelayms = %d\r\n",joinDelayms);
-                        delay((uint32_t)joinDelayms);
-                        // LoRaWan.joinOTAA(20000);
-                    }
-                    break;
-                default:                          //没有密钥信息
-                    STASK_DEBUG("default\r\n");
-                    system_rgb_blink(RGB_COLOR_GREEN, 1000);//绿灯闪烁
-                    break;
-            }
-        }
-    }
-}
-
 void LoraWAN_Setup(void)
 {
     STASK_DEBUG("LoRaWan_Setup\r\n");
@@ -337,22 +299,18 @@ void LoraWAN_Setup(void)
 
 void manage_lorawan_connection(void)
 {
-    if(System.featureEnabled(SYSTEM_FEATURE_LORAMAC_RUN_ENABLED))
-    {
-        if(!INTOROBOT_LORAWAN_JOINED){
-            if(!INTOROBOT_LORAWAN_JOINING){
-                if(LoRaWanJoinIsEnabled()){
-                    STASK_DEBUG("lorawan start join\r\n");
-                    INTOROBOT_LORAWAN_JOINING = true;
-                    LoRaWanJoinEnable(false);
-                    LoRaWanJoinOTAA();
-                }
-            }
-        }
+    if(!System.featureEnabled(SYSTEM_FEATURE_LORAMAC_RUN_ENABLED)) {
+        return;
+    }
 
-        if(INTOROBOT_LORAWAN_JOINED && !INTOROBOT_LORAWAN_CONNECTED && !INTOROBOT_LORAWAN_SEND_INFO) {
-            INTOROBOT_LORAWAN_SEND_INFO = true;
-            intorobot_lorawan_send_terminal_info(); //发送产品信息
+    if(!INTOROBOT_LORAWAN_JOINED){
+        if(!INTOROBOT_LORAWAN_JOINING){
+            if(LoRaWanJoinIsEnabled()){
+                STASK_DEBUG("lorawan start join\r\n");
+                INTOROBOT_LORAWAN_JOINING = true;
+                LoRaWanJoinEnable(false);
+                LoRaWanJoinOTAA();
+            }
         }
     }
 }

@@ -43,6 +43,7 @@
 #include "system_test.h"
 #include "system_utilities.h"
 #include "system_event.h"
+#include "wiring_rgb.h"
 
 /*debug switch*/
 #define SYSTEM_CONFIG_DEBUG
@@ -1031,6 +1032,8 @@ system_config_type_t get_system_config_type(void)
 void system_config_initial(void)
 {
     SCONFIG_DEBUG("system config initial\r\n");
+    RGB.control(false);  //进入配置模式由系统接管
+    system_rgb_blink(RGB_COLOR_RED, 1000);
     HAL_Core_Enter_Config();
     switch(get_system_config_type()) {
         case SYSTEM_CONFIG_TYPE_IMLINK_SERIAL:   //进入串口配置模式
@@ -1224,7 +1227,6 @@ void manage_system_config(void)
 {
     if(System.featureEnabled(SYSTEM_FEATURE_AUTO_CONFIG_PROCESS_ENABLED)) {
         if(SYSTEM_CONFIG_TYPE_NONE != get_system_config_type()) {
-            system_rgb_blink(RGB_COLOR_RED, 1000);
             while(1) {
                 if(system_config_process()) {
                     break;

@@ -27,11 +27,6 @@
 #include "static_assert.h"
 #include "wiring_string.h"
 
-// data protocol
-#define DATA_PROTOCOL_DATAPOINT_JSON              0x30
-#define DATA_PROTOCOL_DATAPOINT_BINARY            0x31
-#define DATA_PROTOCOL_CUSTOM                      0x32
-
 #define PROPERTIES_MAX                            50
 
 #define DATAPOINT_TRANSMIT_AUTOMATIC_INTERVAL     600
@@ -135,6 +130,7 @@ int intorobotSendSingleDatapoint(const uint16_t dpID, const uint8_t *value, cons
 int intorobotSendAllDatapoint(void);
 int intorobotSendAllDatapointManual(bool confirmed, uint16_t timeout);
 int intorobotSendDatapointAutomatic(void);
+int intorobotSendRawData(uint8_t *data, uint16_t dataLen, bool confirmed, uint16_t timeout);
 
 #ifdef __cplusplus
 }

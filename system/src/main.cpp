@@ -100,8 +100,8 @@ extern "C" void HAL_SysTick_Handler(void)
     if(BUTTON_press_time) {
         if( BUTTON_press_time > TIMING_MODE_FACTORY_RESET ) {
             if(BUTTON_Mode!=BUTTON_MODE_FAC) {
-                BUTTON_Mode=BUTTON_MODE_FAC;       //恢复出厂设置
-                HAL_UI_RGB_Color(RGB_COLOR_YELLOW);//黄灯打开
+                BUTTON_Mode=BUTTON_MODE_FAC;          //恢复出厂设置
+                HAL_UI_RGB_Color(RGB_COLOR_YELLOW);   //黄灯打开
             }
         }
         else if( BUTTON_press_time > TIMING_MODE_CONFIG_IMLINK_SERIAL ) {

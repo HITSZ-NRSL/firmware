@@ -329,6 +329,12 @@ void cloud_action_callback(uint8_t *payload, uint32_t len)
             intorobot_program_upgrade(dtokenObject->valuestring, "");
             goto finish;
         } else if(!strcmp("upgradeApp", cmdObject->valuestring)) { //应用固件升级
+            //取消固件升级内部处理
+            if(!System.featureEnabled(SYSTEM_FEATURE_OTA_UPDATE_ENABLED)) {
+                system_notify_event(event_cloud_data, ep_cloud_comm_ota, payload, len);
+                goto finish;
+            }
+
             //处理type
             aJsonObject *typeObject = aJson.getObjectItem(root, "type");
             if((typeObject == NULL) || (typeObject->type != aJson_String)) {
@@ -412,17 +418,10 @@ finish:
 void cloud_data_receive_callback(uint8_t *payload, uint32_t len)
 {
     SCLOUD_DEBUG("Ok! receive data form cloud!\r\n");
-    system_notify_event(event_cloud_data, ep_cloud_data_raw, payload, len);
-    switch(payload[0]) {
-        case DATA_PROTOCOL_DATAPOINT_BINARY:
-            intorobotParseReceiveDatapoints(&payload[1], len-1);
-            break;
-        case DATA_PROTOCOL_CUSTOM:
-            system_notify_event(event_cloud_data, ep_cloud_data_custom, &payload[1], len-1);
-            break;
-        default:
-            break;
-    }
+    system_notify_event(event_cloud_data, ep_cloud_data_raw, payload, len);    //不再使用，兼容之前
+    system_notify_event(event_cloud_data, ep_cloud_data_custom, payload, len); //不再使用，兼容之前
+    system_notify_event(event_cloud_data, ep_cloud_comm_data, payload, len);
+    intorobotParseReceiveDatapoints(payload, len);
 }
 
 void cloud_debug_callback(uint8_t *payload, uint32_t len)
@@ -852,20 +851,15 @@ void intorobot_cloud_init(void)
     memset(&g_debug_rx_buffer, 0, sizeof(g_debug_rx_buffer));
 
     g_mqtt_client = MqttClientClass(sv_domain, sv_port, mqtt_client_callback, g_mqtt_tcp_client);
-    //ota 升级
-    if(System.featureEnabled(SYSTEM_FEATURE_OTA_UPDATE_ENABLED)) {
-        intorobot_subscribe(TOPIC_VERSION_V2, INTOROBOT_MQTT_ACTION_TOPIC, NULL, cloud_action_callback, 0);                   //从平台获取系统控制信息
-        intorobot_subscribe(TOPIC_VERSION_V2, INTOROBOT_MQTT_DEBUGTX_TOPIC, NULL, cloud_debug_callback, 0);                   //从平台获取调试信息
-    }
-    //数据点处理
-    if(System.featureEnabled(SYSTEM_FEATURE_DATA_PROTOCOL_ENABLED)) {
-        // v2版本subscibe
-        intorobot_subscribe(TOPIC_VERSION_V2, INTOROBOT_MQTT_TX_TOPIC, NULL, cloud_data_receive_callback, 0);                 //从平台获取数据通讯信息
 
-        // 添加默认数据点
-        intorobotDefineDatapointBool(DPID_DEFAULT_BOOL_RESET, DP_PERMISSION_UP_DOWN, false, DP_POLICY_NONE, 0);               //reboot
-        intorobotDefineDatapointBool(DPID_DEFAULT_BOOL_GETALLDATAPOINT, DP_PERMISSION_UP_DOWN, false, DP_POLICY_NONE, 0);     //get all datapoint
-    }
+    // v2版本subscibe
+    intorobot_subscribe(TOPIC_VERSION_V2, INTOROBOT_MQTT_ACTION_TOPIC, NULL, cloud_action_callback, 0);   //从平台获取系统控制信息
+    intorobot_subscribe(TOPIC_VERSION_V2, INTOROBOT_MQTT_DEBUGTX_TOPIC, NULL, cloud_debug_callback, 0);   //从平台获取调试信息
+    intorobot_subscribe(TOPIC_VERSION_V2, INTOROBOT_MQTT_TX_TOPIC, NULL, cloud_data_receive_callback, 0); //从平台获取数据通讯信息
+
+    // 添加默认数据点
+    intorobotDefineDatapointBool(DPID_DEFAULT_BOOL_RESET, DP_PERMISSION_UP_DOWN, false, DP_POLICY_NONE, 0);           //reboot
+    intorobotDefineDatapointBool(DPID_DEFAULT_BOOL_GETALLDATAPOINT, DP_PERMISSION_UP_DOWN, false, DP_POLICY_NONE, 0); //get all datapoint
 }
 
 int intorobot_cloud_connect(void)

@@ -123,6 +123,8 @@ class SystemClass {
             sleep(0xff, CHANGE, seconds, handler);
         }
 
+        static void process(void) { intorobot_process(); }
+
         static String deviceID(void) { return intorobot_deviceID(); }
         static uint16_t buttonPushed(uint8_t button=0) {
             return system_button_pushed_duration(button, NULL);

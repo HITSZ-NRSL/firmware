@@ -75,10 +75,14 @@ enum SystemEventsParam {
     ep_app_status_disconneted          = 1,
     ep_app_status_connected            = 2,
 
-    // cloud data
+    // cloud data 替换成cloud comm 为了兼容之前程序保留
     ep_cloud_data_raw                  = 1,  //原始数据 事件
     ep_cloud_data_datapoint            = 2,  //数据点数据协议处理 事件
     ep_cloud_data_custom               = 3,  //自定义数据协议处理 事件
+
+    // cloud comm
+    ep_cloud_comm_data                 = 1,  //接收到云端数据
+    ep_cloud_comm_ota                  = 2,  //接收到云端OTA升级事件
 
     // time change
     ep_time_changed_manually           = 1,

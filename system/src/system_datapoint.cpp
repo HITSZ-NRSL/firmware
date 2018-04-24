@@ -423,11 +423,16 @@ static double _pow(double base, int exponent)
 
 void intorobotParseReceiveDatapoints(uint8_t *payload, uint16_t len)
 {
-    //dpid(1-2 bytes)+data type(1 byte)+data len(1-2 bytes)+data(n bytes)
+    //0x31 dpid(1-2 bytes)+data type(1 byte)+data len(1-2 bytes)+data(n bytes)
     //大端表示，如果最高位是1，则表示两个字节，否则是一个字节
     if(len == 0){
         return;
     }
+
+    if(!System.featureEnabled(SYSTEM_FEATURE_DATA_PROTOCOL_ENABLED)) {
+        return;
+    }
+
     int32_t index = 0;
     uint16_t dpID = 0;
     uint8_t dataType;
@@ -437,6 +442,7 @@ void intorobotParseReceiveDatapoints(uint8_t *payload, uint16_t len)
     SDATAPOINT_DEBUG("OK! Rev datapoint data <%d>: ", len);
     SDATAPOINT_DEBUG_DUMP(payload, len);
 
+    index++;
     while(index < len) {
         if(payload[index] & 0x80)  {      //数据点有2个字节
             dpID = ((payload[index] & 0x7F) << 8) | payload[index+1]; //去掉最高位
@@ -656,7 +662,7 @@ static uint16_t intorobotFormAllDatapoint(uint8_t *buffer, uint16_t len, uint8_t
     return index;
 }
 
-static int _intorobotSendRawData(uint8_t *data, uint16_t dataLen, bool confirmed, uint16_t timeout)
+int intorobotSendRawData(uint8_t *data, uint16_t dataLen, bool confirmed, uint16_t timeout)
 {
     SDATAPOINT_DEBUG("send data:");
     SDATAPOINT_DEBUG_DUMP(data, dataLen);
@@ -672,6 +678,10 @@ static int _intorobotSendRawData(uint8_t *data, uint16_t dataLen, bool confirmed
 //datepoint process
 int intorobotSendSingleDatapoint(const uint16_t dpID, const uint8_t *value, const uint16_t len, bool confirmed, uint16_t timeout)
 {
+    if(!System.featureEnabled(SYSTEM_FEATURE_DATA_PROTOCOL_ENABLED)) {
+        return -1;
+    }
+
     int i = intorobotDiscoverProperty(dpID);
 
     if (i == -1) {
@@ -708,10 +718,10 @@ int intorobotSendSingleDatapoint(const uint16_t dpID, const uint8_t *value, cons
         uint8_t buffer[512];
         uint16_t index = 0;
 
-        buffer[index++] = DATA_PROTOCOL_DATAPOINT_BINARY;
+        buffer[index++] = 0x31;
         index += intorobotFormSingleDatapoint(i, buffer+index, sizeof(buffer)-1);
         properties[i]->runtime = current_millis;
-        return _intorobotSendRawData(buffer, index, confirmed, timeout);
+        return intorobotSendRawData(buffer, index, confirmed, timeout);
     }
     return -1;
 }
@@ -721,20 +731,28 @@ int intorobotSendAllDatapoint(void)
     uint8_t buffer[512];
     uint16_t index = 0;
 
+    if(!System.featureEnabled(SYSTEM_FEATURE_DATA_PROTOCOL_ENABLED)) {
+        return -1;
+    }
+
     if(0 == intorobotGetPropertyPermissionUpCount()) {
         return -1;
     }
 
-    buffer[index++] = DATA_PROTOCOL_DATAPOINT_BINARY;
+    buffer[index++] = 0x31;
     index += intorobotFormAllDatapoint(buffer+index, sizeof(buffer)-1, 1);
     intorobotPropertyChangeClear();
-    return _intorobotSendRawData(buffer, index, false, 0);
+    return intorobotSendRawData(buffer, index, false, 0);
 }
 
 int intorobotSendAllDatapointManual(bool confirmed, uint16_t timeout)
 {
     uint8_t buffer[512];
     uint16_t index = 0;
+
+    if(!System.featureEnabled(SYSTEM_FEATURE_DATA_PROTOCOL_ENABLED)) {
+        return -1;
+    }
 
     if(0 == intorobotGetPropertyPermissionUpCount()) {
         return -1;
@@ -744,10 +762,10 @@ int intorobotSendAllDatapointManual(bool confirmed, uint16_t timeout)
         return -1;
     }
 
-    buffer[index++] = DATA_PROTOCOL_DATAPOINT_BINARY;
+    buffer[index++] = 0x31;
     index += intorobotFormAllDatapoint(buffer+index, sizeof(buffer)-1, 1);
     intorobotPropertyChangeClear();
-    return _intorobotSendRawData(buffer, index, confirmed, timeout);
+    return intorobotSendRawData(buffer, index, confirmed, timeout);
 }
 
 int intorobotSendDatapointAutomatic(void)
@@ -755,6 +773,10 @@ int intorobotSendDatapointAutomatic(void)
     uint8_t buffer[512];
     uint16_t index = 0;
     bool sendFlag = false;
+
+    if(!System.featureEnabled(SYSTEM_FEATURE_DATA_PROTOCOL_ENABLED)) {
+        return -1;
+    }
 
     if(0 == intorobotGetPropertyPermissionUpCount()) {
         return -1;
@@ -766,7 +788,7 @@ int intorobotSendDatapointAutomatic(void)
 
     //当数值发生变化
     if(intorobotPropertyChanged()) {
-        buffer[index++] = DATA_PROTOCOL_DATAPOINT_BINARY;
+        buffer[index++] = 0x31;
         index += intorobotFormAllDatapoint(buffer+index, sizeof(buffer)-1, 1);
         sendFlag = true;
     } else {
@@ -779,7 +801,7 @@ int intorobotSendDatapointAutomatic(void)
 
         //发送时间时间到
         if ( elapsed_millis >= DATAPOINT_TRANSMIT_AUTOMATIC_INTERVAL*1000 ) {
-            buffer[index++] = DATA_PROTOCOL_DATAPOINT_BINARY;
+            buffer[index++] = 0x31;
             index += intorobotFormAllDatapoint(buffer+index, sizeof(buffer)-1, 1);
             sendFlag = true;
         }
@@ -788,7 +810,7 @@ int intorobotSendDatapointAutomatic(void)
     if(sendFlag) {
         g_datapoint_control.runtime = millis();
         intorobotPropertyChangeClear();
-        return _intorobotSendRawData(buffer, index, false, 0);
+        return intorobotSendRawData(buffer, index, false, 0);
     }
     return -1;
 }

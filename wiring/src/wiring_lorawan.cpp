@@ -208,7 +208,6 @@ void LoRaWanClass::setProtocol(lorawan_protocol_t type)
     switch(type){
     case LORAWAN_STANDARD:
         System.disableFeature(SYSTEM_FEATURE_DATA_PROTOCOL_ENABLED);   //关闭datapoint数据处理
-        System.disableFeature(SYSTEM_FEATURE_SEND_INFO_ENABLED);       //关闭产品信息上送
         System.enableFeature(SYSTEM_FEATURE_STANDARD_LORAWAN_ENABLED); //运行标准协议
         break;
 
