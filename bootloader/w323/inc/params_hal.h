@@ -104,8 +104,6 @@ int HAL_PARAMS_Set_System_sv_select(SV_SELECT_FLAG_TypeDef flag);
 
 uint16_t HAL_PARAMS_Get_System_fwlib_ver(char* buffer, uint16_t len);
 int HAL_PARAMS_Set_System_fwlib_ver(const char* buffer);
-uint16_t HAL_PARAMS_Get_System_subsys_ver(char* buffer, uint16_t len);
-int HAL_PARAMS_Set_System_subsys_ver(const char* buffer);
 
 uint16_t HAL_PARAMS_Get_System_config_flag(void);
 int HAL_PARAMS_Set_System_config_flag(uint16_t flag);

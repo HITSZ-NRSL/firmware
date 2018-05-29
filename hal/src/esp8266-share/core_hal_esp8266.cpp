@@ -143,14 +143,10 @@ static void do_global_ctors(void)
         (*--p)();
 }
 
-extern "C" const char intorobot_subsys_version_header[8] __attribute__((section(".subsys.version.header"))) = {'V', 'E', 'R', 'S', 'I', 'O', 'N', ':'};
-extern "C" const char intorobot_subsys_version[32] __attribute__((section(".subsys.version"))) = stringify(SUBSYS_VERSION_STRING);
 void init_done()
 {
     gdb_init();
     do_global_ctors();
-    printf("\n%08x ", (uint32_t)intorobot_subsys_version_header);
-    printf("%08x\n", (uint32_t)intorobot_subsys_version);
     HAL_Core_Config();
     HAL_Core_Setup();
     wlan_set_macaddr_when_init();
@@ -223,16 +219,6 @@ void HAL_Core_Load_Params(void)
     if(INITPARAM_FLAG_NORMAL != HAL_PARAMS_Get_Boot_initparam_flag()) {
         HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_NORMAL);
         HAL_PARAMS_Save_Params();
-    }
-
-    //保存子系统程序版本号
-    char subsys_ver1[32] = {0}, subsys_ver2[32] = {0};
-    if(HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1))) {
-        HAL_PARAMS_Get_System_subsys_ver(subsys_ver2, sizeof(subsys_ver2));
-        if(strcmp(subsys_ver1, subsys_ver2)) {
-            HAL_PARAMS_Set_System_subsys_ver(subsys_ver1);
-            HAL_PARAMS_Save_Params();
-        }
     }
 }
 

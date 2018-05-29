@@ -111,8 +111,6 @@ int HAL_PARAMS_Set_System_subsys_flag(uint8_t flag);
 
 uint16_t HAL_PARAMS_Get_System_fwlib_ver(char* buffer, uint16_t len);
 int HAL_PARAMS_Set_System_fwlib_ver(const char* buffer);
-uint16_t HAL_PARAMS_Get_System_subsys_ver(char* buffer, uint16_t len);
-int HAL_PARAMS_Set_System_subsys_ver(const char* buffer);
 
 CONFIG_FLAG_TypeDef HAL_PARAMS_Get_System_config_flag(void);
 int HAL_PARAMS_Set_System_config_flag(CONFIG_FLAG_TypeDef flag);

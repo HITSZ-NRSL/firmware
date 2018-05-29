@@ -100,12 +100,6 @@ ifndef PLATFORM_ID
 PLATFORM_ID=0
 endif
 
-ifeq ($(COMMON_BUILD),)
-include ../build/subsys_version/$(PLATFORM)/version.mk
-else
-include $(COMMON_BUILD)/subsys_version/$(PLATFORM)/version.mk
-endif
-
 # Determine which is the target device
 
 PLATFORM_ARCH=arm
@@ -329,7 +323,6 @@ PLATFORM_THREADING ?= 0
 PLATFORM_BOOTLOADER ?= 1
 CDEFINES += -DPLATFORM_THREADING=$(PLATFORM_THREADING)
 CDEFINES += -DPLATFORM_ID=$(PLATFORM_ID) -DPLATFORM_NAME=$(PLATFORM_NAME)
-CDEFINES += -DSUBSYS_VERSION_STRING=$(SUBSYS_VERSION_STRING)
 
 
 MODULE_FUNCTION_NONE            :=0

@@ -418,36 +418,6 @@ int HAL_PARAMS_Set_System_fwlib_ver(const char* buffer) {
 }
 
 /*
- * 读取子系统版本号
- * */
-uint16_t HAL_PARAMS_Get_System_subsys_ver(char* buffer, uint16_t len) {
-    uint16_t templen;
-
-    if (buffer!=NULL && len>0) {
-        templen = MIN(strlen(intorobot_system_params.subsys_ver), len-1);
-        memset(buffer, 0, len);
-        memcpy(buffer, intorobot_system_params.subsys_ver, templen);
-        return templen;
-    }
-    return 0;
-}
-
-/*
- * 设置文件下载域名
- * */
-int HAL_PARAMS_Set_System_subsys_ver(const char* buffer) {
-    uint16_t templen;
-
-    if (buffer!=NULL) {
-        templen = MIN(sizeof(intorobot_system_params.subsys_ver)-1, strlen(buffer));
-        memset(intorobot_system_params.subsys_ver, 0, sizeof(intorobot_system_params.subsys_ver));
-        memcpy(intorobot_system_params.subsys_ver, buffer, templen);
-        return 0;
-    }
-    return -1;
-}
-
-/*
  * 读取参数配置标志
  * */
 CONFIG_FLAG_TypeDef HAL_PARAMS_Get_System_config_flag(void) {

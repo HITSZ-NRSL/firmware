@@ -28,20 +28,6 @@
 
 uint16_t HAL_Core_Get_Subsys_Version(char* buffer, uint16_t len)
 {
-    char data[32];
-    uint16_t templen;
-    InternalFlashStore flashStore;
-
-    if (buffer!=NULL && len>0) {
-        flashStore.read(SUBSYS_VERSION_ADDR, (uint32_t *)data, sizeof(data));
-        if(!memcmp(data, "VERSION:", 8))
-        {
-            templen = MIN(strlen(&data[8]), len-1);
-            memset(buffer, 0, len);
-            memcpy(buffer, &data[8], templen);
-            return templen;
-        }
-    }
     return 0;
 }
 

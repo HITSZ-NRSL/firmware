@@ -954,8 +954,6 @@ int intorobot_cloud_connect(void)
             //后期将废除
             HAL_PARAMS_Get_System_fwlib_ver(buffer, sizeof(buffer));
             aJson.addStringToObject(root, "libVer", buffer);
-            HAL_PARAMS_Get_System_subsys_ver(buffer, sizeof(buffer));
-            aJson.addStringToObject(root, "subsysVer", buffer);
 
             aJson.addBooleanToObject(root, "online", true);
             char *string = aJson.print(root);

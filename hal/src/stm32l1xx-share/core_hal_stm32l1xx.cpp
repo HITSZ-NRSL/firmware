@@ -111,16 +111,6 @@ static void HAL_Core_Load_Params(void)
         HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_NORMAL);
         HAL_PARAMS_Save_Params();
     }
-
-    //保存子系统程序版本号
-    char subsys_ver1[32] = {0}, subsys_ver2[32] = {0};
-    if(HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1))) {
-        HAL_PARAMS_Get_System_subsys_ver(subsys_ver2, sizeof(subsys_ver2));
-        if(strcmp(subsys_ver1, subsys_ver2)) {
-            HAL_PARAMS_Set_System_subsys_ver(subsys_ver1);
-            HAL_PARAMS_Save_Params();
-        }
-    }
 }
 
 void HAL_Core_Setup(void)
@@ -299,16 +289,6 @@ void HAL_Core_Execute_Standby_Mode(void)
 
 uint16_t HAL_Core_Get_Subsys_Version(char* buffer, uint16_t len)
 {
-    char data[32] = "";
-    uint16_t templen;
-
-    if (buffer!=NULL && len>0) {
-        sprintf(data, "1.0.0.%d", HAL_PARAMS_Get_Boot_boot_version());
-        templen = MIN(strlen(data), len-1);
-        memset(buffer, 0, len);
-        memcpy(buffer, &data[8], templen);
-        return templen;
-    }
     return 0;
 }
 

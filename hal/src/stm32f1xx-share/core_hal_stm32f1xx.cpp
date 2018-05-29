@@ -96,14 +96,6 @@ static void HAL_Core_Load_Params(void)
     if(INITPARAM_FLAG_NORMAL != HAL_PARAMS_Get_Boot_initparam_flag()) {
         HAL_PARAMS_Set_Boot_initparam_flag(INITPARAM_FLAG_NORMAL);
     }
-
-    //保存子系统程序版本号
-    char subsys_ver1[32] = {0}, subsys_ver2[32] = {0};
-    HAL_Core_Get_Subsys_Version(subsys_ver1, sizeof(subsys_ver1));
-    HAL_PARAMS_Get_System_subsys_ver(subsys_ver2, sizeof(subsys_ver2));
-    if(strcmp(subsys_ver1, subsys_ver2)) {
-        HAL_PARAMS_Set_System_subsys_ver(subsys_ver1);
-    }
 }
 
 void HAL_Core_Setup(void)
