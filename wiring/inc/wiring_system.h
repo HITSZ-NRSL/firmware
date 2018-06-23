@@ -87,16 +87,16 @@ class SystemClass {
         }
 #endif
         /**
-         * @brief Éè±¸½øÈëSTOPË¯ÃßÄ£Ê½(»½ĞÑºóÖØÆô)»òÕßÊ¹Í¨Ñ¶Ä£×é½øÈëË¯ÃßÄ£Ê½
-         * @param sleepMode Ë¯ÃßÄ£Ê½ÀàĞÍ
-         * @param seconds   Ë¯ÃßÊ±¼ä
+         * @brief è®¾å¤‡è¿›å…¥STOPç¡çœ æ¨¡å¼(å”¤é†’åé‡å¯)æˆ–è€…ä½¿é€šè®¯æ¨¡ç»„è¿›å…¥ç¡çœ æ¨¡å¼
+         * @param sleepMode ç¡çœ æ¨¡å¼ç±»å‹
+         * @param seconds ç¡çœ æ—¶é—´
          * @return
          */
         static void sleep(system_sleep_mode_t sleepMode, long seconds=0);
 
         /**
-         * @brief Ê¹Í¨Ñ¶Ä£×é½øÈëË¯ÃßÄ£Ê½
-         * @param seconds   Ë¯ÃßÊ±¼ä
+         * @brief ä½¿é€šè®¯æ¨¡ç»„è¿›å…¥ç¡çœ æ¨¡å¼
+         * @param seconds ç¡çœ æ—¶é—´
          * @return
          */
         inline static void sleep(long seconds) {
@@ -104,20 +104,20 @@ class SystemClass {
         }
 
         /**
-         * @brief Éè±¸½øÈëstopË¯ÃßÄ£Ê½(»½ĞÑºó¼ÌĞøÖ´ĞĞ)
-         * @param wakeUpPin   »½ĞÑÒı½Å
-         * @param edgeTriggerMode  Òı½Å»½ĞÑ·½Ê½
-         * @param seconds   Ë¯ÃßÊ±¼ä
-         * @param handler   »½ĞÑ»Øµ÷º¯Êı
+         * @brief è®¾å¤‡è¿›å…¥stopç¡çœ æ¨¡å¼(å”¤é†’åç»§ç»­æ‰§è¡Œ)
+         * @param wakeUpPin å”¤é†’å¼•è„š
+         * @param edgeTriggerMode å¼•è„šå”¤é†’æ–¹å¼
+         * @param seconds ç¡çœ æ—¶é—´
+         * @param handler å”¤é†’å›è°ƒå‡½æ•°
          * @return
          */
         static void sleep(uint16_t wakeUpPin, InterruptMode edgeTriggerMode, uint32_t seconds=0, void(*handler)()=NULL);
 
         /**
-         * @brief Éè±¸½øÈëstopË¯ÃßÄ£Ê½(»½ĞÑºó¼ÌĞøÖ´ĞĞ)
-         * @param handler   »½ĞÑ»Øµ÷º¯Êı
-         * @param seconds   Ë¯ÃßÊ±¼ä
-         * @return
+         * @brief è®¾å¤‡è¿›å…¥stopç¡çœ æ¨¡å¼(å”¤é†’åç»§ç»­æ‰§è¡Œ)
+         * @param handler å”¤é†’å›è°ƒå‡½æ•°
+         * @param seconds ç¡çœ æ—¶é—´
+         * * @return
          */
         inline static void sleep(void(*handler)(), uint32_t seconds=0) __attribute__((deprecated("Please use WiFi.connect() instead"))) {
             sleep(0xff, CHANGE, seconds, handler);
