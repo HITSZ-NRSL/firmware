@@ -28,17 +28,7 @@
 #include "inet_hal.h"
 #include "intorobot_macros.h"
 
-//#define WIRING_TCPCLIENT_DEBUG
-
-#ifdef WIRING_TCPCLIENT_DEBUG
-#define WTCPCLIENT_DEBUG(...)    do {DEBUG(__VA_ARGS__);}while(0)
-#define WTCPCLIENT_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#define WTCPCLIENT_DEBUG_DUMP    DEBUG_DUMP
-#else
-#define WTCPCLIENT_DEBUG(...)
-#define WTCPCLIENT_DEBUG_D(...)
-#define WTCPCLIENT_DEBUG_DUMP
-#endif
+const static char *TAG = "wire-tcpc";
 
 using namespace intorobot;
 
@@ -62,16 +52,13 @@ int TCPClient::connect(const char* host, uint16_t port, network_interface_t nif)
 {
     stop();
     int rv = 0;
-    if(Network.ready())
-    {
+    if(Network.ready()) {
         IPAddress ip_addr;
 
-        if((rv = inet_gethostbyname(host, strlen(host), ip_addr, nif, NULL)) == 0)
-        {
+        if((rv = inet_gethostbyname(host, strlen(host), ip_addr, nif, NULL)) == 0) {
             return connect(ip_addr, port, nif);
-        }
-        else{
-            WTCPCLIENT_DEBUG("tcp connect: unable to get IP for hostname\r\n");
+        } else {
+            MOLMC_LOGD(TAG, "tcp connect: unable to get IP for hostname");
         }
     }
     return rv;
@@ -81,13 +68,11 @@ int TCPClient::connect(IPAddress ip, uint16_t port, network_interface_t nif)
 {
     stop();
     int connected = 0;
-    if(Network.from(nif).ready())
-    {
+    if(Network.from(nif).ready()) {
         sockaddr_t tSocketAddr;
         _sock = socket_create(AF_INET, SOCK_STREAM, IPPROTO_TCP, port, nif);
 
-        if (socket_handle_valid(_sock))
-        {
+        if (socket_handle_valid(_sock)) {
             flush_buffer();
             tSocketAddr.sa_family = AF_INET;
             tSocketAddr.sa_data[0] = (port & 0xFF00) >> 8;
@@ -101,13 +86,10 @@ int TCPClient::connect(IPAddress ip, uint16_t port, network_interface_t nif)
             connected = (socket_connect(_sock, &tSocketAddr, sizeof(tSocketAddr)) == 0 ? 1 : 0);
             HAL_NET_SetNetWatchDog(ot);
             _remoteIP = ip;
-            if(connected)
-            {
-                WTCPCLIENT_DEBUG("tcp connect success! create socket %d\r\n", _sock);
-            }
-            else
-            {
-                WTCPCLIENT_DEBUG("tcp connect failed!\r\n");
+            if(connected) {
+                MOLMC_LOGD(TAG, "tcp connect success! create socket %d", _sock);
+            } else {
+                MOLMC_LOGD(TAG, "tcp connect failed!");
                 stop();
             }
         }
@@ -135,20 +117,16 @@ int TCPClient::available()
     int avail = 0;
 
     // At EOB => Flush it
-    if (_total && (_offset == _total))
-    {
+    if (_total && (_offset == _total)) {
         flush_buffer();
     }
 
-    if(Network.from(nif).ready() && isOpen(_sock))
-    {
+    if(Network.from(nif).ready() && isOpen(_sock)) {
         // Have room
-        if ( _total < arraySize(_buffer))
-        {
+        if ( _total < arraySize(_buffer)) {
             int ret = socket_receive(_sock, _buffer + _total , arraySize(_buffer)-_total, 0);
-            if (ret > 0)
-            {
-                WTCPCLIENT_DEBUG("tcp receive data %d\r\n", ret);
+            if (ret > 0) {
+                MOLMC_LOGD(TAG, "tcp receive data %d", ret);
                 if (_total == 0) _offset = 0;
                 _total += ret;
             }
@@ -166,8 +144,7 @@ int TCPClient::read()
 int TCPClient::read(uint8_t *buffer, size_t size)
 {
     int read = -1;
-    if (bufferCount() || available())
-    {
+    if (bufferCount() || available()) {
         read = (size > (size_t) bufferCount()) ? bufferCount() : size;
         memcpy(buffer, &_buffer[_offset], read);
         _offset += read;
@@ -195,7 +172,7 @@ void TCPClient::flush()
 
 void TCPClient::stop()
 {
-    WTCPCLIENT_DEBUG("tcp stop! close socket %d\r\n", _sock);
+    MOLMC_LOGD(TAG, "tcp stop! close socket %d", _sock);
     if (isOpen(_sock))
         socket_close(_sock);
     _sock = socket_handle_invalid();
@@ -208,11 +185,10 @@ uint8_t TCPClient::connected()
     // Wlan up, open and not in CLOSE_WAIT or data still in the local buffer
     bool rv = (status() || bufferCount());
     // no data in the local buffer, Socket open but my be in CLOSE_WAIT yet the CC3000 may have data in its buffer
-    if(!rv && isOpen(_sock) && (SOCKET_STATUS_INACTIVE == socket_active_status(_sock)))
-    {
+    if(!rv && isOpen(_sock) && (SOCKET_STATUS_INACTIVE == socket_active_status(_sock))) {
         rv = available(); // Try CC3000
         if (!rv) {        // No more Data and CLOSE_WAIT
-            // DEBUG("caling Stop No more Data and in CLOSE_WAIT\r\n");
+            //MOLMC_LOGD(TAG, "caling Stop No more Data and in CLOSE_WAIT");
             stop();       // Close our side
         }
     }

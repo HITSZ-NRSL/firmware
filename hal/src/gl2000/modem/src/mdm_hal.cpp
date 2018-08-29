@@ -25,22 +25,15 @@
 
 #include "hw_config.h"
 #include "mdm_hal.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 #include "delay_hal.h"
 #include "gpio_hal.h"
-#include "service_debug.h"
 #include "concurrent_hal.h"
 #include "net_hal.h"
 #include "flash_map.h"
 #include "flash_storage_impl.h"
 
-#ifdef MODEM_DEBUG
-#define MDM_DEBUG(...)    do {DEBUG(__VA_ARGS__);}while(0)
-#define MDM_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#else
-#define MDM_DEBUG(...)
-#define MDM_DEBUG_D(...)
-#endif
+const static char *TAG = "hal-modem";
 
 #ifdef putc
 #undef putc
@@ -72,7 +65,7 @@ extern "C"
 //! test if it is a socket is ok to use
 #define ISSOCKET(s)     (((s) >= 0) && ((s) < NUMSOCKETS) && (_sockets[s].handle != MDM_SOCKET_ERROR))
 //! check for timeout
-#define TIMEOUT(t, ms)  ((ms != TIMEOUT_BLOCKING) && ((HAL_Timer_Get_Milli_Seconds() - t) > ms))
+#define TIMEOUT(t, ms)  ((ms != TIMEOUT_BLOCKING) && ((HAL_Tick_Get_Milli_Seconds() - t) > ms))
 //! helper to make sure that lock unlock pair is always balanced
 #define LOCK()      __modem_lock()
 //! helper to make sure that lock unlock pair is always balanced
@@ -98,30 +91,33 @@ static void __modem_unlock(void)
         os_mutex_recursive_unlock(modem_mutex);
 }
 
+#ifdef MDM_DEBUG
 
-static void dumpAtCmd(const char* buf, int len)
+void dumpAtCmd(const char* buf, int len)
 {
-    MDM_DEBUG_D(" %3d \"", len);
+    MOLMC_LOGD_TEXT(TAG, "(%3d): \"", len);
     while (len --) {
         char ch = *buf++;
         if ((ch > 0x1F) && (ch < 0x7F)) { // is printable
-            if      (ch == '%')  MDM_DEBUG_D("%%");
-            else if (ch == '"')  MDM_DEBUG_D("\\\"");
-            else if (ch == '\\') MDM_DEBUG_D("\\\\");
-            else DEBUG_D("%c", ch);
+            if      (ch == '%')  MOLMC_LOGD_TEXT(TAG, "%%");
+            else if (ch == '"')  MOLMC_LOGD_TEXT(TAG, "\\\"");
+            else if (ch == '\\') MOLMC_LOGD_TEXT(TAG, "\\\\");
+            else MOLMC_LOGD_TEXT(TAG, "%c", ch);
         } else {
-            if      (ch == '\a') MDM_DEBUG_D("\\a"); // BEL (0x07)
-            else if (ch == '\b') MDM_DEBUG_D("\\b"); // Backspace (0x08)
-            else if (ch == '\t') MDM_DEBUG_D("\\t"); // Horizontal Tab (0x09)
-            else if (ch == '\n') MDM_DEBUG_D("\\n"); // Linefeed (0x0A)
-            else if (ch == '\v') MDM_DEBUG_D("\\v"); // Vertical Tab (0x0B)
-            else if (ch == '\f') MDM_DEBUG_D("\\f"); // Formfeed (0x0C)
-            else if (ch == '\r') MDM_DEBUG_D("\\r"); // Carriage Return (0x0D)
-            else                 MDM_DEBUG_D("\\x%02x", (unsigned char)ch);
+            if      (ch == '\a') MOLMC_LOGD_TEXT(TAG, "\\a"); // BEL (0x07)
+            else if (ch == '\b') MOLMC_LOGD_TEXT(TAG, "\\b"); // Backspace (0x08)
+            else if (ch == '\t') MOLMC_LOGD_TEXT(TAG, "\\t"); // Horizontal Tab (0x09)
+            else if (ch == '\n') MOLMC_LOGD_TEXT(TAG, "\\n"); // Linefeed (0x0A)
+            else if (ch == '\v') MOLMC_LOGD_TEXT(TAG, "\\v"); // Vertical Tab (0x0B)
+            else if (ch == '\f') MOLMC_LOGD_TEXT(TAG, "\\f"); // Formfeed (0x0C)
+            else if (ch == '\r') MOLMC_LOGD_TEXT(TAG, "\\r"); // Carriage Return (0x0D)
+            else                 MOLMC_LOGD_TEXT(TAG, "\\x%02x", (unsigned char)ch);
         }
     }
-    DEBUG_D("\"\r\n");
+    MOLMC_LOGD_TEXT(TAG, "\"\r\n");
 }
+
+#endif
 /* Private variables --------------------------------------------------------*/
 
 MDMParser* MDMParser::inst;
@@ -149,28 +145,28 @@ MDMParser::MDMParser(void)
     memset(_sockets, 0, sizeof(_sockets));
     for (int socket = 0; socket < NUMSOCKETS; socket ++)
         _sockets[socket].handle = MDM_SOCKET_ERROR;
-#ifdef MODEM_DEBUG
+#ifdef MDM_DEBUG
     _debugLevel = 3;
-    _debugTime = HAL_Timer_Get_Milli_Seconds();
 #endif
 }
 
 void MDMParser::cancel(void) {
-    MDM_DEBUG_D("\r\n[ Modem::cancel ] = = = = = = = = = = = = = = =");
+    MOLMC_LOGI(TAG, "[ Modem::cancel ] = = = = = = = = = = = = = = =");
     _cancel_all_operations = true;
 }
 
 void MDMParser::resume(void) {
-    MDM_DEBUG_D("\r\n[ Modem::resume ] = = = = = = = = = = = = = = =");
+    MOLMC_LOGI(TAG, "[ Modem::resume ] = = = = = = = = = = = = = = =");
     _cancel_all_operations = false;
 }
 
 int MDMParser::send(const char* buf, int len)
 {
-#ifdef MODEM_DEBUG
+#ifdef MDM_DEBUG
     if (_debugLevel >= 3) {
-        MDM_DEBUG_D("[%010u]:AT send    ", HAL_Timer_Get_Milli_Seconds()-_debugTime);
-        dumpAtCmd(buf,len);
+        MOLMC_LOGD_HEADER(TAG);
+        MOLMC_LOGD_TEXT(TAG, "AT Send ");
+        dumpAtCmd(buf, len);
     }
 #endif
     return _send(buf, len);
@@ -194,10 +190,10 @@ int MDMParser::waitFinalResp(_CALLBACKPTR cb /* = NULL*/,
     if (_cancel_all_operations) return WAIT;
 
     char buf[MAX_SIZE + 64 /* add some more space for framing */];
-    system_tick_t start = HAL_Timer_Get_Milli_Seconds();
+    system_tick_t start = HAL_Tick_Get_Milli_Seconds();
     do {
         int ret = getLine(buf, sizeof(buf));
-#ifdef MODEM_DEBUG
+#ifdef MDM_DEBUG
         if ((_debugLevel >= 3) && (ret != WAIT) && (ret != NOT_FOUND))
         {
             int len = LENGTH(ret);
@@ -209,7 +205,8 @@ int MDMParser::waitFinalResp(_CALLBACKPTR cb /* = NULL*/,
                 (type == TYPE_PLUS)   ? " + ":
                 (type == TYPE_PROMPT) ? " > ":
                 "..." ;
-            MDM_DEBUG_D("[%010u]:AT read %s", HAL_Timer_Get_Milli_Seconds()-_debugTime, s);
+            MOLMC_LOGD_HEADER(TAG);
+            MOLMC_LOGD_TEXT(TAG, "AT Read ");
             dumpAtCmd(buf, len);
             (void)s;
         }
@@ -230,7 +227,7 @@ int MDMParser::waitFinalResp(_CALLBACKPTR cb /* = NULL*/,
                 // +IPD, <socket>,<length>,<remote IP>,<remote port>
                 if ((sscanf(cmd, "IPD,%d,%d," IPSTR ",%d", &sk, &sz, &a, &b, &c, &d, &p) == 7)) {
                     socket = _findSocket(sk);
-                    MDM_DEBUG_D("Socket %d: handle %d has %d bytes pending!\r\n", socket, sk, sz);
+                    MOLMC_LOGD(TAG, "Socket %d: handle %d has %d bytes pending!", socket, sk, sz);
                     if (socket != MDM_SOCKET_ERROR) {
                         s = strchr(buf, ':');
                         for(n=0; n < sz; n++) {
@@ -336,7 +333,7 @@ int MDMParser::_cbInt(int type, const char* buf, int len, int* val)
 // ----------------------------------------------------------------
 void MDMParser::reset(void)
 {
-    MDM_DEBUG_D("[ Modem reset ]");
+    MOLMC_LOGI(TAG, "[ Modem reset ]");
 
     GPIO_InitTypeDef   GPIO_InitStruct;
 
@@ -374,7 +371,7 @@ bool MDMParser::init(void)
     init_modem_mutex();
     LOCK();
     if (!_init) {
-        MDM_DEBUG_D("[ Esp8266 init ]");
+        MOLMC_LOGI(TAG, "[ Esp8266 init ]");
         esp8266MDM.begin(115200);
         reset();
         /* Initialize only once */
@@ -404,7 +401,7 @@ bool MDMParser::init(void)
     }
 
     if (i < 0) {
-        MDM_DEBUG_D("[ No Reply from Modem ]\r\n");
+        MOLMC_LOGD(TAG, "[ No Reply from Modem ]");
     }
 
     if (continue_cancel) {
@@ -681,7 +678,7 @@ int MDMParser::apScan(wifi_ap_t* aps, size_t aps_count)
         if (RESP_OK == waitFinalResp(_cbApScan, aps, 10000)){
             result = _aplistindex;
         }
-        DEBUG_D("result = %d \r\n", result);
+        MOLMC_LOGD(TAG, "result = %d ", result);
     }
     UNLOCK();
     return result;
@@ -854,7 +851,7 @@ int MDMParser::socketCreate(IpProtocol ipproto, int port)
     // find an free socket
     socket = _findSocket(MDM_SOCKET_ERROR);
     if (socket != MDM_SOCKET_ERROR) {
-        //MDM_DEBUG_D("Socket %d: handle %d was created", socket, socket);
+        //MOLMC_LOGD(TAG, "Socket %d: handle %d was created", socket, socket);
         _sockets[socket].handle     = socket;
         _sockets[socket].ipproto    = ipproto;
         _sockets[socket].localip    = port;
@@ -863,7 +860,7 @@ int MDMParser::socketCreate(IpProtocol ipproto, int port)
         _sockets[socket].open       = true;
         _sockets[socket].pipe = new Pipe<char>(MAX_SIZE);
     }
-    //MDM_DEBUG_D("socketCreate(%s)", (ipproto?"UDP":"TCP"));
+    //MOLMC_LOGD(TAG, "socketCreate(%s)", (ipproto?"UDP":"TCP"));
     return socket;
 }
 
@@ -872,7 +869,7 @@ bool MDMParser::socketConnect(int socket, const char * host, int port)
     bool ok = false;
     LOCK();
     if (ISSOCKET(socket) && (!_sockets[socket].connected)) {
-        //MDM_DEBUG_D("socketConnect(%d,port:%d)", socket,port);
+        //MOLMC_LOGD(TAG, "socketConnect(%d,port:%d)", socket,port);
         if(_sockets[socket].ipproto)
             sendFormated("AT+CIPSTART=%d,\"%s\",\"%s\",%d,%d,%d\r\n", _sockets[socket].handle, "UDP", host, port, _sockets[socket].localip, 2);
         else
@@ -889,7 +886,7 @@ bool MDMParser::socketConnect(int socket, const MDM_IP& ip, int port)
     bool ok = false;
     LOCK();
     if (ISSOCKET(socket) && (!_sockets[socket].connected)) {
-        //MDM_DEBUG_D("socketConnect(%d,port:%d)", socket,port);
+        //MOLMC_LOGD(TAG, "socketConnect(%d,port:%d)", socket,port);
         if(_sockets[socket].ipproto)
             sendFormated("AT+CIPSTART=%d,\"%s\",\"" IPSTR "\",%d,%d,%d\r\n", _sockets[socket].handle, "UDP", IPNUM(ip), port, _sockets[socket].localip, 2);
         else
@@ -906,7 +903,7 @@ bool MDMParser::socketIsConnected(int socket)
     bool ok = false;
     LOCK();
     ok = ISSOCKET(socket) && _sockets[socket].connected;
-    //MDM_DEBUG_D("socketIsConnected(%d) %s", socket, ok?"yes":"no");
+    //MOLMC_LOGD(TAG, "socketIsConnected(%d) %s", socket, ok?"yes":"no");
     UNLOCK();
     return ok;
 }
@@ -918,7 +915,7 @@ bool MDMParser::socketClose(int socket)
     if (ISSOCKET(socket)
             && (_sockets[socket].connected || _sockets[socket].open))
     {
-        //MDM_DEBUG_D("socketClose(%d)", socket);
+        //MOLMC_LOGD(TAG, "socketClose(%d)", socket);
         sendFormated("AT+CIPCLOSE=%d\r\n", _sockets[socket].handle);
         if (RESP_ERROR == waitFinalResp()) {
         }
@@ -939,7 +936,7 @@ bool MDMParser::_socketFree(int socket)
     LOCK();
     if ((socket >= 0) && (socket < NUMSOCKETS)) {
         if (_sockets[socket].handle != MDM_SOCKET_ERROR) {
-            //MDM_DEBUG_D("socketFree(%d)",  socket);
+            //MOLMC_LOGD(TAG, "socketFree(%d)",  socket);
             _sockets[socket].handle     = MDM_SOCKET_ERROR;
             _sockets[socket].localip    = 0;
             _sockets[socket].connected  = false;
@@ -963,7 +960,7 @@ bool MDMParser::socketFree(int socket)
 
 int MDMParser::socketSend(int socket, const char * buf, int len)
 {
-    //MDM_DEBUG_D("socketSend(%d,%d)", socket,len);
+    //MOLMC_LOGD(TAG, "socketSend(%d,%d)", socket,len);
     int cnt = len;
     while (cnt > 0) {
         int blk = USO_MAX_WRITE;
@@ -994,7 +991,7 @@ int MDMParser::socketSend(int socket, const char * buf, int len)
 
 int MDMParser::socketSendTo(int socket, MDM_IP ip, int port, const char * buf, int len)
 {
-    //MDM_DEBUG_D("socketSendTo(%d," IPSTR ",%d,,%d)", socket,IPNUM(ip),port,len);
+    //MOLMC_LOGD(TAG, "socketSendTo(%d," IPSTR ",%d,,%d)", socket,IPNUM(ip),port,len);
     int cnt = len;
     while (cnt > 0) {
         int blk = USO_MAX_WRITE;
@@ -1038,7 +1035,7 @@ int MDMParser::socketReadable(int socket)
     //因为数据已经下发到本地 所以连接断开也可以获取剩余数据  2016-01-12 chenkaiyao
     /*
     if (ISSOCKET(socket) && _sockets[socket].connected) {
-        //MDM_DEBUG_D("socketReadable(%d)", socket);
+        //MOLMC_LOGD(TAG, "socketReadable(%d)", socket);
         // allow to receive unsolicited commands
         if (_sockets[socket].connected)
             pending = _sockets[socket].pending;
@@ -1247,7 +1244,7 @@ bool MDMParser::getBootloader(void)
 // ----------------------------------------------------------------
 bool MDMParser::setDebug(int level)
 {
-#ifdef MODEM_DEBUG
+#ifdef MDM_DEBUG
     if ((_debugLevel >= -1) && (level >= -1) &&
             (_debugLevel <=  3) && (level <=  3)) {
         _debugLevel = level;
@@ -1260,7 +1257,7 @@ bool MDMParser::setDebug(int level)
 void MDMParser::dumpIp(MDM_IP ip)
 {
     if (ip != NOIP) {
-        MDM_DEBUG_D("\r\n[ Modem:IP " IPSTR " ] = = = = = = = = = = = = = =", IPNUM(ip));
+        MOLMC_LOGD(TAG, "[ Modem:IP " IPSTR " ] = = = = = = = = = = = = = =", IPNUM(ip));
     }
 }
 
@@ -1412,8 +1409,8 @@ int MDMParser::_getLine(Pipe<char>* pipe, char* buf, int len)
 MDMEsp8266Serial::MDMEsp8266Serial(int rxSize /*= 256*/, int txSize /*= 256*/) :
     Esp8266SerialPipe(rxSize, txSize)
 {
-#ifdef MODEM_DEBUG
-    //_debugLevel = -1;
+#ifdef MDM_DEBUG
+    _debugLevel = -1;
 #endif
 
     // Important to set _dev.lpm = LPM_ENABLED; when HW FLOW CONTROL enabled.

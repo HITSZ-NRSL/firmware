@@ -75,7 +75,7 @@
 #define RTC_WKUP_IRQ_PRIORITY               4       //RTC Seconds Interrupt
 #define USART1_IRQ_PRIORITY                 5       //USART1 Interrupt
 #define USART2_IRQ_PRIORITY                 5       //USART2 Interrupt
-#define TIM2_IRQ_PRIORITY                   6       //TIM2 CC Interrupt(Button Use)
+#define TIM_IRQ_PRIORITY                    6       //TIM Elapsed Interrupt
 //BUTTON1_EXTI_IRQ_PRIORITY                 7       //Mode Button Interrupt
 #define EXTI15_10_IRQ_PRIORITY              8       //User Interrupt
 #define EXTI9_5_IRQ_PRIORITY                9       //User Interrupt

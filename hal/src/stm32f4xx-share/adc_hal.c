@@ -22,7 +22,7 @@
 #include "gpio_hal.h"
 #include "pinmap_hal.h"
 #include "pinmap_impl.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -134,7 +134,6 @@ int32_t HAL_ADC_Read(uint16_t pin)
     HAL_ADC_Start_DMA(&ADC_HandleStruct, (uint32_t*)&ADC_ConvertedValues, ADC_DMA_BUFFERSIZE);
     // FIXME: if not DEBUG line below, it will not work right.
     HAL_Delay(1);
-    //DEBUG("Miss the DEBUG line, it don't work right!\r\n");
     HAL_ADC_Stop_DMA(&ADC_HandleStruct);
     HAL_ADC_Stop(&ADC_HandleStruct);
 

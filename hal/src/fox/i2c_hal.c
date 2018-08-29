@@ -27,7 +27,7 @@
 #include "hw_config.h"
 #include "i2c_hal.h"
 #include "gpio_hal.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 
 /* Private define ------------------------------------------------------------*/
 // XXX: Change
@@ -282,9 +282,9 @@ uint32_t HAL_I2C_Request_Data(HAL_I2C_Interface i2c, uint8_t address, uint8_t qu
         quantity = BUFFER_LENGTH;
     }
     address = address << 1;
-    startTime = HAL_Timer_Get_Micro_Seconds();
+    startTime = HAL_Tick_Get_Micro_Seconds();
     while(HAL_I2C_Master_Receive(&(i2cMap[i2c]->I2CHandle), address, i2cMap[i2c]->rxBuffer, quantity, 100) != HAL_OK) {
-        if(EVENT_TIMEOUT < (HAL_Timer_Get_Micro_Seconds() - startTime)) {
+        if(EVENT_TIMEOUT < (HAL_Tick_Get_Micro_Seconds() - startTime)) {
             /* SW Reset the I2C Peripheral */
             HAL_I2C_SoftwareReset(i2c);
             i2cMap[i2c]->prevEnding = I2C_ENDING_STOP;
@@ -324,9 +324,9 @@ void HAL_I2C_Begin_Transmission(HAL_I2C_Interface i2c, uint8_t address,void* res
 uint8_t HAL_I2C_End_Transmission(HAL_I2C_Interface i2c, uint8_t stop,void* reserved)
 {
     uint32_t startTime;
-    startTime = HAL_Timer_Get_Micro_Seconds();
+    startTime = HAL_Tick_Get_Micro_Seconds();
     while(HAL_I2C_Master_Transmit( &(i2cMap[i2c]->I2CHandle), (uint16_t)i2cMap[i2c]->txAddress, &i2cMap[i2c]->txBuffer[0], i2cMap[i2c]->txBufferLength, 100) != HAL_OK) {
-        if(EVENT_TIMEOUT < (HAL_Timer_Get_Micro_Seconds() - startTime)) {
+        if(EVENT_TIMEOUT < (HAL_Tick_Get_Micro_Seconds() - startTime)) {
             /* SW Reset the I2C Peripheral */
             HAL_I2C_SoftwareReset(i2c);
             i2cMap[i2c]->prevEnding = I2C_ENDING_START;

@@ -41,7 +41,7 @@
 #include "stringbuffer.h"
 #include "wiring_ajson.h"
 #include "wiring.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 /******************************************************************************
  * Definitions

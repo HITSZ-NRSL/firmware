@@ -20,7 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "hw_config.h"
 #include "usb_hal.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 
 /* Private typedef -----------------------------------------------------------*/
 #ifdef configHAL_USB_CDC_ENABLE
@@ -146,11 +146,11 @@ void USB_USART_Send_Data(uint8_t Data)
     //osMutexWait(usb_mutex, osWaitForever);
     volatile system_tick_t start_micros, current_micros, elapsed_micros;
 
-    start_micros = HAL_Timer_Get_Micro_Seconds();
+    start_micros = HAL_Tick_Get_Micro_Seconds();
     if (USBD_STATE_CONFIGURED == USBD_Device.dev_state) {
         USBD_CDC_SetTxBuffer(&USBD_Device, &Data, 1);
         while(USBD_CDC_TransmitPacket(&USBD_Device) != USBD_OK) {
-            current_micros = HAL_Timer_Get_Micro_Seconds();
+            current_micros = HAL_Tick_Get_Micro_Seconds();
             elapsed_micros = current_micros - start_micros;
 
             if (elapsed_micros < 0){

@@ -108,8 +108,6 @@ bool USARTSerial::isEnabled() {
     return HAL_USART_Is_Enabled(_serial);
 }
 
-
-
 // 不要改成类 为了保证类构造函数使用时，已经初始化
 USARTSerial &__fetch_global_serial()
 {

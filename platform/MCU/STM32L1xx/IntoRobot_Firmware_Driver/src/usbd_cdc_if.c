@@ -31,7 +31,6 @@
 #include "usbd_cdc_desc.h"
 #include "usbd_cdc.h"
 #include "usbd_cdc_if.h"
-#include "service_debug.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/

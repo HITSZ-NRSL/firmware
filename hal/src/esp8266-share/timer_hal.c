@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file    timer_hal.c
- * @authors Satish Nair, Brett Walach
+ * @file    timers_hal.c
+ * @authors robin
  * @version V1.0.0
- * @date    12-Sept-2014
+ * @date    19-06-2017
  * @brief
  ******************************************************************************
   Copyright (c) 2013-2015 IntoRobot Industries, Inc.  All rights reserved.
@@ -26,31 +26,52 @@
 #include "hw_config.h"
 #include "timer_hal.h"
 
+static os_timer_t system_timer;
+static TimerCallback_t _timerCallback = NULL;
+uint32_t _elapsedTickStart = 0;
 
-/* Private typedef -----------------------------------------------------------*/
-
-/* Private define ------------------------------------------------------------*/
-
-/* Private macro -------------------------------------------------------------*/
-
-/* Private variables ---------------------------------------------------------*/
-
-/* Extern variables ----------------------------------------------------------*/
-
-/* Private function prototypes -----------------------------------------------*/
-
-/*
- * @brief Should return the number of microseconds since the processor started up.
- */
-system_tick_t HAL_Timer_Get_Micro_Seconds(void)
+static void _system_timer_handler(void* arg)
 {
-    return GetSystem1UsTick();
+    if(_timerCallback) {
+        HAL_Timer_Stop();
+        _timerCallback();
+    }
 }
 
-/*
- * @brief Should return the number of milliseconds since the processor started up.
- */
-system_tick_t HAL_Timer_Get_Milli_Seconds(void)
+void HAL_Timer_Start(uint32_t timeout)
 {
-    return GetSystem1MsTick();
+    _elapsedTickStart = system_get_time();
+
+    if(timeout < 1) {
+        timeout = 1;
+    }
+
+    HAL_Timer_Stop();
+    os_timer_setfn(&system_timer, (os_timer_func_t*)&_system_timer_handler, 0);
+    os_timer_arm(&system_timer, timeout, 1);
 }
+
+void HAL_Timer_Stop(void)
+{
+    os_timer_disarm(&system_timer);
+}
+
+uint32_t HAL_Timer_Get_ElapsedTime(void)
+{
+    uint32_t elapsedTick = 0;
+    uint32_t _elapsedTickCurrent = system_get_time();
+
+    if (_elapsedTickCurrent < _elapsedTickStart) {
+        elapsedTick =  UINT_MAX - _elapsedTickStart + _elapsedTickCurrent;
+    } else {
+        elapsedTick = _elapsedTickCurrent - _elapsedTickStart;
+    }
+
+    return elapsedTick / 1000;
+}
+
+void HAL_Timer_Set_Callback(TimerCallback_t callback)
+{
+    _timerCallback = callback;
+}
+

@@ -35,16 +35,18 @@ void RGBClass::control(bool flag) {
 }
 
 bool RGBClass::off(void) {
-    if(!_control)
-    {return false;}
+    if(!_control) {
+        return false;
+    }
 
     HAL_UI_RGB_Color(RGB_COLOR_BLACK);
     return true;
 }
 
 bool RGBClass::color(uint32_t rgb) {
-    if(!_control)
-    {return false;}
+    if(!_control) {
+        return false;
+    }
 
     HAL_UI_RGB_Color(rgb);
     return true;
@@ -55,8 +57,9 @@ bool RGBClass::color(uint8_t red, uint8_t green, uint8_t blue) {
 }
 
 bool RGBClass::blink(uint32_t rgb, uint16_t period) {
-    if(!_control)
-    {return false;}
+    if(!_control) {
+        return false;
+    }
 
     HAL_UI_RGB_Blink(rgb, period);
     return true;
@@ -67,8 +70,9 @@ bool RGBClass::blink(uint8_t red, uint8_t green, uint8_t blue, uint16_t period) 
 }
 
 bool RGBClass::breath(uint32_t rgb, uint16_t period) {
-    if(!_control)
-    {return false;}
+    if(!_control) {
+        return false;
+    }
 
     HAL_UI_RGB_Breath(rgb, period);
     return true;

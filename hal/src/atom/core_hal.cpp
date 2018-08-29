@@ -24,12 +24,14 @@
 #include "wiring_ex_bridge.h"
 #include "wiring_ex_process.h"
 
+const static char *TAG = "hal";
+
 int main() {
     USB_Cable_Initial();
     //open bridge
-    DEBUG_D("Bridge Connecting\r\n");
+    MOLMC_LOGD(TAG, "Bridge Connecting");
     Bridge.begin();
-    DEBUG_D("Bridge Connected\r\n");
+    MOLMC_LOGD(TAG, "Bridge Connected");
     app_setup_and_loop();
     return 0;
 }

@@ -49,11 +49,11 @@ bool timerIsEnd(uint32_t timerID, uint32_t time)
     volatile long elapsed_millis = current_millis - timerID;
 
     //Check for wrapping
-    if (elapsed_millis < 0){
+    if (elapsed_millis < 0) {
         elapsed_millis =  0xFFFFFFFF -timerID + current_millis;
     }
 
-    if (elapsed_millis >= (long)time){
+    if (elapsed_millis >= (long)time) {
         return true;
     }
     return false;

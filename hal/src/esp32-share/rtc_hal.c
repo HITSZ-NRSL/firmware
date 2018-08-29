@@ -26,7 +26,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "hw_config.h"
 #include "rtc_hal.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 
 /* Private typedef -----------------------------------------------------------*/
 typedef struct {
@@ -59,7 +59,7 @@ time_t HAL_RTC_Get_UnixTime(void)
     if(g_rtc_time.magic = RTC_MAGIC)
     {
         uint32_t elapsed_rtc_time = 0;
-        uint32_t rtc_time = HAL_Timer_Get_Milli_Seconds();
+        uint32_t rtc_time = HAL_Tick_Get_Milli_Seconds();
 
         if(rtc_time < g_rtc_time.rtc_base)
         {
@@ -86,7 +86,7 @@ void HAL_RTC_Set_UnixTime(time_t value)
     if(g_rtc_time.magic = RTC_MAGIC)
     {
         g_rtc_time.unix_time_base = value;
-        g_rtc_time.rtc_base = HAL_Timer_Get_Milli_Seconds();
+        g_rtc_time.rtc_base = HAL_Tick_Get_Milli_Seconds();
     }
 }
 

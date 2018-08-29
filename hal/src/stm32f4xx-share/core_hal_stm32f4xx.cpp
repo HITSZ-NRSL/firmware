@@ -39,8 +39,9 @@
 #include "task.h"
 #include "malloc.h"
 
-/* Private typedef ----------------------------------------------------------*/
+const static char *TAG = "hal-core";
 
+/* Private typedef ----------------------------------------------------------*/
 /* Private define -----------------------------------------------------------*/
 void HAL_Core_Setup(void);
 extern "C" {
@@ -93,9 +94,6 @@ static void application_task_start(void *argument)
  */
 int main(void)
 {
-#if defined(DEBUG_BUILD)
-    init_debug_mutex();
-#endif
     init_malloc_mutex();
     xTaskCreate( application_task_start, "app_thread", APPLICATION_STACK_SIZE/sizeof( portSTACK_TYPE ), NULL, 2, &app_thread_handle);
     vTaskStartScheduler();
@@ -155,11 +153,11 @@ void HAL_Core_Load_params(void)
 
     if(INITPARAM_FLAG_FACTORY_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
         //初始化参数 保留密钥
-        DEBUG_D("init params fac\r\n");
+        MOLMC_LOGD(TAG, "init params fac");
         HAL_PARAMS_Init_Fac_System_Params();
     } else if(INITPARAM_FLAG_ALL_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
         //初始化所有参数
-        DEBUG_D("init params all\r\n");
+        MOLMC_LOGD(TAG, "init params all");
         HAL_PARAMS_Init_All_System_Params();
     }
 

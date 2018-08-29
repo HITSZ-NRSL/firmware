@@ -53,8 +53,7 @@ void SPIClass::begin()
 
 void SPIClass::begin(uint16_t ss_pin)
 {
-    if (ss_pin >= TOTAL_PINS)
-    {
+    if (ss_pin >= TOTAL_PINS) {
         return;
     }
 
@@ -63,8 +62,7 @@ void SPIClass::begin(uint16_t ss_pin)
 
 void SPIClass::begin(SPI_Mode mode, uint16_t ss_pin)
 {
-    if (ss_pin >= TOTAL_PINS)
-    {
+    if (ss_pin >= TOTAL_PINS) {
         return;
     }
 
@@ -103,8 +101,7 @@ int32_t SPIClass::beginTransaction(const SPISettings& settings)
     querySpiInfo(_spi, &info);
     SPISettings current = spiSettingsFromSpiInfo(&info);
     // If they differ, reconfigure SPI peripheral
-    if (settings != current)
-    {
+    if (settings != current) {
         if (!settings.default_) {
             uint8_t divisor = 0;
             unsigned int clock;
@@ -150,8 +147,7 @@ static uint8_t clock_divisors[] = {
 uint8_t divisorShiftScale(uint8_t divider)
 {
     unsigned result = 0;
-    for (; result<arraySize(clock_divisors); result++)
-    {
+    for (; result<arraySize(clock_divisors); result++) {
         if (clock_divisors[result]==divider)
             break;
     }
@@ -160,15 +156,12 @@ uint8_t divisorShiftScale(uint8_t divider)
 
 void SPIClass::setClockDivider(uint8_t rate)
 {
-    if (dividerReference)
-    {
+    if (dividerReference) {
         // determine the clock speed
         uint8_t scale = divisorShiftScale(rate);
         unsigned targetSpeed = dividerReference>>scale;
         setClockSpeed(targetSpeed);
-    }
-    else
-    {
+    } else {
         HAL_SPI_Set_Clock_Divider(_spi, rate);
     }
 }

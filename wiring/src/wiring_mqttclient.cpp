@@ -27,18 +27,7 @@
 #include "wiring.h"
 #include "wiring_mqttclient.h"
 
-/*debug switch*/
-//#define WIRING_MQTTCLIENT_DEBUG
-
-#ifdef WIRING_MQTTCLIENT_DEBUG
-#define WMQTTCLIENT_DEBUG(...)    do {DEBUG(__VA_ARGS__);}while(0)
-#define WMQTTCLIENT_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#define WMQTTCLIENT_DEBUG_DUMP    DEBUG_DUMP
-#else
-#define WMQTTCLIENT_DEBUG(...)
-#define WMQTTCLIENT_DEBUG_D(...)
-#define WMQTTCLIENT_DEBUG_DUMP
-#endif
+const static char *TAG = "wire-mqttc";
 
 MqttClientClass::MqttClientClass() {
     this->_state = MQTT_DISCONNECTED;
@@ -255,26 +244,26 @@ boolean MqttClientClass::connect(const char *id, const char *user, const char *p
 
 // reads a byte into result
 boolean MqttClientClass::readByte(uint8_t * result) {
-   uint32_t previousMillis = millis();
-   while(!_client->available()) {
-     uint32_t currentMillis = millis();
-     if(currentMillis - previousMillis >= ((int32_t) MQTT_SOCKET_TIMEOUT * 1000)){
-       return false;
-     }
-   }
-   *result = _client->read();
-   return true;
+    uint32_t previousMillis = millis();
+    while(!_client->available()) {
+        uint32_t currentMillis = millis();
+        if(currentMillis - previousMillis >= ((int32_t) MQTT_SOCKET_TIMEOUT * 1000)){
+            return false;
+        }
+    }
+    *result = _client->read();
+    return true;
 }
 
 // reads a byte into result[*index] and increments index
 boolean MqttClientClass::readByte(uint8_t * result, uint16_t * index){
-  uint16_t current_index = *index;
-  uint8_t * write_address = &(result[current_index]);
-  if(readByte(write_address)){
-    *index = current_index + 1;
-    return true;
-  }
-  return false;
+    uint16_t current_index = *index;
+    uint8_t * write_address = &(result[current_index]);
+    if(readByte(write_address)){
+        *index = current_index + 1;
+        return true;
+    }
+    return false;
 }
 
 uint16_t MqttClientClass::readPacket(uint8_t* lengthLength) {
@@ -421,13 +410,13 @@ boolean MqttClientClass::publish(const char* topic, const uint8_t* payload, unsi
         }
         if(write(header,buffer,length-5))
         {
-            WMQTTCLIENT_DEBUG("OK! published topic: %s, payload -> ", topic);
-            WMQTTCLIENT_DEBUG_DUMP(payload, plength);
+            MOLMC_LOGD(TAG, "OK! published topic: %s, payload -> ", topic);
+            MOLMC_LOG_BUFFER_HEX(TAG, payload, plength);
             return true;
         }
     }
-    WMQTTCLIENT_DEBUG("Error! publish topic: %s, payload -> ", topic);
-    WMQTTCLIENT_DEBUG_DUMP(payload, plength);
+    MOLMC_LOGD(TAG, "Error! publish topic: %s, payload -> ", topic);
+    MOLMC_LOG_BUFFER_HEX(TAG, payload, plength);
     return false;
 }
 
@@ -543,11 +532,11 @@ boolean MqttClientClass::subscribe(const char* topic, uint8_t qos) {
         buffer[length++] = qos;
         if(write(MQTTSUBSCRIBE|MQTTQOS1,buffer,length-5))
         {
-            WMQTTCLIENT_DEBUG("OK! subscribe topic: %s\r\n", topic);
+            MOLMC_LOGD(TAG, "OK! subscribe topic: %s", topic);
             return true;
         }
     }
-    WMQTTCLIENT_DEBUG("Error! subscribe topic: %s\r\n", topic);
+    MOLMC_LOGD(TAG, "Error! subscribe topic: %s", topic);
     return false;
 }
 
@@ -567,16 +556,16 @@ boolean MqttClientClass::unsubscribe(const char* topic) {
         length = writeString(topic, buffer,length);
         if(write(MQTTUNSUBSCRIBE|MQTTQOS1,buffer,length-5))
         {
-            WMQTTCLIENT_DEBUG("OK! unsubscribe topic: %s\r\n", topic);
+            MOLMC_LOGD(TAG, "OK! unsubscribe topic: %s", topic);
             return true;
         }
     }
-    WMQTTCLIENT_DEBUG("Error! unsubscribe topic: %s\r\n", topic);
+    MOLMC_LOGD(TAG, "Error! unsubscribe topic: %s", topic);
     return false;
 }
 
 void MqttClientClass::disconnect() {
-    WMQTTCLIENT_DEBUG("mqttClient! disconnect\r\n");
+    MOLMC_LOGD(TAG, "mqttClient! disconnect");
     buffer[0] = MQTTDISCONNECT;
     buffer[1] = 0;
     _client->write(buffer,2);

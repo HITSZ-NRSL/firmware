@@ -27,6 +27,8 @@
 
 using namespace intorobot;
 
+const static char *TAG = "wire-tcps";
+
 static TCPClient* s_invalid_client = NULL;
 
 static bool inline isOpen(sock_handle_t sd)

@@ -27,7 +27,6 @@
 #include "hw_config.h"
 #include "interrupts_hal.h"
 #include "pinmap_impl.h"
-#include "service_debug.h"
 
 //Interrupt Modes
 #define ESP8266_INTERRUPT_MODE_RISING    0x01
@@ -188,12 +187,12 @@ void ICACHE_RAM_ATTR HAL_EXTI_Handler(void)
 
 int HAL_disable_irq()
 {
-    return xt_rsil(15); // stop other interrupts
+    return xt_rsil(15); // disable all interrupts
 }
 
 void HAL_enable_irq(int is)
 {
-    xt_wsr_ps(is);
+    xt_rsil(0); // enable all interrupts
 }
 
 uint8_t HAL_IsISR()

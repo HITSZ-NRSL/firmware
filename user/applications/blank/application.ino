@@ -2,8 +2,13 @@
  * 闪灯程序
  */
 
-//SerialUSBDebugOutput debugOutput(115200, ALL_LEVEL);
-SerialDebugOutput debugOutput(115200, ALL_LEVEL);
+SYSTEM_MODE(MANUAL)
+
+void init_before_setup(void)
+{
+}
+
+STARTUP( init_before_setup() );
 
 void setup()
 {

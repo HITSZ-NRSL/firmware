@@ -7,7 +7,6 @@
 
 #include "hw_config.h"
 #include "ui_hal.h"
-#include "service_debug.h"
 
 #define RGB_GPIO_PIN               5
 #define MODE_BOTTON_GPIO_PIN       0

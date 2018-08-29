@@ -65,7 +65,7 @@
 
 #include <sys/config.h>
 #include <reent.h>
-#include "service_debug.h"
+#include "molmc_log.h"
 
 extern void __malloc_lock(void* p);
 extern void __malloc_unlock(void* p);

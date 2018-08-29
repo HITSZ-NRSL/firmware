@@ -25,15 +25,15 @@
  ******************************************************************************
  */
 
-#ifndef WLAN_H
-#define	WLAN_H
+#ifndef WLAN_HAL_H
+#define	WLAN_HAL_H
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "service_debug.h"
+#include "molmc_log.h"
 #include "inet_hal.h"
 #include "socket_hal.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 #include "net_hal.h"
 
 

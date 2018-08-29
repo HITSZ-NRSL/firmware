@@ -37,7 +37,7 @@
 #include "intorobot_macros.h"
 #include "rtc_hal.h"
 #include "delay_hal.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 #include "params_hal.h"
 #include "bkpreg_hal.h"
 #include "flash_map.h"
@@ -53,6 +53,7 @@ extern "C" {
 #include "nvs_flash.h"
 }
 
+const static char *TAG = "hal-core";
 
 void init() __attribute__((weak));
 void init() {}
@@ -132,11 +133,11 @@ void HAL_Core_Load_Params(void)
 
     if(INITPARAM_FLAG_FACTORY_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
         //初始化参数 保留密钥
-        DEBUG("init params fac\r\n");
+        MOLMC_LOGD(TAG, "init params fac");
         HAL_PARAMS_Init_Fac_System_Params();
     } else if(INITPARAM_FLAG_ALL_RESET == HAL_PARAMS_Get_Boot_initparam_flag()) {
         //初始化所有参数
-        DEBUG("init params all\r\n");
+        MOLMC_LOGD(TAG, "init params all");
         HAL_PARAMS_Init_All_System_Params();
     }
 

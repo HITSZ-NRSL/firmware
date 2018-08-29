@@ -25,18 +25,10 @@
 
 #include "hw_config.h"
 #include "esp8266_conn.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 #include "core_hal_esp8266.h"
 
-//#define HAL_SOCKET_DEBUG
-
-#ifdef HAL_SOCKET_DEBUG
-#define HALSOCKET_DEBUG(...)  do {DEBUG(__VA_ARGS__);}while(0)
-#define HALSOCKET_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#else
-#define HALSOCKET_DEBUG(...)
-#define HALSOCKET_DEBUG_D(...)
-#endif
+const static char *TAG = "hal-socket";
 
 #ifdef putc
 #undef putc
@@ -58,25 +50,23 @@ volatile uint8_t _socketSended=0;
 //! test if it is a socket is ok to use
 #define ISSOCKET(s)     (((s) >= 0) && ((s) < NUMSOCKETS) && (_sockets[s].handle != MDM_SOCKET_ERROR))
 
-#ifdef HAL_SOCKET_DEBUG
 const char *ip_proto_name[] = { "TCP Client", "UDP Client", "TCP Server", "TCP Server Client" };
-#endif
 
 static volatile uint32_t esp8266_conn_timeout_start;
 static volatile uint32_t esp8266_conn_timeout_duration;
 
 inline void ARM_CONN_TIMEOUT(uint32_t dur) {
-    esp8266_conn_timeout_start = HAL_Timer_Get_Milli_Seconds();
+    esp8266_conn_timeout_start = HAL_Tick_Get_Milli_Seconds();
     esp8266_conn_timeout_duration = dur;
-    HALSOCKET_DEBUG("esp8266 CONN WD Set %d\r\n",(dur));
+    MOLMC_LOGD(TAG, "esp8266 CONN WD Set %d",(dur));
 }
 inline bool IS_CONN_TIMEOUT() {
-    return esp8266_conn_timeout_duration && ((HAL_Timer_Get_Milli_Seconds()-esp8266_conn_timeout_start)>esp8266_conn_timeout_duration);
+    return esp8266_conn_timeout_duration && ((HAL_Tick_Get_Milli_Seconds()-esp8266_conn_timeout_start)>esp8266_conn_timeout_duration);
 }
 
 inline void CLR_CONN_TIMEOUT() {
     esp8266_conn_timeout_duration = 0;
-    HALSOCKET_DEBUG("esp8266 CONN WD Cleared, was %d\r\n", esp8266_conn_timeout_duration);
+    MOLMC_LOGD(TAG, "esp8266 CONN WD Cleared, was %d", esp8266_conn_timeout_duration);
 }
 
 SockCtrl Esp8266ConnClass::_sockets[10];
@@ -145,9 +135,9 @@ int Esp8266ConnClass::socketCreate(IpProtocol ipproto, int port)
             espconn_accept(_sockets[socket].conn_ptr);
             espconn_regist_time(_sockets[socket].conn_ptr, 60, 0);
         }
-        HALSOCKET_DEBUG("OK! %s Socket %d was created\r\n", ip_proto_name[_sockets[socket].ipproto], socket);
+        MOLMC_LOGD(TAG, "OK! %s Socket %d was created", ip_proto_name[_sockets[socket].ipproto], socket);
     } else {
-        HALSOCKET_DEBUG("Error! socket create failed!\r\n");
+        MOLMC_LOGD(TAG, "Error! socket create failed!");
     }
     return socket;
 }
@@ -189,10 +179,10 @@ bool Esp8266ConnClass::socketConnect(int socket, const MDM_IP& ip, int port)
     }
 
     if(ok) {
-        HALSOCKET_DEBUG("OK! %s Socket %d connected! remote_ip:" IPSTR ", remote_port:%d, local_port:%d\r\n", ip_proto_name[_sockets[socket].ipproto],\
+        MOLMC_LOGD(TAG, "OK! %s Socket %d connected! remote_ip:" IPSTR ", remote_port:%d, local_port:%d", ip_proto_name[_sockets[socket].ipproto],\
             socket, IPNUM(ip), port, _sockets[socket].conn_ptr->proto.tcp->local_port);
     } else {
-        HALSOCKET_DEBUG("Error! %s Socket %d connect failed! remote_ip::" IPSTR ", remote_port:%d, local_port:%d\r\n", ip_proto_name[_sockets[socket].ipproto], \
+        MOLMC_LOGD(TAG, "Error! %s Socket %d connect failed! remote_ip::" IPSTR ", remote_port:%d, local_port:%d", ip_proto_name[_sockets[socket].ipproto], \
                 socket, IPNUM(ip), port, _sockets[socket].conn_ptr->proto.tcp->local_port);
     }
     return ok;
@@ -202,7 +192,7 @@ bool Esp8266ConnClass::socketIsConnected(int socket)
 {
     bool ok = false;
     ok = ISSOCKET(socket) && _sockets[socket].connected;
-    //HALSOCKET_DEBUG("socket %d is Connected: %s\r\n", socket, ok?"yes":"no");
+    //MOLMC_LOGD(TAG, "socket %d is Connected: %s", socket, ok?"yes":"no");
     return ok;
 }
 
@@ -226,12 +216,12 @@ int Esp8266ConnClass::socketAccept(int socket)
                     _sockets[tcpSocket].open       = true;
                     _sockets[tcpSocket].pipe = new Pipe<char>(MAX_SIZE);
                     _sockets[tcpSocket].conn_ptr = _sockets[socket].server_client_list[i].conn_ptr;
-                    HALSOCKET_DEBUG("OK! %s socket %d was created! server socket %d\r\n", ip_proto_name[_sockets[tcpSocket].ipproto], tcpSocket, socket);
+                    MOLMC_LOGD(TAG, "OK! %s socket %d was created! server socket %d", ip_proto_name[_sockets[tcpSocket].ipproto], tcpSocket, socket);
                     break;
                 }
             }
         } else {
-            HALSOCKET_DEBUG("Error! tcpSocket create failed!\r\n");
+            MOLMC_LOGD(TAG, "Error! tcpSocket create failed!");
         }
     }
     return tcpSocket;
@@ -241,7 +231,7 @@ bool Esp8266ConnClass::socketClose(int socket)
 {
     bool ok = false;
     if (ISSOCKET(socket) && (_sockets[socket].connected || _sockets[socket].open)) {
-        HALSOCKET_DEBUG("OK! %s socket %d close!\r\n", ip_proto_name[_sockets[socket].ipproto], socket);
+        MOLMC_LOGD(TAG, "OK! %s socket %d close!", ip_proto_name[_sockets[socket].ipproto], socket);
         if((MDM_IPPROTO_TCP == _sockets[socket].ipproto) && (_sockets[socket].connected)) {
             ARM_CONN_TIMEOUT(2000);
             _socketDisconnected =0;
@@ -272,7 +262,7 @@ bool Esp8266ConnClass::socketClose(int socket)
 
         if((MDM_IPPROTO_TCP_SERVER_CLIENT != _sockets[socket].ipproto)) {
             if(0 == espconn_delete(_sockets[socket].conn_ptr)) {
-                HALSOCKET_DEBUG("OK! espconn_delete\r\n");
+                MOLMC_LOGD(TAG, "OK! espconn_delete");
             }
         }
         // Assume RESP_OK in most situations, and assume closed
@@ -296,16 +286,16 @@ bool Esp8266ConnClass::_socketFree(int socket)
         _sockets[socket].open       = false;
         if (_sockets[socket].conn_ptr) {
             if (_sockets[socket].conn_ptr->proto.tcp) {
-                HALSOCKET_DEBUG("OK! tcp free\r\n");
+                MOLMC_LOGD(TAG, "OK! tcp free");
                 free(_sockets[socket].conn_ptr->proto.tcp);
                 _sockets[socket].conn_ptr->proto.tcp = NULL;
             }
-            HALSOCKET_DEBUG("OK! esp8266 conn ptr free\r\n");
+            MOLMC_LOGD(TAG, "OK! esp8266 conn ptr free");
             free(_sockets[socket].conn_ptr);
             _sockets[socket].conn_ptr = NULL;
         }
         if (_sockets[socket].pipe) {
-            HALSOCKET_DEBUG("OK! pipe free\r\n");
+            MOLMC_LOGD(TAG, "OK! pipe free");
             delete _sockets[socket].pipe;
             _sockets[socket].pipe = NULL;
         }
@@ -319,16 +309,16 @@ bool Esp8266ConnClass::socketFree(int socket)
     // make sure it is closed
     socketClose(socket);
     if(_socketFree(socket)) {
-        HALSOCKET_DEBUG("OK! socket %d free!\r\n", socket);
+        MOLMC_LOGD(TAG, "OK! socket %d free!", socket);
         return true;
     }
-    HALSOCKET_DEBUG("Error! socket %d free failed!\r\n", socket);
+    MOLMC_LOGD(TAG, "Error! socket %d free failed!", socket);
     return false;
 }
 
 int Esp8266ConnClass::socketSend(int socket, const char * buf, int len)
 {
-    HALSOCKET_DEBUG("OK! socket:%d send data len:%d!\r\n", socket,len);
+    MOLMC_LOGD(TAG, "OK! socket:%d send data len:%d!", socket,len);
     int cnt = len;
     while (cnt > 0) {
         int blk = USO_MAX_WRITE;
@@ -378,7 +368,7 @@ int Esp8266ConnClass::socketSend(int socket, const char * buf, int len)
 
 int Esp8266ConnClass::socketSendTo(int socket, MDM_IP ip, int port, const char * buf, int len)
 {
-    HALSOCKET_DEBUG("OK! socket:%d send data to ip:" IPSTR ", port:%d, len:%d!\r\n", socket,IPNUM(ip),port,len);
+    MOLMC_LOGD(TAG, "OK! socket:%d send data to ip:" IPSTR ", port:%d, len:%d!", socket,IPNUM(ip),port,len);
     int cnt = len;
     while (cnt > 0) {
         int blk = USO_MAX_WRITE;
@@ -392,7 +382,7 @@ int Esp8266ConnClass::socketSendTo(int socket, MDM_IP ip, int port, const char *
                 _sockets[socket].conn_ptr->proto.tcp->remote_ip[2] = (ip >> 8) & 0xFF;
                 _sockets[socket].conn_ptr->proto.tcp->remote_ip[3] = ip & 0xFF;
                 _sockets[socket].conn_ptr->proto.tcp->remote_port = port;
-                HALSOCKET_DEBUG("%s remote_ip:" IPSTR ", remote_port:%d\r\n", ip_proto_name[_sockets[socket].ipproto], _sockets[socket].conn_ptr->proto.tcp->remote_ip[0], _sockets[socket].conn_ptr->proto.tcp->remote_ip[1], _sockets[socket].conn_ptr->proto.tcp->remote_ip[2], _sockets[socket].conn_ptr->proto.tcp->remote_ip[3], \
+                MOLMC_LOGD(TAG, "%s remote_ip:" IPSTR ", remote_port:%d", ip_proto_name[_sockets[socket].ipproto], _sockets[socket].conn_ptr->proto.tcp->remote_ip[0], _sockets[socket].conn_ptr->proto.tcp->remote_ip[1], _sockets[socket].conn_ptr->proto.tcp->remote_ip[2], _sockets[socket].conn_ptr->proto.tcp->remote_ip[3], \
                         _sockets[socket].conn_ptr->proto.tcp->remote_port);
                 ARM_CONN_TIMEOUT(2000);
                 _socketSended =0;
@@ -490,7 +480,7 @@ int Esp8266ConnClass::_findSocketServer(int port, int handle) {
 }
 
 void Esp8266ConnClass::_espconn_connect_callback(void *arg) {
-    HALSOCKET_DEBUG("_espconn_connect_callback\r\n");
+    MOLMC_LOGD(TAG, "_espconn_connect_callback");
 
     int socket=0;
     struct espconn *pespconn = (struct espconn *)arg;
@@ -510,7 +500,7 @@ void Esp8266ConnClass::_espconn_connect_callback(void *arg) {
 }
 
 void Esp8266ConnClass::_espconn_reconnect_callback(void *arg, sint8 errType) {
-    HALSOCKET_DEBUG("_espconn_reconnect_callback\r\n");
+    MOLMC_LOGD(TAG, "_espconn_reconnect_callback");
 
     int socket=0;
     struct espconn *pespconn = (struct espconn *)arg;
@@ -532,12 +522,12 @@ void Esp8266ConnClass::_espconn_reconnect_callback(void *arg, sint8 errType) {
 }
 
 void Esp8266ConnClass::_espconn_sent_callback(void *arg) {
-    HALSOCKET_DEBUG("_espconn_sent_callback\r\n");
+    MOLMC_LOGD(TAG, "_espconn_sent_callback");
     _socketSended = 1;
 }
 
 void Esp8266ConnClass::_espconn_recv_callback(void *arg, char *pusrdata, unsigned short len) {
-    HALSOCKET_DEBUG("_espconn_recv_callback\r\n");
+    MOLMC_LOGD(TAG, "_espconn_recv_callback");
 
     int socket=0, n=0;
     struct espconn *pespconn = (struct espconn *)arg;
@@ -546,13 +536,13 @@ void Esp8266ConnClass::_espconn_recv_callback(void *arg, char *pusrdata, unsigne
         if (ISSOCKET(socket)) {
             if((pespconn->proto.tcp->remote_port == _sockets[socket].conn_ptr->proto.tcp->remote_port)
                     &&(!memcmp(pespconn->proto.tcp->remote_ip, (void *)_sockets[socket].conn_ptr->proto.tcp->remote_ip, 4))) {
-                //HALSOCKET_DEBUG("socket = %d\r\n", socket);
+                //MOLMC_LOGD(TAG, "socket = %d", socket);
                 break;
             }
         }
     }
     if (NUMSOCKETS != socket) {
-        HALSOCKET_DEBUG("Socket %d: has %d bytes pending\r\n", socket, len);
+        MOLMC_LOGD(TAG, "Socket %d: has %d bytes pending", socket, len);
         for(n=0; n < len ; n++) {
             if (_sockets[socket].pipe->writeable()) {
                 _sockets[socket].pipe->putc(pusrdata[n]);
@@ -565,9 +555,9 @@ void Esp8266ConnClass::_espconn_recv_callback(void *arg, char *pusrdata, unsigne
         if(MDM_IPPROTO_UDP == _sockets[socket].ipproto) {
             remot_info *premot = NULL;
             if (espconn_get_connection_info(pespconn, &premot, 0) == ESPCONN_OK){
-                HALSOCKET_DEBUG("espconn_get_connection_info\r\n");
-                HALSOCKET_DEBUG("remote_ip:" IPSTR "\r\n", premot->remote_ip[0], premot->remote_ip[1], premot->remote_ip[2], premot->remote_ip[3]);
-                HALSOCKET_DEBUG("remote_port:%d\r\n", premot->remote_port);
+                MOLMC_LOGD(TAG, "espconn_get_connection_info");
+                MOLMC_LOGD(TAG, "remote_ip:" IPSTR "", premot->remote_ip[0], premot->remote_ip[1], premot->remote_ip[2], premot->remote_ip[3]);
+                MOLMC_LOGD(TAG, "remote_port:%d", premot->remote_port);
                 memcpy(_sockets[socket].conn_ptr->proto.tcp->remote_ip, premot->remote_ip, 4);
                 _sockets[socket].conn_ptr->proto.tcp->remote_port = premot->remote_port;
             }
@@ -576,7 +566,7 @@ void Esp8266ConnClass::_espconn_recv_callback(void *arg, char *pusrdata, unsigne
 }
 
 void Esp8266ConnClass::_espconn_disconnect_callback(void *arg) {
-    HALSOCKET_DEBUG("_espconn_disconnect_callback\r\n");
+    MOLMC_LOGD(TAG, "_espconn_disconnect_callback");
 
     int socket=0;
     struct espconn *pespconn = (struct espconn *)arg;
@@ -598,7 +588,7 @@ void Esp8266ConnClass::_espconn_disconnect_callback(void *arg) {
 }
 
 void Esp8266ConnClass::_espconn_tcp_server_listen_callback(void *arg) {
-    HALSOCKET_DEBUG("_espconn_tcp_server_listen_callback\r\n");
+    MOLMC_LOGD(TAG, "_espconn_tcp_server_listen_callback");
 
     int socket=0;
     struct espconn *pespconn = (struct espconn *)arg;
@@ -607,9 +597,9 @@ void Esp8266ConnClass::_espconn_tcp_server_listen_callback(void *arg) {
         if (ISSOCKET(socket)) {
             if((_sockets[socket].ipproto == MDM_IPPROTO_TCP_SERVER)
                     &&(pespconn->proto.tcp->local_port == _sockets[socket].conn_ptr->proto.tcp->local_port)) {
-                HALSOCKET_DEBUG("tcp server socket = %d, local_port = %d\r\n", socket, pespconn->proto.tcp->local_port);
-                HALSOCKET_DEBUG("remote_ip:" IPSTR "\r\n", pespconn->proto.tcp->remote_ip[0], pespconn->proto.tcp->remote_ip[1], pespconn->proto.tcp->remote_ip[2], pespconn->proto.tcp->remote_ip[3]);
-                HALSOCKET_DEBUG("remote_port:%d\r\n", pespconn->proto.tcp->remote_port);
+                MOLMC_LOGD(TAG, "tcp server socket = %d, local_port = %d", socket, pespconn->proto.tcp->local_port);
+                MOLMC_LOGD(TAG, "remote_ip:" IPSTR "", pespconn->proto.tcp->remote_ip[0], pespconn->proto.tcp->remote_ip[1], pespconn->proto.tcp->remote_ip[2], pespconn->proto.tcp->remote_ip[3]);
+                MOLMC_LOGD(TAG, "remote_port:%d", pespconn->proto.tcp->remote_port);
                 break;
             }
         }
@@ -624,7 +614,7 @@ void Esp8266ConnClass::_espconn_tcp_server_listen_callback(void *arg) {
                 memcpy(_sockets[socket].server_client_list[i].connect_info.remote_ip, pespconn->proto.tcp->remote_ip, 4);
                 _sockets[socket].server_client_list[i].connect_info.remote_port = pespconn->proto.tcp->remote_port;
                 _sockets[socket].server_client_list[i].conn_ptr = pespconn;
-                HALSOCKET_DEBUG("add server client, server index = %d\r\n", i);
+                MOLMC_LOGD(TAG, "add server client, server index = %d", i);
                 break;
             }
         }
@@ -638,11 +628,11 @@ void Esp8266ConnClass::_espconn_tcp_server_listen_callback(void *arg) {
 
 void Esp8266ConnClass::_espconn_tcp_server_sent_callback(void *arg) {
     _socketSended = 1;
-    HALSOCKET_DEBUG("_espconn_tcp_server_sent_callback\r\n");
+    MOLMC_LOGD(TAG, "_espconn_tcp_server_sent_callback");
 }
 
 void Esp8266ConnClass::_espconn_tcp_server_recv_callback(void *arg, char *pusrdata, unsigned short len) {
-    HALSOCKET_DEBUG("_espconn_tcp_server_recv_callback\r\n");
+    MOLMC_LOGD(TAG, "_espconn_tcp_server_recv_callback");
     int socket=0;
     struct espconn *pespconn = (struct espconn *)arg;
 
@@ -650,7 +640,7 @@ void Esp8266ConnClass::_espconn_tcp_server_recv_callback(void *arg, char *pusrda
         if (ISSOCKET(socket)) {
             if((_sockets[socket].ipproto == MDM_IPPROTO_TCP_SERVER)
                     &&(pespconn->proto.tcp->local_port == _sockets[socket].conn_ptr->proto.tcp->local_port)) {
-                HALSOCKET_DEBUG("tcp server socket = %d, local_port = %d\r\n", socket, pespconn->proto.tcp->local_port);
+                MOLMC_LOGD(TAG, "tcp server socket = %d, local_port = %d", socket, pespconn->proto.tcp->local_port);
                 break;
             }
         }
@@ -662,10 +652,10 @@ void Esp8266ConnClass::_espconn_tcp_server_recv_callback(void *arg, char *pusrda
             if((pespconn->proto.tcp->remote_port == _sockets[socket].server_client_list[i].connect_info.remote_port)
                     &&(!memcmp(pespconn->proto.tcp->remote_ip, (void *)_sockets[socket].server_client_list[i].connect_info.remote_ip, 4))
                     &&(_sockets[socket].server_client_list[i].isAccepted)) {
-                HALSOCKET_DEBUG("remote_ip:" IPSTR "\r\n", pespconn->proto.tcp->remote_ip[0], pespconn->proto.tcp->remote_ip[1], pespconn->proto.tcp->remote_ip[2], pespconn->proto.tcp->remote_ip[3]);
-                HALSOCKET_DEBUG("remote_port:%d\r\n", pespconn->proto.tcp->remote_port);
+                MOLMC_LOGD(TAG, "remote_ip:" IPSTR "", pespconn->proto.tcp->remote_ip[0], pespconn->proto.tcp->remote_ip[1], pespconn->proto.tcp->remote_ip[2], pespconn->proto.tcp->remote_ip[3]);
+                MOLMC_LOGD(TAG, "remote_port:%d", pespconn->proto.tcp->remote_port);
                 int handle = _sockets[socket].server_client_list[i].handle;
-                HALSOCKET_DEBUG("Socket %d: has %d bytes pending\r\n", handle, len);
+                MOLMC_LOGD(TAG, "Socket %d: has %d bytes pending", handle, len);
                 int n = 0;
                 for(n=0; n < len ; n++) {
                     if (_sockets[handle].pipe->writeable()) {
@@ -682,7 +672,7 @@ void Esp8266ConnClass::_espconn_tcp_server_recv_callback(void *arg, char *pusrda
 }
 
 void Esp8266ConnClass::_espconn_tcp_server_disconnect_callback(void *arg) {
-    HALSOCKET_DEBUG("_espconn_tcp_server_disconnect_callback\r\n");
+    MOLMC_LOGD(TAG, "_espconn_tcp_server_disconnect_callback");
     int socket=0;
     struct espconn *pespconn = (struct espconn *)arg;
 
@@ -690,7 +680,7 @@ void Esp8266ConnClass::_espconn_tcp_server_disconnect_callback(void *arg) {
         if (ISSOCKET(socket)) {
             if((_sockets[socket].ipproto == MDM_IPPROTO_TCP_SERVER)
                     &&(pespconn->proto.tcp->local_port == _sockets[socket].conn_ptr->proto.tcp->local_port)) {
-                HALSOCKET_DEBUG("tcp server socket = %d, local_port = %d\r\n", socket, pespconn->proto.tcp->local_port);
+                MOLMC_LOGD(TAG, "tcp server socket = %d, local_port = %d", socket, pespconn->proto.tcp->local_port);
                 break;
             }
         }
@@ -705,8 +695,8 @@ void Esp8266ConnClass::_espconn_tcp_server_disconnect_callback(void *arg) {
                     _sockets[_sockets[socket].server_client_list[i].handle].connected = false;
                 }
                 _sockets[socket].server_client_list[i].isValid = false;
-                HALSOCKET_DEBUG("remote_ip:" IPSTR "\r\n", pespconn->proto.tcp->remote_ip[0], pespconn->proto.tcp->remote_ip[1], pespconn->proto.tcp->remote_ip[2], pespconn->proto.tcp->remote_ip[3]);
-                HALSOCKET_DEBUG("remote_port:%d, server index = %d\r\n", pespconn->proto.tcp->remote_port, i);
+                MOLMC_LOGD(TAG, "remote_ip:" IPSTR "", pespconn->proto.tcp->remote_ip[0], pespconn->proto.tcp->remote_ip[1], pespconn->proto.tcp->remote_ip[2], pespconn->proto.tcp->remote_ip[3]);
+                MOLMC_LOGD(TAG, "remote_port:%d, server index = %d", pespconn->proto.tcp->remote_port, i);
                 break;
             }
         }

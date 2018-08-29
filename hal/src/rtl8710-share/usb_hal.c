@@ -20,12 +20,12 @@
 
   You should have received a copy of the GNU Lesser General Public
   License along with this program; if not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************
- */
+  ******************************************************************************
+*/
 
 /* Includes ------------------------------------------------------------------*/
-#include <stdint.h>
 #include "usb_hal.h"
+#include <stdint.h>
 
 /* Private typedef -----------------------------------------------------------*/
 
@@ -48,7 +48,7 @@ void USB_USART_Initial(uint32_t baudRate)
  *******************************************************************************/
 int32_t USB_USART_Available_Data(void)
 {
-    return 0;
+  return 0;
 }
 
 /*******************************************************************************
@@ -59,7 +59,7 @@ int32_t USB_USART_Available_Data(void)
  *******************************************************************************/
 int32_t USB_USART_Receive_Data(uint8_t peek)
 {
-    return 0;
+  return -1;
 }
 
 /*******************************************************************************
@@ -70,7 +70,7 @@ int32_t USB_USART_Receive_Data(uint8_t peek)
  *******************************************************************************/
 int32_t USB_USART_Available_Data_For_Write(void)
 {
-    return 0;
+  return 0;
 }
 
 /*******************************************************************************
@@ -81,6 +81,7 @@ int32_t USB_USART_Available_Data_For_Write(void)
  *******************************************************************************/
 void USB_USART_Send_Data(uint8_t Data)
 {
+
 }
 
 /*******************************************************************************
@@ -91,6 +92,7 @@ void USB_USART_Send_Data(uint8_t Data)
  *******************************************************************************/
 void USB_USART_Flush_Data(void)
 {
+
 }
 #endif
 
@@ -107,9 +109,11 @@ void USB_HID_Send_Report(void *pHIDReport, size_t reportSize)
 }
 #endif
 
+
+
 unsigned int USB_USART_Baud_Rate(void)
 {
-    return 115200;
+    return 0;
 }
 
 void USB_USART_LineCoding_BitRate_Handler(void (*handler)(uint32_t bitRate))

@@ -23,14 +23,9 @@
  ******************************************************************************
  */
 
-#include "core_hal.h"
 #include "delay_hal.h"
 #include "hw_config.h"
-#include "ets_sys.h"
-#include "osapi.h"
-#include "user_interface.h"
-#include "cont.h"
-#include "core_hal_esp8266.h"
+#include "watchdog_hal.h"
 
 /*******************************************************************************
 * Function Name  : Delay
@@ -39,27 +34,8 @@
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void HAL_Delay_Milliseconds(uint32_t millis)
+void HAL_Delay_Milliseconds(uint32_t nTime)
 {
-    volatile system_tick_t start_millis, current_millis, elapsed_millis;
-
-    start_millis = HAL_Timer_Get_Milli_Seconds();
-    while (1)
-    {
-        current_millis = HAL_Timer_Get_Milli_Seconds();
-        elapsed_millis = current_millis - start_millis;
-        //Check for wrapping
-        if (elapsed_millis < 0)
-        {
-            elapsed_millis =  0xFFFFFFFF - start_millis + current_millis;
-        }
-
-        if (elapsed_millis >= (long)millis)
-        {
-            break;
-        }
-        optimistic_yield(100);
-    }
 }
 
 /*******************************************************************************
@@ -69,7 +45,6 @@ void HAL_Delay_Milliseconds(uint32_t millis)
  * Output         : None
  * Return         : None
  *******************************************************************************/
-void HAL_Delay_Microseconds(uint32_t micros)
+void HAL_Delay_Microseconds(uint32_t uSec)
 {
-    os_delay_us(micros);
 }

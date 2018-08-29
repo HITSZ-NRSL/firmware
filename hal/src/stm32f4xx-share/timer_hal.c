@@ -1,6 +1,12 @@
 /**
  ******************************************************************************
-  Copyright (c) 2013-2014 IntoRobot Team.  All right reserved.
+ * @file    timers_hal.c
+ * @authors robin
+ * @version V1.0.0
+ * @date    19-06-2017
+ * @brief
+ ******************************************************************************
+  Copyright (c) 2013-2015 IntoRobot Industries, Inc.  All rights reserved.
 
   This library is free software; you can redistribute it and/or
   modify it under the terms of the GNU Lesser General Public
@@ -14,37 +20,79 @@
 
   You should have received a copy of the GNU Lesser General Public
   License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  ******************************************************************************
-*/
+ ******************************************************************************
+ */
 
 #include "hw_config.h"
 #include "timer_hal.h"
+#include "stm32f4xx_it.h"
 
+static TIM_HandleTypeDef TimHandle;
+static TimerCallback_t _timerCallback = NULL;
+uint32_t _elapsedTickStart = 0;
 
-/* Private typedef -----------------------------------------------------------*/
-
-/* Private define ------------------------------------------------------------*/
-
-/* Private macro -------------------------------------------------------------*/
-
-/* Private variables ---------------------------------------------------------*/
-
-/* Extern variables ----------------------------------------------------------*/
-
-/* Private function prototypes -----------------------------------------------*/
-
-/*
- * @brief Should return the number of microseconds since the processor started up.
- */
-system_tick_t HAL_Timer_Get_Micro_Seconds(void)
+void HAL_Timer_Start(uint32_t timeout)
 {
-    return GetSystem1UsTick();
+    _elapsedTickStart = DWT->CYCCNT;
+    HAL_Timer_Stop();
+    __HAL_RCC_TIM1_CLK_ENABLE(); //必须要放在HAL_TIM_Base_Init之前
+
+    timeout *= 10;
+    if(timeout < 3) {  //如果timeout等于0 需要等计数溢出才会触发中断
+        timeout = 3;
+    } else if (timeout > 0x10000) {
+        timeout = 0x10000;
+    }
+
+    TimHandle.Instance = TIM1;
+    TimHandle.Init.Period = timeout - 1;
+    TimHandle.Init.Prescaler = (uint32_t) ((SystemCoreClock / 10000) - 1);;
+    TimHandle.Init.ClockDivision = 0;
+    TimHandle.Init.CounterMode = TIM_COUNTERMODE_UP;
+    HAL_TIM_Base_Init(&TimHandle);
+
+    HAL_NVIC_SetPriority(TIM1_UP_TIM10_IRQn, TIM_IRQ_PRIORITY, 0);
+    HAL_NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
+
+    HAL_TIM_Base_Start_IT(&TimHandle);
+    __HAL_TIM_CLEAR_IT(&TimHandle, TIM_IT_UPDATE); //防止定时器开启立即进入定时器中断
 }
 
-/*
- * @brief Should return the number of milliseconds since the processor started up.
- */
-system_tick_t HAL_Timer_Get_Milli_Seconds(void)
+void HAL_Timer_Stop(void)
 {
-    return GetSystem1MsTick();
+    __HAL_RCC_TIM1_CLK_DISABLE();
+    HAL_NVIC_DisableIRQ(TIM1_UP_TIM10_IRQn);
 }
+
+uint32_t HAL_Timer_Get_ElapsedTime(void)
+{
+    uint32_t elapsedTick = 0;
+    uint32_t _elapsedTickCurrent = DWT->CYCCNT;
+
+    if (_elapsedTickCurrent < _elapsedTickStart) {
+        elapsedTick =  UINT_MAX - _elapsedTickStart + _elapsedTickCurrent;
+    } else {
+        elapsedTick = _elapsedTickCurrent - _elapsedTickStart;
+    }
+
+    return elapsedTick / (SYSTEM_US_TICKS * 1000);
+}
+
+void HAL_Timer_Set_Callback(TimerCallback_t callback)
+{
+    _timerCallback = callback;
+}
+
+void TIM1_UP_TIM10_IRQHandler(void)
+{
+    if(__HAL_TIM_GET_FLAG(&TimHandle, TIM_FLAG_UPDATE) != RESET) {
+        if(__HAL_TIM_GET_IT_SOURCE(&TimHandle, TIM_IT_UPDATE) != RESET) {
+            __HAL_TIM_CLEAR_IT(&TimHandle, TIM_IT_UPDATE);
+            if(_timerCallback) {
+                HAL_Timer_Stop();
+                _timerCallback();
+            }
+        }
+    }
+}
+

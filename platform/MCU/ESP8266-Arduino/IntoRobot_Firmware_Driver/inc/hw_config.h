@@ -38,7 +38,7 @@
 #include "esp8266_timer.h"
 #include "esp8266_peri.h"
 #include "stdlib_noniso.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 #ifdef __cplusplus
 extern "C" {

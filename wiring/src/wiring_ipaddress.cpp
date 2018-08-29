@@ -91,20 +91,19 @@ bool IPAddress::operator==(const uint8_t* address)
 
 bool IPAddress::operator==(const IPAddress& that)
 {
-#if 	HAL_IPv6
-	if (address.v!=that.address.v)
-		return false;
-	if (address.v==6)
-		return !memcmp(address.ipv6, that.address.ipv6, sizeof(address.ipv6));
+#if HAL_IPv6
+    if (address.v!=that.address.v)
+        return false;
+    if (address.v==6)
+        return !memcmp(address.ipv6, that.address.ipv6, sizeof(address.ipv6));
 #endif
-	return address.ipv4==that.address.ipv4;
+    return address.ipv4==that.address.ipv4;
 }
 
 size_t IPAddress::printTo(Print& p) const
 {
     size_t n = 0;
-    for (int i = 0; i < 4; i++)
-    {
+    for (int i = 0; i < 4; i++) {
         if (n)
             n += p.print('.');
         n += p.print((*this)[i], DEC);

@@ -19,7 +19,7 @@
 
 #include "socket_hal.h"
 #include "parser.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 #include "delay_hal.h"
 
 

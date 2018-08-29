@@ -33,7 +33,8 @@
 #include "gpio_hal.h"
 #include <math.h>
 #include "rtc_hal_lora.h"
-#include "service_debug.h"
+
+const static char *TAG = "hal";
 
 RTC_HandleTypeDef RtcHandle;
 
@@ -52,14 +53,14 @@ void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc)
     RCC_OscInitStruct.LSIState = RCC_LSI_OFF;
     if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
     {
-        DEBUG("RCC_OscConfg Error\r\n");
+        MOLMC_LOGD(TAG, "RCC_OscConfg Error");
     }
 
     PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_RTC;
     PeriphClkInitStruct.RTCClockSelection = RCC_RTCCLKSOURCE_LSE;
     if(HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
     {
-        DEBUG("RCCEx_PeriphCLKConfig Error\r\n");
+        MOLMC_LOGD(TAG, "RCCEx_PeriphCLKConfig Error");
     }
     /*##-2- Enable RTC peripheral Clocks #######################################*/
     /* Enable RTC Clock */
@@ -106,7 +107,7 @@ static void RTC_CalendarAlarmConfig(void)
 
     if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
     {
-        DEBUG("RTC CalendarAlarmConfig SetDate Error!\r\n");
+        MOLMC_LOGD(TAG, "RTC CalendarAlarmConfig SetDate Error!");
     }
 
     /*##-2- Configure the Time #################################################*/
@@ -120,7 +121,7 @@ static void RTC_CalendarAlarmConfig(void)
 
     if (HAL_RTC_SetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BCD) != HAL_OK)
     {
-        DEBUG("RTC CalendarAlarmConfig SetTime Error!\r\n");
+        MOLMC_LOGD(TAG, "RTC CalendarAlarmConfig SetTime Error!");
     }
 }
 #endif
@@ -196,7 +197,7 @@ void HAL_RTC_Set_UnixTime(time_t value)
 
     if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
     {
-        DEBUG("RTC Set_UnixTime SetDate failed!\r\n");
+        MOLMC_LOGD(TAG, "RTC Set_UnixTime SetDate failed!");
     }
 
     /*##-2- Configure the Time #################################################*/
@@ -210,7 +211,7 @@ void HAL_RTC_Set_UnixTime(time_t value)
 
     if (HAL_RTC_SetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BCD) != HAL_OK)
     {
-        DEBUG("RTC Set_UnixTime SetTime failed!\r\n");
+        MOLMC_LOGD(TAG, "RTC Set_UnixTime SetTime failed!");
     }
 }
 
@@ -247,7 +248,7 @@ void HAL_RTC_Set_UnixAlarm(time_t value)
     if(HAL_RTC_SetAlarm_IT(&RtcHandle,&salarmstructure,RTC_FORMAT_BCD) != HAL_OK)
     {
         /* Initialization Error */
-        DEBUG("RTC CalendarAlarmConfig SetAlarm Error!\r\n");
+        MOLMC_LOGD(TAG, "RTC CalendarAlarmConfig SetAlarm Error!");
     }
 #endif
 }
@@ -269,7 +270,7 @@ void HAL_RTC_Cancel_UnixAlarm(void)
  */
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-    DEBUG("RTC Alarm Callback\r\n");
+    MOLMC_LOGD(TAG, "RTC Alarm Callback");
 }
 #endif
 

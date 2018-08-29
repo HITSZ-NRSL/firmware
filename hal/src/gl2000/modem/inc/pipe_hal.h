@@ -23,8 +23,6 @@
 #include <string.h>
 #include <stddef.h>
 
-#include "service_debug.h"
-
 #ifdef putc
 #undef putc
 #undef getc
@@ -78,7 +76,6 @@ public:
             o = _inc(o);
         }
         strcat(temp1,"\n");
-        DEBUG_D(temp1);
     }
 
     // writing thread/context API

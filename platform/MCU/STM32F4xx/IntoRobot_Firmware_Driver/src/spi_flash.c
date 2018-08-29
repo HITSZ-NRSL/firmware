@@ -497,7 +497,6 @@ bool sFLASH_SelfCheck(void)
 
     sFLASH_Init();
     FlashID = sFLASH_ReadID();
-    //DEBUG("FlashID = 0x%x\r\n", FlashID);
     if(0 == FlashID) {
         return false;
     }

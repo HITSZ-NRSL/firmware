@@ -30,18 +30,7 @@
 #include "system_datapoint.h"
 #include "system_lorawan.h"
 
-/*debug switch*/
-#define SYSTEM_DATAPOINT_DEBUG
-
-#ifdef SYSTEM_DATAPOINT_DEBUG
-#define SDATAPOINT_DEBUG(...)    do {DEBUG(__VA_ARGS__);}while(0)
-#define SDATAPOINT_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#define SDATAPOINT_DEBUG_DUMP    DEBUG_DUMP
-#else
-#define SDATAPOINT_DEBUG(...)
-#define SDATAPOINT_DEBUG_D(...)
-#define SDATAPOINT_DEBUG_DUMP
-#endif
+const static char *TAG = "sys-datap";
 
 volatile datapoint_control_t g_datapoint_control = {DP_TRANSMIT_MODE_AUTOMATIC, DATAPOINT_TRANSMIT_AUTOMATIC_INTERVAL, 0};
 int intorobotSendAllDatapoint(void);
@@ -462,7 +451,7 @@ void intorobotParseReceiveDatapoints(uint8_t *payload, uint16_t len)
                     if(DATA_TYPE_BOOL == properties[i]->dataType) {
                         String valueString = String(valueBool);
                         intorobotWriteDatapoint(dpID, (uint8_t *)valueString.c_str(), valueString.length(), 0);
-                        SDATAPOINT_DEBUG("bool = %d\r\n", valueBool);
+                        MOLMC_LOGD(TAG, "bool = %d", valueBool);
                     }
                     break;
                 }
@@ -660,8 +649,8 @@ static uint16_t intorobotFormAllDatapoint(uint8_t *buffer, uint16_t len, uint8_t
 
 int intorobotSendRawData(uint8_t *data, uint16_t dataLen, bool confirmed, uint16_t timeout)
 {
-    SDATAPOINT_DEBUG("send data:");
-    SDATAPOINT_DEBUG_DUMP(data, dataLen);
+    MOLMC_LOGD(TAG, "send data:");
+    MOLMC_LOG_BUFFER_HEX(TAG, data, dataLen);
 #ifndef configNO_CLOUD
     bool result = intorobot_publish(TOPIC_VERSION_V2, INTOROBOT_MQTT_RX_TOPIC, data, dataLen, 0, false);
     return result ? 0 : -1;
@@ -693,13 +682,13 @@ int intorobotSendSingleDatapoint(const uint16_t dpID, const uint8_t *value, cons
 
     //只允许下发
     if ( DP_PERMISSION_DOWN_ONLY == properties[i]->permission ) {
-        SDATAPOINT_DEBUG("only permit cloud -> terminal %d\r\n", properties[i]->dpID);
+        MOLMC_LOGD(TAG, "only permit cloud -> terminal %d", properties[i]->dpID);
         return -1;
     }
 
     //数值未发生变化
     if ( !(properties[i]->change) && (DP_POLICY_ON_CHANGE == properties[i]->policy) ) {
-        SDATAPOINT_DEBUG("No Changes for %d:%d\r\n", properties[i]->dpID, value);
+        MOLMC_LOGD(TAG, "No Changes for %d:%d", properties[i]->dpID, value);
         return -1;
     }
 

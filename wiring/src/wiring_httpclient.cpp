@@ -32,35 +32,24 @@
 #include "wiring_ticks.h"
 #include "wiring_httpclient.h"
 
-/*debug switch*/
-#define WIRING_HTTPCLIENT_DEBUG
-
-#ifdef WIRING_HTTPCLIENT_DEBUG
-#define WHTTPCLIENT_DEBUG(...)    do {DEBUG(__VA_ARGS__);}while(0)
-#define WHTTPCLIENT_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#define WHTTPCLIENT_DEBUG_DUMP    DEBUG_DUMP
-#else
-#define WHTTPCLIENT_DEBUG(...)
-#define WHTTPCLIENT_DEBUG_D(...)
-#define WHTTPCLIENT_DEBUG_DUMP
-#endif
+const static char *TAG = "wire-httpc";
 
 class TransportTraits
 {
-public:
-    virtual ~TransportTraits()
-    {
-    }
+    public:
+        virtual ~TransportTraits()
+        {
+        }
 
-    virtual std::unique_ptr<TCPClient> create()
-    {
-        return std::unique_ptr<TCPClient>(new TCPClient());
-    }
+        virtual std::unique_ptr<TCPClient> create()
+        {
+            return std::unique_ptr<TCPClient>(new TCPClient());
+        }
 
-    virtual bool verify(TCPClient& client, const char* host)
-    {
-        return true;
-    }
+        virtual bool verify(TCPClient& client, const char* host)
+        {
+            return true;
+        }
 };
 
 /**
@@ -107,13 +96,13 @@ bool HTTPClient::begin(String url)
 
 bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 {
-    WHTTPCLIENT_DEBUG("[HTTP-Client][begin] url: %s\r\n", url.c_str());
+    MOLMC_LOGD(TAG, "[HTTP-Client][begin] url: %s", url.c_str());
     clear();
 
     // check for : (http: or https:
     int index = url.indexOf(':');
     if(index < 0) {
-        WHTTPCLIENT_DEBUG("[HTTP-Client][begin] failed to parse protocol\r\n");
+        MOLMC_LOGD(TAG, "[HTTP-Client][begin] failed to parse protocol");
         return false;
     }
 
@@ -145,10 +134,10 @@ bool HTTPClient::beginInternal(String url, const char* expectedProtocol)
 
     _uri = url;
     if (_protocol != expectedProtocol) {
-        WHTTPCLIENT_DEBUG("[HTTP-Client][begin] unexpected protocol: %s, expected %s\r\n", _protocol.c_str(), expectedProtocol);
+        MOLMC_LOGD(TAG, "[HTTP-Client][begin] unexpected protocol: %s, expected %s", _protocol.c_str(), expectedProtocol);
         return false;
     }
-    WHTTPCLIENT_DEBUG("[HTTP-Client][begin] host: %s port: %d url: %s\r\n", _host.c_str(), _port, _uri.c_str());
+    MOLMC_LOGD(TAG, "[HTTP-Client][begin] host: %s port: %d url: %s", _host.c_str(), _port, _uri.c_str());
     return true;
 }
 
@@ -159,7 +148,7 @@ bool HTTPClient::begin(String host, uint16_t port, String uri)
     _port = port;
     _uri = uri;
     _transportTraits = TransportTraitsPtr(new TransportTraits());
-    WHTTPCLIENT_DEBUG("[HTTP-Client][begin] host: %s port: %d uri: %s\r\n", host.c_str(), port, uri.c_str());
+    MOLMC_LOGD(TAG, "[HTTP-Client][begin] host: %s port: %d uri: %s", host.c_str(), port, uri.c_str());
     return true;
 }
 
@@ -171,19 +160,19 @@ void HTTPClient::end(void)
 {
     if(connected()) {
         if(_tcp->available() > 0) {
-            WHTTPCLIENT_DEBUG("[HTTP-Client][end] still data in buffer (%d), clean up.\r\n", _tcp->available());
+            MOLMC_LOGD(TAG, "[HTTP-Client][end] still data in buffer (%d), clean up.", _tcp->available());
             while(_tcp->available() > 0) {
                 _tcp->read();
             }
         }
         if(_reuse && _canReuse) {
-            WHTTPCLIENT_DEBUG("[HTTP-Client][end] tcp keep open for reuse\r\n");
+            MOLMC_LOGD(TAG, "[HTTP-Client][end] tcp keep open for reuse");
         } else {
-            WHTTPCLIENT_DEBUG("[HTTP-Client][end] tcp stop\r\n");
+            MOLMC_LOGD(TAG, "[HTTP-Client][end] tcp stop");
             _tcp->stop();
         }
     } else {
-        WHTTPCLIENT_DEBUG("[HTTP-Client][end] tcp is closed\r\n");
+        MOLMC_LOGD(TAG, "[HTTP-Client][end] tcp is closed");
     }
 }
 
@@ -340,7 +329,7 @@ int HTTPClient::sendRequest(const char * type, uint8_t * payload, size_t size)
 
     // send Payload if needed
     if(payload && size > 0) {
-        WHTTPCLIENT_DEBUG("[HTTP-Client][sendRequest] payload : %s\r\n", payload);
+        MOLMC_LOGD(TAG, "[HTTP-Client][sendRequest] payload : %s", payload);
         if(_tcp->write(&payload[0], size) != size) {
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
         }
@@ -424,11 +413,11 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 
                 // are all Bytes a writen to stream ?
                 if(bytesWrite != bytesRead) {
-                    WHTTPCLIENT_DEBUG("[HTTP-Client][sendRequest] short write, asked for %d but got %d retry...\r\n", bytesRead, bytesWrite);
+                    MOLMC_LOGD(TAG, "[HTTP-Client][sendRequest] short write, asked for %d but got %d retry...", bytesRead, bytesWrite);
 
                     // check for write error
                     if(_tcp->getWriteError()) {
-                        WHTTPCLIENT_DEBUG("[HTTP-Client][sendRequest] stream write error %d\r\n", _tcp->getWriteError());
+                        MOLMC_LOGD(TAG, "[HTTP-Client][sendRequest] stream write error %d", _tcp->getWriteError());
 
                         //reset write error for retry
                         _tcp->clearWriteError();
@@ -445,7 +434,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 
                     if(bytesWrite != leftBytes) {
                         // failed again
-                        WHTTPCLIENT_DEBUG("[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.\r\n", leftBytes, bytesWrite);
+                        MOLMC_LOGD(TAG, "[HTTP-Client][sendRequest] short write, asked for %d but got %d failed.", leftBytes, bytesWrite);
                         free(buff);
                         return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
                     }
@@ -453,7 +442,7 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
 
                 // check for write error
                 if(_tcp->getWriteError()) {
-                    WHTTPCLIENT_DEBUG("[HTTP-Client][sendRequest] stream write error %d\r\n", _tcp->getWriteError());
+                    MOLMC_LOGD(TAG, "[HTTP-Client][sendRequest] stream write error %d", _tcp->getWriteError());
                     free(buff);
                     return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
                 }
@@ -471,15 +460,15 @@ int HTTPClient::sendRequest(const char * type, Stream * stream, size_t size)
         free(buff);
 
         if(size && (int) size != bytesWritten) {
-            WHTTPCLIENT_DEBUG("[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.\r\n", bytesWritten, size);
-            WHTTPCLIENT_DEBUG("[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!\r\n");
+            MOLMC_LOGD(TAG, "[HTTP-Client][sendRequest] Stream payload bytesWritten %d and size %d mismatch!.", bytesWritten, size);
+            MOLMC_LOGD(TAG, "[HTTP-Client][sendRequest] ERROR SEND PAYLOAD FAILED!");
             return returnError(HTTPC_ERROR_SEND_PAYLOAD_FAILED);
         } else {
-            WHTTPCLIENT_DEBUG("[HTTP-Client][sendRequest] Stream payload written: %d\r\n", bytesWritten);
+            MOLMC_LOGD(TAG, "[HTTP-Client][sendRequest] Stream payload written: %d", bytesWritten);
         }
 
     } else {
-        WHTTPCLIENT_DEBUG("[HTTP-Client][sendRequest] too less ram! need %d\r\n", HTTP_TCP_BUFFER_SIZE);
+        MOLMC_LOGD(TAG, "[HTTP-Client][sendRequest] too less ram! need %d", HTTP_TCP_BUFFER_SIZE);
         return returnError(HTTPC_ERROR_TOO_LESS_RAM);
     }
 
@@ -506,7 +495,7 @@ TCPClient& HTTPClient::getStream(void)
         return *_tcp;
     }
 
-    WHTTPCLIENT_DEBUG("[HTTP-Client] getStream: not connected\r\n");
+    MOLMC_LOGD(TAG, "[HTTP-Client] getStream: not connected");
     static TCPClient empty;
     return empty;
 }
@@ -521,7 +510,7 @@ TCPClient* HTTPClient::getStreamPtr(void)
         return _tcp.get();
     }
 
-    WHTTPCLIENT_DEBUG("[HTTP-Client] getStreamPtr: not connected\r\n");
+    MOLMC_LOGD(TAG, "[HTTP-Client] getStreamPtr: not connected");
     return nullptr;
 }
 
@@ -568,7 +557,7 @@ int HTTPClient::writeToStream(Stream * stream)
             // read size of chunk
             len = (uint32_t) strtol((const char *) chunkHeader.c_str(), NULL, 16);
             size += len;
-            WHTTPCLIENT_DEBUG("[HTTP-Client] read chunk len: %d\r\n", len);
+            MOLMC_LOGD(TAG, "[HTTP-Client] read chunk len: %d", len);
 
             // data left?
             if(len > 0) {
@@ -620,7 +609,7 @@ String HTTPClient::getString(void)
     if(_size) {
         // try to reserve needed memmory
         if(!sstring.reserve((_size + 1))) {
-            WHTTPCLIENT_DEBUG("[HTTP-Client][getString] not enough memory to reserve a string! need: %d\r\n", (_size + 1));
+            MOLMC_LOGD(TAG, "[HTTP-Client][getString] not enough memory to reserve a string! need: %d", (_size + 1));
             return "";
         }
     }
@@ -759,7 +748,7 @@ bool HTTPClient::hasHeader(const char* name)
 bool HTTPClient::connect(void)
 {
     if(connected()) {
-        WHTTPCLIENT_DEBUG("[HTTP-Client] connect. already connected, try reuse!\r\n");
+        MOLMC_LOGD(TAG, "[HTTP-Client] connect. already connected, try reuse!");
         while(_tcp->available() > 0) {
             _tcp->read();
         }
@@ -767,21 +756,21 @@ bool HTTPClient::connect(void)
     }
 
     if (!_transportTraits) {
-        WHTTPCLIENT_DEBUG("[HTTP-Client] connect: HTTPClient::begin was not called or returned error\r\n");
+        MOLMC_LOGD(TAG, "[HTTP-Client] connect: HTTPClient::begin was not called or returned error");
         return false;
     }
 
     _tcp = _transportTraits->create();
 
     if(!_tcp->connect(_host.c_str(), _port)) {
-        WHTTPCLIENT_DEBUG("[HTTP-Client] failed connect to %s:%u\r\n", _host.c_str(), _port);
+        MOLMC_LOGD(TAG, "[HTTP-Client] failed connect to %s:%u", _host.c_str(), _port);
         return false;
     }
 
-    WHTTPCLIENT_DEBUG("[HTTP-Client] connected to %s:%u\r\n", _host.c_str(), _port);
+    MOLMC_LOGD(TAG, "[HTTP-Client] connected to %s:%u", _host.c_str(), _port);
 
     if (!_transportTraits->verify(*_tcp, _host.c_str())) {
-        WHTTPCLIENT_DEBUG("[HTTP-Client] transport level verify failed\r\n");
+        MOLMC_LOGD(TAG, "[HTTP-Client] transport level verify failed");
         _tcp->stop();
         return false;
     }
@@ -840,7 +829,7 @@ bool HTTPClient::sendHeader(const char * type)
 
     header += _headers + "\r\n";
 
-    WHTTPCLIENT_DEBUG("[HTTP-Client] send header: %s\r\n", header.c_str());
+    MOLMC_LOGD(TAG, "[HTTP-Client] send header: %s", header.c_str());
     return (_tcp->write((const uint8_t *) header.c_str(), header.length()) == header.length());
 }
 
@@ -868,7 +857,7 @@ int HTTPClient::handleHeaderResponse()
 
             lastDataTime = millis();
 
-            WHTTPCLIENT_DEBUG("[HTTP-Client][handleHeaderResponse] RX: '%s'\r\n", headerLine.c_str());
+            MOLMC_LOGD(TAG, "[HTTP-Client][handleHeaderResponse] RX: '%s'", headerLine.c_str());
 
             if(headerLine.startsWith("HTTP/1.")) {
                 _returnCode = headerLine.substring(9, headerLine.indexOf(' ', 9)).toInt();
@@ -898,14 +887,14 @@ int HTTPClient::handleHeaderResponse()
             }
 
             if(headerLine == "") {
-                WHTTPCLIENT_DEBUG("[HTTP-Client][handleHeaderResponse] code: %d\r\n", _returnCode);
+                MOLMC_LOGD(TAG, "[HTTP-Client][handleHeaderResponse] code: %d", _returnCode);
 
                 if(_size > 0) {
-                    WHTTPCLIENT_DEBUG("[HTTP-Client][handleHeaderResponse] size: %d\r\n", _size);
+                    MOLMC_LOGD(TAG, "[HTTP-Client][handleHeaderResponse] size: %d", _size);
                 }
 
                 if(transferEncoding.length() > 0) {
-                    WHTTPCLIENT_DEBUG("[HTTP-Client][handleHeaderResponse] Transfer-Encoding: %s\r\n", transferEncoding.c_str());
+                    MOLMC_LOGD(TAG, "[HTTP-Client][handleHeaderResponse] Transfer-Encoding: %s", transferEncoding.c_str());
                     if(transferEncoding.equalsIgnoreCase("chunked")) {
                         _transferEncoding = HTTPC_TE_CHUNKED;
                     } else {
@@ -918,7 +907,7 @@ int HTTPClient::handleHeaderResponse()
                 if(_returnCode) {
                     return _returnCode;
                 } else {
-                    WHTTPCLIENT_DEBUG("[HTTP-Client][handleHeaderResponse] Remote host is not an HTTP Server!\r\n");
+                    MOLMC_LOGD(TAG, "[HTTP-Client][handleHeaderResponse] Remote host is not an HTTP Server!");
                     return HTTPC_ERROR_NO_HTTP_SERVER;
                 }
             }
@@ -983,11 +972,11 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 
                 // are all Bytes a writen to stream ?
                 if(bytesWrite != bytesRead) {
-                    WHTTPCLIENT_DEBUG("[HTTP-Client][writeToStream] short write asked for %d but got %d retry...\r\n", bytesRead, bytesWrite);
+                    MOLMC_LOGD(TAG, "[HTTP-Client][writeToStream] short write asked for %d but got %d retry...", bytesRead, bytesWrite);
 
                     // check for write error
                     if(stream->getWriteError()) {
-                        WHTTPCLIENT_DEBUG("[HTTP-Client][writeToStreamDataBlock] stream write error %d\r\n", stream->getWriteError());
+                        MOLMC_LOGD(TAG, "[HTTP-Client][writeToStreamDataBlock] stream write error %d", stream->getWriteError());
 
                         //reset write error for retry
                         stream->clearWriteError();
@@ -1004,7 +993,7 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 
                     if(bytesWrite != leftBytes) {
                         // failed again
-                        WHTTPCLIENT_DEBUG("[HTTP-Client][writeToStream] short write asked for %d but got %d failed.\r\n", leftBytes, bytesWrite);
+                        MOLMC_LOGD(TAG, "[HTTP-Client][writeToStream] short write asked for %d but got %d failed.", leftBytes, bytesWrite);
                         free(buff);
                         return HTTPC_ERROR_STREAM_WRITE;
                     }
@@ -1012,7 +1001,7 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 
                 // check for write error
                 if(stream->getWriteError()) {
-                    WHTTPCLIENT_DEBUG("[HTTP-Client][writeToStreamDataBlock] stream write error %d\r\n", stream->getWriteError());
+                    MOLMC_LOGD(TAG, "[HTTP-Client][writeToStreamDataBlock] stream write error %d", stream->getWriteError());
                     free(buff);
                     return HTTPC_ERROR_STREAM_WRITE;
                 }
@@ -1030,15 +1019,15 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 
         free(buff);
 
-        WHTTPCLIENT_DEBUG("[HTTP-Client][writeToStreamDataBlock] connection closed or file end (written: %d).\r\n", bytesWritten);
+        MOLMC_LOGD(TAG, "[HTTP-Client][writeToStreamDataBlock] connection closed or file end (written: %d).", bytesWritten);
 
         if((size > 0) && (size != bytesWritten)) {
-            WHTTPCLIENT_DEBUG("[HTTP-Client][writeToStreamDataBlock] bytesWritten %d and size %d mismatch!.\r\n", bytesWritten, size);
+            MOLMC_LOGD(TAG, "[HTTP-Client][writeToStreamDataBlock] bytesWritten %d and size %d mismatch!.", bytesWritten, size);
             return HTTPC_ERROR_STREAM_WRITE;
         }
 
     } else {
-        WHTTPCLIENT_DEBUG("[HTTP-Client][writeToStreamDataBlock] too less ram! need %d\r\n", HTTP_TCP_BUFFER_SIZE);
+        MOLMC_LOGD(TAG, "[HTTP-Client][writeToStreamDataBlock] too less ram! need %d", HTTP_TCP_BUFFER_SIZE);
         return HTTPC_ERROR_TOO_LESS_RAM;
     }
 
@@ -1053,9 +1042,9 @@ int HTTPClient::writeToStreamDataBlock(Stream * stream, int size)
 int HTTPClient::returnError(int error)
 {
     if(error < 0) {
-        WHTTPCLIENT_DEBUG("[HTTP-Client][returnError] error(%d): %s\r\n", error, errorToString(error).c_str());
+        MOLMC_LOGD(TAG, "[HTTP-Client][returnError] error(%d): %s", error, errorToString(error).c_str());
         if(connected()) {
-            WHTTPCLIENT_DEBUG("[HTTP-Client][returnError] tcp stop\r\n");
+            MOLMC_LOGD(TAG, "[HTTP-Client][returnError] tcp stop");
             _tcp->stop();
         }
     }

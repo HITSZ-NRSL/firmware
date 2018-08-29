@@ -55,7 +55,7 @@ protected:
         result = cellular_pdp_activate(savedCreds, NULL);
         if (result) { return; }
 
-        //SNETWORK_DEBUG("savedCreds = %s %s %s\r\n", savedCreds->apn, savedCreds->username, savedCreds->password);
+        //MOLMC_LOGD(GTAG, "savedCreds = %s %s %s", savedCreds->apn, savedCreds->username, savedCreds->password);
         result = cellular_gprs_attach(savedCreds, NULL);
         if (result) { return; }
 
@@ -125,11 +125,11 @@ public:
     bool has_credentials() override
     {
         bool rv = cellular_sim_ready(NULL);
-        SNETWORK_DEBUG("%s", (rv)?"Sim Ready":"Sim not inserted? Detecting...\r\n");
+        MOLMC_LOGD(GTAG, "%s", (rv)?"Sim Ready":"Sim not inserted? Detecting...");
         if (!rv) {
             cellular_on(NULL);
             rv = cellular_sim_ready(NULL);
-            SNETWORK_DEBUG("%s", (rv)?"Sim Ready":"Sim not inserted.\r\n");
+            MOLMC_LOGD(GTAG, "%s", (rv)?"Sim Ready":"Sim not inserted.");
         }
         return rv;
     }

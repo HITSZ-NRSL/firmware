@@ -1,6 +1,6 @@
 #include "core_hal.h"
 #include "wiring_ex_bridge.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 BridgeClass::BridgeClass(Stream &_stream) :
     index(0), stream(_stream), started(false), max_retries(0)

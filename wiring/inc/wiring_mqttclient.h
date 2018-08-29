@@ -43,11 +43,7 @@
 
 // MQTT_KEEPALIVE : keepAlive interval in Seconds
 #ifndef MQTT_KEEPALIVE
-#ifdef configWIRING_CELLULAR_ENABLE
-#define MQTT_KEEPALIVE 10*60
-#else
 #define MQTT_KEEPALIVE 60
-#endif
 #endif
 
 // MQTT_SOCKET_TIMEOUT: socket timeout interval in Seconds

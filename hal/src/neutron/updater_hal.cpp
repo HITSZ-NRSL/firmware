@@ -27,7 +27,7 @@
 #include "flash_map.h"
 #include "params_hal.h"
 #include "flash_storage_impl.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 static THandlerFunction_Progress _update_handle = NULL;
 

@@ -32,7 +32,7 @@
 #include "enums_hal.h"
 
 /* Include for debug capabilty */
-//#define MODEM_DEBUG
+#define MDM_DEBUG
 
 #define MDM_ESP8266_RESET_DELAY  4000
 
@@ -403,7 +403,7 @@ protected:
     static int _aplistindex;
 
     volatile bool _cancel_all_operations;
-#ifdef MODEM_DEBUG
+#ifdef MDM_DEBUG
     int _debugLevel;
     system_tick_t _debugTime;
     void _debugPrint(int level, const char* color, const char* format, ...);

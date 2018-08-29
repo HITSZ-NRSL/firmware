@@ -31,6 +31,8 @@
 
 #define TONE_TIM_COUNTER_CLOCK_FREQ 1000000 ////TIM Counter clock = 1MHz
 
+const static char *TAG = "hal";
+
 TIM_HandleTypeDef TimHandleTone;
 /*
  * @brief Tone start with frequency and  duration
@@ -187,20 +189,20 @@ void HAL_Tone_Start(uint8_t pin, uint32_t frequency, uint32_t duration)
         if (HAL_TIM_OC_ConfigChannel(&TimHandleTone, &sConfig, PIN_MAP[pin].timer_ch) != HAL_OK)
         {
             /* Configuration Error */
-            DEBUG("TIM OC CconfigChannel Error\r\n");
+            MOLMC_LOGD(TAG, "TIM OC CconfigChannel Error");
         }
 
         /* Start channel */
         if (HAL_TIM_OC_Start_IT(&TimHandleTone, PIN_MAP[pin].timer_ch) != HAL_OK)
         {
             //Error_Handler();
-            DEBUG("TIM OC Start IT Error\r\n");
+            MOLMC_LOGD(TAG, "TIM OC Start IT Error");
         }
     }
     else
     {
         // Error
-        DEBUG("The Tone First Error\r\n");
+        MOLMC_LOGD(TAG, "The Tone First Error");
     }
 }
 

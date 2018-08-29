@@ -143,8 +143,7 @@ size_t TwoWire::write(uint8_t data)
 size_t TwoWire::write(const uint8_t *data, size_t quantity)
 {
     // in master/slave transmitter mode
-    for(size_t i = 0; i < quantity; ++i)
-    {
+    for(size_t i = 0; i < quantity; ++i) {
         write(data[i]);
     }
 
@@ -205,13 +204,10 @@ void TwoWire::reset()
     pin_t _SCA;
     pin_t _SCL;
 
-    if (_i2c==HAL_I2C_INTERFACE1)
-    {
+    if(_i2c==HAL_I2C_INTERFACE1) {
         _SCA = SDA;
         _SCL = SCL;
-    }
-    else
-    {
+    } else {
         return; // todo fill in other pins. The pins should ideally come from the HAL.
     }
 
@@ -222,8 +218,7 @@ void TwoWire::reset()
     HAL_GPIO_Write(_SCL, HIGH); // Start idle HIGH
 
     //Generate 9 pulses on SCL to tell slave to release the bus
-    for(int i=0; i <9; i++)
-    {
+    for(int i=0; i <9; i++) {
         HAL_GPIO_Write(_SCL, LOW);
         delayMicroseconds(100);
         HAL_GPIO_Write(_SCL, HIGH);

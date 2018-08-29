@@ -23,5 +23,24 @@
  ******************************************************************************
  */
 
+/* Includes ------------------------------------------------------------------*/
 #include "eeprom_hal.h"
-#include "eeprom_emulation_impl.h"
+
+
+void HAL_EEPROM_Init(void)
+{
+}
+
+uint8_t HAL_EEPROM_Read(uint32_t address)
+{
+    return 0;
+}
+
+void HAL_EEPROM_Write(uint32_t address, uint8_t data)
+{
+}
+
+size_t HAL_EEPROM_Length()
+{
+    return 0;
+}

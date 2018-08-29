@@ -25,6 +25,7 @@
 
 #ifndef configNO_NETWORK
 
+#include "config.h"
 #include "system_network.h"
 #include "wiring_client.h"
 #include "wiring_ipaddress.h"

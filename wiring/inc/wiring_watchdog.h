@@ -24,7 +24,7 @@
 
 #include "wiring_thread.h"
 #include "delay_hal.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 
 #if 0
 //#if PLATFORM_THREADING
@@ -68,7 +68,7 @@ public:
 
 	static inline system_tick_t current_time()
 	{
-		return HAL_Timer_Get_Milli_Seconds();
+		return HAL_Tick_Get_Milli_Seconds();
 	}
 
 	bool has_timedout()

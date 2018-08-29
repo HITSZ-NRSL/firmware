@@ -109,7 +109,6 @@ void Process::runAsynchronously(void)
     uint8_t cmd[] = {'R'};
     uint8_t res[2];
 
-    //DEBUG("cmdline:%s len:%d\r\n",cmdline->c_str(), cmdline->length());
     bridge.transfer(cmd, 1, (uint8_t*)cmdline->c_str(), cmdline->length(), res, 2);
     handle = res[1];
 

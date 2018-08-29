@@ -1,9 +1,9 @@
 /**
  ******************************************************************************
- * @file    timer_hal.c
- * @authors Satish Nair, Brett Walach
+ * @file    software_timers_hal.c
+ * @authors robin
  * @version V1.0.0
- * @date    12-Sept-2014
+ * @date    19-06-2017
  * @brief
  ******************************************************************************
   Copyright (c) 2013-2015 IntoRobot Industries, Inc.  All rights reserved.
@@ -23,34 +23,22 @@
  ******************************************************************************
  */
 
-#include "hw_config.h"
 #include "timer_hal.h"
 
-
-/* Private typedef -----------------------------------------------------------*/
-
-/* Private define ------------------------------------------------------------*/
-
-/* Private macro -------------------------------------------------------------*/
-
-/* Private variables ---------------------------------------------------------*/
-
-/* Extern variables ----------------------------------------------------------*/
-
-/* Private function prototypes -----------------------------------------------*/
-
-/*
- * @brief Should return the number of microseconds since the processor started up.
- */
-system_tick_t HAL_Timer_Get_Micro_Seconds(void)
+void HAL_Timer_Start(uint32_t timeout)
 {
-    return GetSystem1UsTick();
 }
 
-/*
- * @brief Should return the number of milliseconds since the processor started up.
- */
-system_tick_t HAL_Timer_Get_Milli_Seconds(void)
+void HAL_Timer_Stop(void)
 {
-    return GetSystem1MsTick();
 }
+
+uint32_t HAL_Timer_Get_ElapsedTime(void)
+{
+    return 0;
+}
+
+void HAL_Timer_Set_Callback(TimerCallback_t callback)
+{
+}
+

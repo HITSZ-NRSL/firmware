@@ -24,11 +24,11 @@
 extern "C" {
 #endif
 
-#include "timer_hal.h"
+#include "tick_hal.h"
 #include "delay_hal.h"
 
-inline system_tick_t millis(void) { return HAL_Timer_Get_Milli_Seconds(); }
-inline unsigned long micros(void) { return HAL_Timer_Get_Micro_Seconds(); }
+inline system_tick_t millis(void) { return HAL_Tick_Get_Milli_Seconds(); }
+inline unsigned long micros(void) { return HAL_Tick_Get_Micro_Seconds(); }
 void delay(unsigned long ms);
 inline void delayMicroseconds(unsigned int us) { HAL_Delay_Microseconds(us); }
 

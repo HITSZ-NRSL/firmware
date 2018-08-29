@@ -26,11 +26,11 @@
 #include <stdint.h>
 #include <ctype.h>
 #include <math.h>
-#include "service_debug.h"
+#include "molmc_log.h"
 
 //------------------------------------------------------------------------------------------
-
-void str_reverse(char* begin, char* end) {
+void str_reverse(char* begin, char* end)
+{
     char *is = begin;
     char *ie = end - 1;
     while(is < ie) {
@@ -42,7 +42,8 @@ void str_reverse(char* begin, char* end) {
     }
 }
 
-char* itoa(int value, char* result, int base) {
+char* itoa(int value, char* result, int base)
+{
     if(base < 2 || base > 16) {
         *result = 0;
         return result;
@@ -67,7 +68,8 @@ char* itoa(int value, char* result, int base) {
     return result;
 }
 
-char* ltoa(long value, char* result, int base) {
+char* ltoa(long value, char* result, int base)
+{
     if(base < 2 || base > 16) {
         *result = 0;
         return result;
@@ -92,7 +94,8 @@ char* ltoa(long value, char* result, int base) {
     return result;
 }
 
-char* utoa(unsigned value, char* result, int base) {
+char* utoa(unsigned value, char* result, int base)
+{
     if(base < 2 || base > 16) {
         *result = 0;
         return result;
@@ -113,7 +116,8 @@ char* utoa(unsigned value, char* result, int base) {
     return result;
 }
 
-char* ultoa(unsigned long value, char* result, int base) {
+char* ultoa(unsigned long value, char* result, int base)
+{
     if(base < 2 || base > 16) {
         *result = 0;
         return result;
@@ -134,7 +138,8 @@ char* ultoa(unsigned long value, char* result, int base) {
     return result;
 }
 
-char * dtostrf(double number, signed char width, unsigned char prec, char *s) {
+char * dtostrf(double number, signed char width, unsigned char prec, char *s)
+{
     bool negative = false;
 
     if (isnan(number)) {

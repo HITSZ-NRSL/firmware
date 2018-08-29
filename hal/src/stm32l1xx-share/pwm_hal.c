@@ -28,6 +28,8 @@
 #include "pinmap_impl.h"
 #include "hw_config.h"
 
+const static char *TAG = "hal";
+
 #define TIM_NUM   4
 
 typedef struct pwm_state_t {
@@ -183,7 +185,7 @@ void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm
         // TimHandle.Init.RepetitionCounter = 0;
         if(HAL_TIM_PWM_Init(&TimHandle) != HAL_OK) {
             // Error
-            DEBUG("PWM Init Error!\r\n");
+            MOLMC_LOGD(TAG, "PWM Init Error!");
         }
 
         /*##-2- Configure the PWM channels #b########################################*/
@@ -196,17 +198,17 @@ void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm
         sConfig.Pulse = TIM_CCR;
         if(HAL_TIM_PWM_ConfigChannel(&TimHandle, &sConfig, PIN_MAP[pin].timer_ch) != HAL_OK) {
             /* Configuration Error */
-            DEBUG("PWM Configuration Error!\r\n");
+            MOLMC_LOGD(TAG, "PWM Configuration Error!");
         }
 
         /* Start channel */
         if(HAL_TIM_PWM_Start(&TimHandle, PIN_MAP[pin].timer_ch) != HAL_OK) {
             /* PWM Generation Error */
-            DEBUG("PWM Generation Error!\r\n");
+            MOLMC_LOGD(TAG, "PWM Generation Error!");
         }
     } else {
         // Error
-        DEBUG("PWM First Error!\r\n");
+        MOLMC_LOGD(TAG, "PWM First Error!");
     }
 }
 

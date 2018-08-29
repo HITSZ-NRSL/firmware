@@ -23,8 +23,6 @@
 #include <string.h>
 #include <stddef.h>
 
-#include "service_debug.h"
-
 #ifdef putc
 #undef putc
 #undef getc

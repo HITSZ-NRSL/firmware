@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-#include "service_debug.h"
+#include "molmc_log.h"
 #include <stdint.h>
 #include "system_tick_hal.h"
 #include "inet_hal.h"

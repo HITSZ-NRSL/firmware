@@ -33,6 +33,8 @@
 #define ADC_SAMPLING_TIME     ADC_SAMPLETIME_4CYCLES
 
 /* Private variables ---------------------------------------------------------*/
+const static char *TAG = "hal";
+
 // FIXME:Here not use volatile, it will occur volatile pointer error in C, but it is OK in C++
 static uint16_t ADC_ConvertedValues[ADC_DMA_BUFFERSIZE];
 static uint8_t adcInitFirstTime = true;
@@ -115,7 +117,7 @@ int32_t HAL_ADC_Read(uint16_t pin)
 
         if(HAL_ADC_Init(&ADC_HandleStruct) != HAL_OK)
         {
-            DEBUG("ADC Initialize Fial !!!\r\n");
+            MOLMC_LOGD(TAG, "ADC Initialize Fial !!!");
         }
 
         /* Configure ADC regular channel */
@@ -127,7 +129,7 @@ int32_t HAL_ADC_Read(uint16_t pin)
 
         if(HAL_ADC_ConfigChannel(&ADC_HandleStruct, &ADC_ChannelConfStruct) != HAL_OK)
         {
-            DEBUG("ADC Config Channel Fail\r\n");
+            MOLMC_LOGD(TAG, "ADC Config Channel Fail");
         }
     }
 
@@ -136,7 +138,7 @@ int32_t HAL_ADC_Read(uint16_t pin)
     /* Start the conversion process */
     if( HAL_ADC_Start_DMA(&ADC_HandleStruct, (uint32_t*)ADC_ConvertedValues, ADC_DMA_BUFFERSIZE) != HAL_OK)
     {
-        DEBUG("ADC DMA Transmission Fail !!!\r\n");
+        MOLMC_LOGD(TAG, "ADC DMA Transmission Fail !!!");
     }
 
     // FIXME: if not DEBUG line below, it will not work right.

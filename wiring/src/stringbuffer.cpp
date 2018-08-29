@@ -44,8 +44,7 @@ char global_buffer[BUFFER_SIZE];
 string_buffer *stringBufferCreate(void)
 {
     string_buffer* result = (string_buffer *)malloc(sizeof(string_buffer));
-    if (result == NULL)
-    {
+    if (result == NULL) {
         return NULL;
     }
     result->string = global_buffer;
@@ -63,8 +62,7 @@ string_buffer *stringBufferCreate(void)
 
 char stringBufferAdd(char value, string_buffer* buffer)
 {
-    if (buffer->string_length >= buffer->memory)
-    {
+    if (buffer->string_length >= buffer->memory) {
         //this has to be enabled after realloc works
         /*char* new_string = (char*) realloc((void*) buffer->string, (buffer->memory
         + BUFFER_DEFAULT_SIZE) * sizeof(char));
@@ -90,8 +88,7 @@ char* stringBufferToString(string_buffer* buffer)
     //this is the realloc dependent function - it does not work
     //  char* result = buffer->string;
     //ensure that the string ends with 0
-    if (buffer->string_length == 0 || buffer->string[(buffer->string_length - 1)] != 0)
-    {
+    if (buffer->string_length == 0 || buffer->string[(buffer->string_length - 1)] != 0) {
         stringBufferAdd(0, buffer);
     }
     /*  char* string = realloc(result, buffer->string_length);
@@ -102,8 +99,7 @@ char* stringBufferToString(string_buffer* buffer)
     free(buffer);
     return string;*/
     char* result = (char *)malloc(buffer->string_length * sizeof(char));
-    if (result == NULL)
-    {
+    if (result == NULL) {
         return NULL;
     }
     strcpy(result, global_buffer);
@@ -114,8 +110,7 @@ char* stringBufferToString(string_buffer* buffer)
 
 void stringBufferFree(string_buffer* buffer)
 {
-    if (buffer == NULL)
-    {
+    if (buffer == NULL) {
         //hmm it was null before - whatever
         return;
     }

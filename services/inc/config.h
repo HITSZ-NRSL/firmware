@@ -25,7 +25,7 @@
 #undef  DEBUG_BUILD
 #endif
 
-#if !defined(DEBUG_BUILD)
+#if !defined(DEBUG_BUILD) && !PLATFORM_LOG
 #define USE_ONLY_PANIC // Define to remove all Logging and only have Panic
 #endif
 

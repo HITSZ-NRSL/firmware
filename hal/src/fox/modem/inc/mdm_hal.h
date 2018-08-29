@@ -20,7 +20,7 @@
 #ifndef MDM_HAL_H
 #define MDM_HAL_H
 
-//#include <stdio.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
@@ -32,7 +32,7 @@
 #include "enums_hal.h"
 
 /* Include for debug capabilty */
-//#define MDM_DEBUG
+#define MDM_DEBUG
 
 #undef putc
 #undef getc
@@ -548,7 +548,6 @@ protected:
     volatile bool _cancel_all_operations;
 #ifdef MDM_DEBUG
     int _debugLevel;
-    system_tick_t _debugTime;
     void _debugPrint(int level, const char* color, const char* format, ...);
 #endif
 };

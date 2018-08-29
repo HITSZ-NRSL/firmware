@@ -31,26 +31,19 @@ Servo::Servo()
     this->resetFields();
 }
 
-bool Servo::attach(uint16_t pin,
-        uint16_t minPW,
-        uint16_t maxPW,
-        int16_t minAngle,
-        int16_t maxAngle)
+bool Servo::attach(uint16_t pin, uint16_t minPW, uint16_t maxPW, int16_t minAngle, int16_t maxAngle)
 {
 
-    if (HAL_Validate_Pin_Function(pin, PF_TIMER)!=PF_TIMER)
-    {
+    if (HAL_Validate_Pin_Function(pin, PF_TIMER) != PF_TIMER) {
         return false;
     }
 
     // Safety check
-    if (!pinAvailable(pin))
-    {
+    if (!pinAvailable(pin)) {
         return false;
     }
 
-    if (this->attached())
-    {
+    if (this->attached()) {
         this->detach();
     }
 
@@ -67,8 +60,7 @@ bool Servo::attach(uint16_t pin,
 
 bool Servo::detach()
 {
-    if (!this->attached())
-    {
+    if (!this->attached()) {
         return false;
     }
 
@@ -96,9 +88,7 @@ int Servo::read() const
 
 void Servo::writeMicroseconds(uint16_t pulseWidth)
 {
-
-    if (!this->attached())
-    {
+    if (!this->attached()) {
         return;
     }
 
@@ -109,8 +99,7 @@ void Servo::writeMicroseconds(uint16_t pulseWidth)
 
 uint16_t Servo::readMicroseconds() const
 {
-    if (!this->attached())
-    {
+    if (!this->attached()) {
         return 0;
     }
 

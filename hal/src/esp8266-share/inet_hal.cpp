@@ -25,7 +25,7 @@
 
 #include "inet_hal.h"
 #include "esp8266-hal-wifi.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 
 int inet_gethostbyname(const char* hostname, uint16_t hostnameLen, HAL_IPAddress* out_ip_addr,

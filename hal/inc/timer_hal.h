@@ -22,9 +22,10 @@
 #define __TIMER_HAL_H
 
 /* Includes ------------------------------------------------------------------*/
-#include "system_tick_hal.h"
+#include <stdint.h>
 
 /* Exported types ------------------------------------------------------------*/
+typedef void (*TimerCallback_t)(void);
 
 /* Exported constants --------------------------------------------------------*/
 
@@ -36,15 +37,14 @@
 extern "C" {
 #endif
 
-
-system_tick_t HAL_Timer_Get_Micro_Seconds(void);
-system_tick_t HAL_Timer_Get_Milli_Seconds(void);
-
-#define HAL_Timer_Microseconds HAL_Timer_Get_Micro_Seconds
-#define HAL_Timer_Milliseconds HAL_Timer_Get_Milli_Seconds
+void HAL_Timer_Start(uint32_t timeout);
+void HAL_Timer_Stop(void);
+uint32_t HAL_Timer_Get_ElapsedTime(void);
+void HAL_Timer_Set_Callback(TimerCallback_t callback);
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif  /* __TIMER_HAL_H */
+

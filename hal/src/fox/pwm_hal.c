@@ -20,7 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "pwm_hal.h"
 #include "pinmap_impl.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 #define TIM_NUM   4
 

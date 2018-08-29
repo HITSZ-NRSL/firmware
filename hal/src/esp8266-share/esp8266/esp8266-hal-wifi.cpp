@@ -36,20 +36,12 @@ extern "C" {
 #include "lwip/dns.h"
 }
 
-#include "timer_hal.h"
+#include "tick_hal.h"
 #include "net_hal.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 #include "core_hal_esp8266.h"
 
-#define HAL_WIFI_DEBUG
-
-#ifdef HAL_WIFI_DEBUG
-#define HALWIFI_DEBUG(...)  do {DEBUG(__VA_ARGS__);}while(0)
-#define HALWIFI_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#else
-#define HALWIFI_DEBUG(...)
-#define HALWIFI_DEBUG_D(...)
-#endif
+const static char *TAG = "hal-wifi";
 
 volatile uint8_t _dns_founded=0;
 
@@ -57,17 +49,17 @@ static volatile uint32_t esp8266_wifi_timeout_start;
 static volatile uint32_t esp8266_wifi_timeout_duration;
 
 inline void ARM_WIFI_TIMEOUT(uint32_t dur) {
-    esp8266_wifi_timeout_start = HAL_Timer_Get_Milli_Seconds();
+    esp8266_wifi_timeout_start = HAL_Tick_Get_Milli_Seconds();
     esp8266_wifi_timeout_duration = dur;
-    //HALWIFI_DEBUG("esp8266 WIFI WD Set %d\r\n",(dur));
+    //MOLMC_LOGD(TAG, "esp8266 WIFI WD Set %d",(dur));
 }
 inline bool IS_WIFI_TIMEOUT() {
-    return esp8266_wifi_timeout_duration && ((HAL_Timer_Get_Milli_Seconds()-esp8266_wifi_timeout_start)>esp8266_wifi_timeout_duration);
+    return esp8266_wifi_timeout_duration && ((HAL_Tick_Get_Milli_Seconds()-esp8266_wifi_timeout_start)>esp8266_wifi_timeout_duration);
 }
 
 inline void CLR_WIFI_TIMEOUT() {
     esp8266_wifi_timeout_duration = 0;
-    //HALWIFI_DEBUG("esp8266 WIFI WD Cleared, was %d\r\n", esp8266_wifi_timeout_duration);
+    //MOLMC_LOGD(TAG, "esp8266 WIFI WD Cleared, was %d", esp8266_wifi_timeout_duration);
 }
 
 static void _eventCallback(System_Event_t * evt)
@@ -75,17 +67,17 @@ static void _eventCallback(System_Event_t * evt)
     switch (evt->event)
     {
         case EVENT_STAMODE_CONNECTED:
-            HALWIFI_DEBUG("EVENT_STAMODE_CONNECTED\r\n");
+            MOLMC_LOGD(TAG, "EVENT_STAMODE_CONNECTED");
             break;
         case EVENT_STAMODE_DISCONNECTED:
-            HALWIFI_DEBUG("EVENT_STAMODE_DISCONNECTED\r\n");
+            MOLMC_LOGD(TAG, "EVENT_STAMODE_DISCONNECTED");
             HAL_NET_notify_disconnected();
             break;
         case EVENT_STAMODE_AUTHMODE_CHANGE:
-            HALWIFI_DEBUG("EVENT_STAMODE_AUTHMODE_CHANGE\r\n");
+            MOLMC_LOGD(TAG, "EVENT_STAMODE_AUTHMODE_CHANGE");
             break;
         case EVENT_STAMODE_GOT_IP:
-            HALWIFI_DEBUG("EVENT_STAMODE_GOT_IP\r\n");
+            MOLMC_LOGD(TAG, "EVENT_STAMODE_GOT_IP");
             HAL_NET_notify_dhcp(true);
             HAL_NET_notify_connected();
             break;
@@ -101,8 +93,9 @@ static void _eventCallback(System_Event_t * evt)
  * set new mode
  * @param m WiFiMode_t
  */
-bool esp8266_wifiInit(void) {
-    HALWIFI_DEBUG("esp8266_wifiInit\r\n");
+bool esp8266_wifiInit(void)
+{
+    MOLMC_LOGD(TAG, "esp8266_wifiInit");
     wifi_set_event_handler_cb(_eventCallback);
     return true;
 }
@@ -111,7 +104,8 @@ bool esp8266_wifiInit(void) {
  * set new mode
  * @param m WiFiMode_t
  */
-bool esp8266_setMode(WiFiMode_t m) {
+bool esp8266_setMode(WiFiMode_t m)
+{
     if(wifi_get_opmode() == (uint8) m) {
         return true;
     }
@@ -129,7 +123,8 @@ bool esp8266_setMode(WiFiMode_t m) {
  * get WiFi mode
  * @return WiFiMode
  */
-WiFiMode_t esp8266_getMode() {
+WiFiMode_t esp8266_getMode()
+{
     return (WiFiMode_t) wifi_get_opmode();
 }
 
@@ -138,7 +133,8 @@ WiFiMode_t esp8266_getMode() {
  * @param enable bool
  * @return ok
  */
-bool esp8266_enableSTA(bool enable) {
+bool esp8266_enableSTA(bool enable)
+{
 
     WiFiMode_t currentMode = esp8266_getMode();
     bool isEnabled = ((currentMode & WIFI_STA) != 0);
@@ -159,7 +155,8 @@ bool esp8266_enableSTA(bool enable) {
  * @param enable bool
  * @return ok
  */
-bool esp8266_enableAP(bool enable){
+bool esp8266_enableAP(bool enable)
+{
 
     WiFiMode_t currentMode = esp8266_getMode();
     bool isEnabled = ((currentMode & WIFI_AP) != 0);
@@ -180,7 +177,8 @@ bool esp8266_enableAP(bool enable){
  * @param mac   pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
  * @return      pointer to uint8_t *
  */
-uint8_t* esp8266_getMacAddress(uint8_t* mac) {
+uint8_t* esp8266_getMacAddress(uint8_t* mac)
+{
     wifi_get_macaddr(STATION_IF, mac);
     return mac;
 }
@@ -201,7 +199,8 @@ bool esp8266_setDHCP(char enable)
  * @param autoConnect bool
  * @return if saved
  */
-bool esp8266_setAutoConnect(bool autoConnect) {
+bool esp8266_setAutoConnect(bool autoConnect)
+{
     bool ret;
     ETS_UART_INTR_DISABLE();
     ret = wifi_station_set_auto_connect(autoConnect);
@@ -214,7 +213,8 @@ bool esp8266_setAutoConnect(bool autoConnect) {
  * automatically or not when it is powered on.
  * @return auto connect
  */
-bool esp8266_getAutoConnect() {
+bool esp8266_getAutoConnect()
+{
     return (wifi_station_get_auto_connect() != 0);
 }
 
@@ -223,7 +223,8 @@ bool esp8266_getAutoConnect() {
  * @param autoReconnect
  * @return
  */
-bool esp8266_setAutoReconnect(bool autoReconnect) {
+bool esp8266_setAutoReconnect(bool autoReconnect)
+{
     return wifi_station_set_reconnect_policy(autoReconnect);
 }
 
@@ -231,7 +232,8 @@ bool esp8266_setAutoReconnect(bool autoReconnect) {
  * Return the current network RSSI.
  * @return  RSSI value
  */
-int32_t esp8266_getRSSI(void) {
+int32_t esp8266_getRSSI(void)
+{
     return wifi_station_get_rssi();
 }
 
@@ -244,14 +246,15 @@ bool _smartConfigDone = false;
  * @param st
  * @param result
  */
-void smartConfigCallback(uint32_t st, void* result) {
+void smartConfigCallback(uint32_t st, void* result)
+{
     sc_status status = (sc_status) st;
 
-    HALWIFI_DEBUG("beginSmartConfig status = %d\r\n", status);
+    MOLMC_LOGD(TAG, "beginSmartConfig status = %d", status);
     if(status == SC_STATUS_LINK) {
         station_config* sta_conf = reinterpret_cast<station_config*>(result);
-        HALWIFI_DEBUG("ssid     = %s\r\n", sta_conf->ssid);
-        HALWIFI_DEBUG("password = %s\r\n", sta_conf->password);
+        MOLMC_LOGD(TAG, "ssid     = %s", sta_conf->ssid);
+        MOLMC_LOGD(TAG, "password = %s", sta_conf->password);
         wifi_station_set_config(sta_conf);
         wifi_station_disconnect();
         wifi_station_connect();
@@ -263,12 +266,13 @@ void smartConfigCallback(uint32_t st, void* result) {
 /**
  * Start SmartConfig
  */
-bool esp8266_beginSmartConfig() {
+bool esp8266_beginSmartConfig()
+{
     if(_smartConfigStarted) {
         return false;
     }
 
-    HALWIFI_DEBUG("esp8266_beginSmartConfig\r\n");
+    MOLMC_LOGD(TAG, "esp8266_beginSmartConfig");
     if(!esp8266_enableSTA(true)) {
         // enable STA failed
         return false;
@@ -282,16 +286,16 @@ bool esp8266_beginSmartConfig() {
     return false;
 }
 
-
 /**
  *  Stop SmartConfig
  */
-bool esp8266_stopSmartConfig() {
+bool esp8266_stopSmartConfig()
+{
     if(!_smartConfigStarted) {
         return true;
     }
 
-    HALWIFI_DEBUG("esp8266_stopSmartConfig\r\n");
+    MOLMC_LOGD(TAG, "esp8266_stopSmartConfig");
     if(smartconfig_stop()) {
         _smartConfigStarted = false;
         return true;
@@ -303,7 +307,8 @@ bool esp8266_stopSmartConfig() {
  * Query SmartConfig status, to decide when stop config
  * @return smartConfig Done
  */
-bool esp8266_smartConfigDone() {
+bool esp8266_smartConfigDone()
+{
     if(!_smartConfigStarted) {
         return false;
     }
@@ -311,7 +316,8 @@ bool esp8266_smartConfigDone() {
     return _smartConfigDone;
 }
 
-void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg) {
+void wifi_dns_found_callback(const char *name, ip_addr_t *ipaddr, void *callback_arg)
+{
     if(ipaddr) {
         (*reinterpret_cast<uint32_t*>(callback_arg)) = ipaddr->addr;
     }

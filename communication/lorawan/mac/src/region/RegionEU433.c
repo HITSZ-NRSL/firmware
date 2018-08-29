@@ -30,18 +30,9 @@ Maintainer: Miguel Luis ( Semtech ), Gregory Cristian ( Semtech ) and Daniel Jae
 #include "Region.h"
 #include "RegionCommon.h"
 #include "RegionEU433.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
-#define REGION_EU433_DEBUG
-#ifdef  REGION_EU433_DEBUG
-#define REGION_EU433_DEBUG(...)  do {DEBUG(__VA_ARGS__);}while(0)
-#define REGION_EU433_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#define REGION_EU433_DEBUG_DUMP DEBUG_DUMP
-#else
-#define REGION_EU433_DEBUG(...)
-#define REGION_EU433_DEBUG_D(...)
-#define REGION_EU433_DEBUG_DUMP
-#endif
+const static char *TAG = "communication-lorawan";
 
 // Definitions
 #define CHANNELS_MASK_SIZE              1
@@ -148,7 +139,7 @@ static uint8_t CountNbOfEnabledChannels( bool joined, uint8_t datarate, uint16_t
                         //lz-modify 去掉让所有通道都可以入网
                         if(UseLoRaWanStandardProtocol())
                         {
-                            REGION_EU433_DEBUG("region eu433 use default channel join\r\n");
+                            MOLMC_LOGD(TAG, "region eu433 use default channel join");
                             continue;
                         }
                         //end===
@@ -160,7 +151,7 @@ static uint8_t CountNbOfEnabledChannels( bool joined, uint8_t datarate, uint16_t
                     //lz-modify
                     if(UseLoRaWanStandardProtocol())
                     {
-                        REGION_EU433_DEBUG("region eu433 datarate is not supported\r\n");
+                        MOLMC_LOGD(TAG, "region eu433 datarate is not supported");
                         continue;
                     }
                     //end===
@@ -584,10 +575,10 @@ bool RegionEU433RxConfig( RxConfigParams_t* rxConfig, int8_t* datarate )
     Radio.SetChannel( frequency );
 
     #if  0 
-    REGION_EU433_DEBUG("rx freq=%d\r\n",frequency);
-    REGION_EU433_DEBUG("bandwidth = %d\r\n",rxConfig->Bandwidth);
-    REGION_EU433_DEBUG("datarate = %d\r\n",phyDr);
-    REGION_EU433_DEBUG("rxContinuous = %d\r\n",rxConfig->RxContinuous);
+    MOLMC_LOGD(TAG, "rx freq=%d\r\n",frequency);
+    MOLMC_LOGD(TAG, "bandwidth = %d\r\n",rxConfig->Bandwidth);
+    MOLMC_LOGD(TAG, "datarate = %d\r\n",phyDr);
+    MOLMC_LOGD(TAG, "rxContinuous = %d\r\n",rxConfig->RxContinuous);
     #endif
     // Radio configuration
     if( dr == DR_7 )
@@ -630,21 +621,21 @@ bool RegionEU433TxConfig( TxConfigParams_t* txConfig, int8_t* txPower, TimerTime
     Radio.SetChannel( Channels[txConfig->Channel].Frequency );
 
     #if 1
-    REGION_EU433_DEBUG("loramac tx frequency = %d\r\n",Channels[txConfig->Channel].Frequency);
-    REGION_EU433_DEBUG("tx power=%d\r\n",phyTxPower);
-    REGION_EU433_DEBUG("bandwidth=%d\r\n",bandwidth);
-    REGION_EU433_DEBUG("datarate=%d\r\n",phyDr);
+    MOLMC_LOGD(TAG, "loramac tx frequency = %d\r\n",Channels[txConfig->Channel].Frequency);
+    MOLMC_LOGD(TAG, "tx power=%d\r\n",phyTxPower);
+    MOLMC_LOGD(TAG, "bandwidth=%d\r\n",bandwidth);
+    MOLMC_LOGD(TAG, "datarate=%d\r\n",phyDr);
     #endif
 
     if( txConfig->Datarate == DR_7 )
     { // High Speed FSK channel
-        REGION_EU433_DEBUG("loramac fsk-mode tx\r\n");
+        MOLMC_LOGD(TAG, "loramac fsk-mode tx");
         modem = MODEM_FSK;
         Radio.SetTxConfig( modem, phyTxPower, 25000, bandwidth, phyDr * 1000, 0, 5, false, true, 0, 0, false, 3000 );
     }
     else
     {
-        REGION_EU433_DEBUG("loramac lora-mode tx\r\n");
+        MOLMC_LOGD(TAG, "loramac lora-mode tx");
         modem = MODEM_LORA;
         Radio.SetTxConfig( modem, phyTxPower, 0, bandwidth, phyDr, 1, 8, false, true, 0, 0, false, 3000 );
     }
@@ -955,7 +946,7 @@ bool RegionEU433NextChannel( NextChanParams_t* nextChanParams, uint8_t* channel,
         //lz-modify add
         if(!UseLoRaWanStandardProtocol())
         {
-            REGION_EU433_DEBUG("region eu433 select datarate\r\n");
+            MOLMC_LOGD(TAG, "region eu433 select datarate");
             LoRaMacParams.ChannelsDatarate = randr( Channels[*channel].DrRange.Fields.Min, Channels[*channel].DrRange.Fields.Max );
         }
         //======

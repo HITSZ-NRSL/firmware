@@ -51,7 +51,7 @@ void usart_debug_initial(uint32_t baud)
     UartHandleDebug.Init.OverSampling = UART_OVERSAMPLING_16;
     HAL_UART_DeInit(&UartHandleDebug);
     HAL_UART_Init(&UartHandleDebug);
-    set_logger_output(log_output, ALL_LEVEL); //注册debug实现函数
+    //set_logger_output(log_output, ALL_LEVEL); //注册debug实现函数
 }
 
 void usart_esp8266_initial(uint32_t baud)
@@ -180,12 +180,12 @@ void Esp8266_Enter_UpdateMode(void)
 
 system_tick_t millis(void)
 {
-    return HAL_Timer_Get_Milli_Seconds();
+    return HAL_Tick_Get_Milli_Seconds();
 }
 
 unsigned long micros(void)
 {
-    return HAL_Timer_Get_Micro_Seconds();
+    return HAL_Tick_Get_Micro_Seconds();
 }
 
 void delay(uint32_t ms)

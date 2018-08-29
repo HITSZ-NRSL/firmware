@@ -30,7 +30,7 @@ void ICACHE_RAM_ATTR cont_init(cont_t* cont) {
     cont->stack_guard2 = CONT_STACKGUARD;
     cont->stack_end = cont->stack + (sizeof(cont->stack) / 4);
     cont->struct_start = (unsigned*) cont;
-    
+
     // fill stack with magic values to check high water mark
     for(int pos = 0; pos < (int)(sizeof(cont->stack) / 4); pos++)
     {
@@ -53,7 +53,7 @@ int ICACHE_RAM_ATTR cont_get_free_stack(cont_t* cont) {
         head++;
         freeWords++;
     }
-    
+
     return freeWords * 4;
 }
 

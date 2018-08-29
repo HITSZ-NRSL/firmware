@@ -44,18 +44,7 @@
 #include "system_event.h"
 #include "wiring_rgb.h"
 
-/*debug switch*/
-#define SYSTEM_CONFIG_DEBUG
-
-#ifdef SYSTEM_CONFIG_DEBUG
-#define SCONFIG_DEBUG(...)    do {DEBUG(__VA_ARGS__);}while(0)
-#define SCONFIG_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#define SCONFIG_DEBUG_DUMP    DEBUG_DUMP
-#else
-#define SCONFIG_DEBUG(...)
-#define SCONFIG_DEBUG_D(...)
-#define SCONFIG_DEBUG_DUMP
-#endif
+const static char *TAG = "sys-config";
 
 #ifndef configNO_NETWORK
 //using namespace intorobot;
@@ -68,17 +57,17 @@ static volatile uint32_t config_timeout_start;
 static volatile uint32_t config_timeout_duration;
 
 inline void ARM_CONFIG_TIMEOUT(uint32_t dur) {
-    config_timeout_start = HAL_Timer_Get_Milli_Seconds();
+    config_timeout_start = HAL_Tick_Get_Milli_Seconds();
     config_timeout_duration = dur;
-    SCONFIG_DEBUG("CONFIG WD Set %d\r\n",(dur));
+    MOLMC_LOGD(TAG, "CONFIG WD Set %d",(dur));
 }
 inline bool IS_CONFIG_TIMEOUT() {
-    return config_timeout_duration && ((HAL_Timer_Get_Milli_Seconds()-config_timeout_start)>config_timeout_duration);
+    return config_timeout_duration && ((HAL_Tick_Get_Milli_Seconds()-config_timeout_start)>config_timeout_duration);
 }
 
 inline void CLR_CONFIG_TIMEOUT() {
     config_timeout_duration = 0;
-    SCONFIG_DEBUG("CONFIG WD Cleared, was %d\r\n", config_timeout_duration);
+    MOLMC_LOGD(TAG, "CONFIG WD Cleared, was %d", config_timeout_duration);
 }
 
 DeviceConfigCmdType DeviceConfig::getMessageType(char *s) {
@@ -123,7 +112,7 @@ bool DeviceConfig::process(void)
     while(available()) {
         String tmp=readString();
 
-        //SCONFIG_DEBUG("OK! Rev: %s\r\n", (char *)tmp.c_str());
+        //MOLMC_LOGD(TAG, "OK! Rev: %s", (char *)tmp.c_str());
         root = aJson.parse((char *)tmp.c_str());
         if (root == NULL) {break;}
 
@@ -216,7 +205,7 @@ void DeviceConfig::sendComfirm(int status)
 
 void DeviceConfig::dealHello(void)
 {
-    //DEBUG("dealHello = %d\r\n", System.freeMemory());
+    //DEBUG("dealHello = %d", System.freeMemory());
     aJsonObject* root = aJson.createObject();
     if (root == NULL) {return;}
 
@@ -322,7 +311,7 @@ void DeviceConfig::dealGetWifiList(void)
 
 void DeviceConfig::dealGetInfo(void)
 {
-    //DEBUG("dealGetInfo = %d\r\n", System.freeMemory());
+    //DEBUG("dealGetInfo = %d", System.freeMemory());
     aJsonObject* root = aJson.createObject();
     if (root == NULL) {return;}
 
@@ -976,7 +965,7 @@ system_config_type_t get_system_config_type(void)
 
 void system_config_initial(void)
 {
-    SCONFIG_DEBUG("system config initial\r\n");
+    MOLMC_LOGD(TAG, "system config initial");
     RGB.control(false);  //进入配置模式由系统接管
     system_rgb_blink(RGB_COLOR_RED, 1000);
     HAL_Core_Enter_Config();
@@ -1033,7 +1022,7 @@ void system_config_initial(void)
 
 void system_config_finish(void)
 {
-    SCONFIG_DEBUG("system config finish\r\n");
+    MOLMC_LOGD(TAG, "system config finish");
 #ifdef configSETUP_UDP_ENABLE
     DeviceSetupImlink.close();
 #endif

@@ -25,14 +25,14 @@
 
 #include "hw_config.h"
 #include "openwrt_conn.h"
-#include "timer_hal.h"
-#include "service_debug.h"
-
+#include "tick_hal.h"
 
 #ifdef putc
 #undef putc
 #undef getc
 #endif
+
+const static char *TAG = "hal";
 
 /* Private typedef ----------------------------------------------------------*/
 /* Private define -----------------------------------------------------------*/
@@ -60,7 +60,7 @@ int OpenwrtConnClass::socketCreate(IpProtocol ipproto, int port)
     // find an free socket
     socket = _findSocket(MDM_SOCKET_ERROR);
     if (socket != MDM_SOCKET_ERROR) {
-        DEBUG_D("Socket %d: handle %d was created\r\n", socket, socket);
+        MOLMC_LOGD(TAG, "Socket %d: handle %d was created", socket, socket);
         _sockets[socket].handle       = socket;
         _sockets[socket].ipproto      = ipproto;
         _sockets[socket].local_port   = port;
@@ -71,7 +71,7 @@ int OpenwrtConnClass::socketCreate(IpProtocol ipproto, int port)
         _sockets[socket].open       = true;
         _sockets[socket].pipe = new Pipe<char>(MAX_SIZE);
     }
-    DEBUG_D("socketCreate(%s)\r\n", (ipproto?"UDP":"TCP"));
+    MOLMC_LOGD(TAG, "socketCreate(%s)", (ipproto?"UDP":"TCP"));
     return socket;
 }
 
@@ -79,7 +79,7 @@ bool OpenwrtConnClass::socketConnect(int socket, const MDM_IP& ip, int port)
 {
     bool ok = false;
     if (ISSOCKET(socket) && (!_sockets[socket].connected)) {
-        DEBUG_D("socketConnect(%d, ip:%s port:%d)\r\n", socket, ip, port);
+        MOLMC_LOGD(TAG, "socketConnect(%d, ip:%s port:%d)", socket, ip, port);
         _sockets[socket].remote_port  = port;
         memcpy((void *)_sockets[socket].remote_ip, &ip, 4);
         if(_sockets[socket].ipproto) {  //udp
@@ -147,7 +147,7 @@ bool OpenwrtConnClass::socketIsConnected(int socket)
 {
     bool ok = false;
     ok = ISSOCKET(socket) && _sockets[socket].connected;
-    DEBUG_D("socketIsConnected(%d) %s\r\n", socket, ok?"yes":"no");
+    MOLMC_LOGD(TAG, "socketIsConnected(%d) %s", socket, ok?"yes":"no");
     return ok;
 }
 
@@ -182,7 +182,7 @@ bool OpenwrtConnClass::_socketFree(int socket)
     bool ok = false;
     if ((socket >= 0) && (socket < NUMSOCKETS)) {
         if (_sockets[socket].handle != MDM_SOCKET_ERROR) {
-            DEBUG_D("socketFree(%d)\r\n",  socket);
+            MOLMC_LOGD(TAG, "socketFree(%d)",  socket);
             _sockets[socket].handle     = MDM_SOCKET_ERROR;
             _sockets[socket].local_port    = 0;
             _sockets[socket].remote_port  = 0;
@@ -207,7 +207,7 @@ bool OpenwrtConnClass::socketFree(int socket)
 
 int OpenwrtConnClass::socketSend(int socket, const char * buf, int len)
 {
-    DEBUG_D("socketSend(%d,,%d)\r\n", socket,len);
+    MOLMC_LOGD(TAG, "socketSend(%d,,%d)", socket,len);
     int cnt = len;
     while (cnt > 0) {
         int blk = USO_MAX_WRITE;
@@ -231,7 +231,7 @@ int OpenwrtConnClass::socketSend(int socket, const char * buf, int len)
 
 int OpenwrtConnClass::socketSendTo(int socket, MDM_IP ip, int port, const char * buf, int len)
 {
-    DEBUG_D("socketSendTo(%d," IPSTR ",%d,,%d)\r\n", socket,IPNUM(ip),port,len);
+    MOLMC_LOGD(TAG, "socketSendTo(%d," IPSTR ",%d,,%d)", socket,IPNUM(ip),port,len);
     //Todo 后期实现
     return socketSend(socket, buf, len);
 }
@@ -242,7 +242,7 @@ int OpenwrtConnClass::socketReadable(int socket)
     int pending = MDM_SOCKET_ERROR;
 
     if (ISSOCKET(socket) && _sockets[socket].connected) {
-        DEBUG_D("socketReadable(%d)\r\n", socket);
+        MOLMC_LOGD(TAG, "socketReadable(%d)", socket);
         // allow to receive unsolicited commands
         if( 0 == _sockets[socket].pending )
         {

@@ -50,12 +50,13 @@
 #include "system_utilities.h"
 #include "system_product.h"
 #include "system_config.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 #include "platforms.h"
 #include "system_lorawan.h"
 #include "system_datapoint.h"
 #include "malloc.h"
 #include "wiring_time.h"
+#include "system_timer.h"
 
 using namespace intorobot;
 
@@ -66,6 +67,8 @@ using namespace intorobot;
 /* Private macro -------------------------------------------------------------*/
 
 /* Private variables ---------------------------------------------------------*/
+const static char *TAG = "system-main";
+
 typedef enum
 {
     BUTTON_MODE_NONE = 0,
@@ -240,9 +243,10 @@ void app_setup_and_loop_initial(bool *threaded)
     HAL_Core_Init();
     load_system_fwlib_version();
     set_system_mode(DEFAULT);
+    system_timer_set_irq_callback();
     Time.zone(HAL_PARAMS_Get_System_zone());
 
-    DEBUG("---------------welcome from IntoRobot!-----------------\r\n");
+    MOLMC_LOGD(TAG, "---------------welcome from IntoRobot!-----------------");
 #if defined (START_DFU_FLASHER_SERIAL_SPEED) || defined (START_YMODEM_FLASHER_SERIAL_SPEED)
 #ifdef configHAL_USB_CDC_ENABLE
     USB_USART_LineCoding_BitRate_Handler(system_lineCodingBitRateHandler);
@@ -253,18 +257,18 @@ void app_setup_and_loop_initial(bool *threaded)
     char buffer[33] = {0};
 
     if(PRODUCT_TYPE_GATEWAY == system_get_product_type()) {
-        DEBUG("product_type = gateway\r\n");
+        MOLMC_LOGD(TAG, "product_type = gateway");
     } else {
-        DEBUG("product_type = note\r\n");
+        MOLMC_LOGD(TAG, "product_type = note");
     }
     system_get_product_software_version(buffer, sizeof(buffer));
-    DEBUG("product_software_version = %s\r\n", buffer);
+    MOLMC_LOGD(TAG, "product_software_version = %s", buffer);
     system_get_product_hardware_version(buffer, sizeof(buffer));
-    DEBUG("product_hardware_version = %s\r\n", buffer);
+    MOLMC_LOGD(TAG, "product_hardware_version = %s", buffer);
     system_get_product_id(buffer, sizeof(buffer));
-    DEBUG("product_id = %s\r\n", buffer);
+    MOLMC_LOGD(TAG, "product_id = %s", buffer);
     system_get_product_secret(buffer, sizeof(buffer));
-    DEBUG("product_secret = %s\r\n", buffer);
+    MOLMC_LOGD(TAG, "product_secret = %s", buffer);
 #endif
 
 #ifdef configSETUP_ENABLE

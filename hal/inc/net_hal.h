@@ -24,6 +24,9 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+#include <stddef.h>
+
 typedef struct {
     size_t size;
     void (*notify_connected)();     // HAL_NET_notify_connected()

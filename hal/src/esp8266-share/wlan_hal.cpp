@@ -30,21 +30,23 @@
 #define STATION_IF      0x00
 #define SOFTAP_IF       0x01
 
+const static char *TAG = "hal";
+
 static volatile uint32_t wlan_timeout_start;
 static volatile uint32_t wlan_timeout_duration;
 
 inline void WLAN_TIMEOUT(uint32_t dur) {
-    wlan_timeout_start = HAL_Timer_Get_Milli_Seconds();
+    wlan_timeout_start = HAL_Tick_Get_Milli_Seconds();
     wlan_timeout_duration = dur;
-    //DEBUG("WLAN WD Set %d\r\n",(dur));
+    //MOLMC_LOGD(TAG, "WLAN WD Set %d",(dur));
 }
 inline bool IS_WLAN_TIMEOUT() {
-    return wlan_timeout_duration && ((HAL_Timer_Get_Milli_Seconds()-wlan_timeout_start)>wlan_timeout_duration);
+    return wlan_timeout_duration && ((HAL_Tick_Get_Milli_Seconds()-wlan_timeout_start)>wlan_timeout_duration);
 }
 
 inline void CLR_WLAN_TIMEOUT() {
     wlan_timeout_duration = 0;
-    //DEBUG("WLAN WD Cleared, was %d\r\n", wlan_timeout_duration);
+    //MOLMC_LOGD(TAG, "WLAN WD Cleared, was %d", wlan_timeout_duration);
 }
 
 //=======net notify===========

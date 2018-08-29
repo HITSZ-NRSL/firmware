@@ -25,7 +25,7 @@
 
 #include "hw_config.h"
 #include "delay_hal.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 //#include "watchdog_hal.h"
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
@@ -50,15 +50,15 @@ void HAL_Delay_Milliseconds(uint32_t millis)
  */
 void HAL_Delay_Microseconds(uint32_t micros)
 {
-    uint32_t m = HAL_Timer_Get_Micro_Seconds();
+    uint32_t m = HAL_Tick_Get_Micro_Seconds();
     if(micros){
         uint32_t e = (m + micros) % ((0xFFFFFFFF / CONFIG_ESP32_DEFAULT_CPU_FREQ_MHZ) + 1);
         if(m > e){ //overflow
-            while(HAL_Timer_Get_Micro_Seconds() > e){
+            while(HAL_Tick_Get_Micro_Seconds() > e){
                 NOP();
             }
         }
-        while(HAL_Timer_Get_Micro_Seconds() < e){
+        while(HAL_Tick_Get_Micro_Seconds() < e){
             NOP();
         }
     }

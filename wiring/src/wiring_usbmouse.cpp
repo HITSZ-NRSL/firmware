@@ -30,58 +30,57 @@ USBMouse::USBMouse(void)
 
 void USBMouse::buttons(uint8_t button)
 {
-	if (mouseReport.buttons != button)
-	{
-		mouseReport.buttons = button;
-		move(0,0,0);
-	}
+    if (mouseReport.buttons != button)
+    {
+        mouseReport.buttons = button;
+        move(0,0,0);
+    }
 }
 
 void USBMouse::begin(void)
 {
-	IntoRobot_USB_Setup();
+    IntoRobot_USB_Setup();
 }
 
 void USBMouse::end(void)
 {
-	//To Do
+    //To Do
 }
 
 void USBMouse::move(int8_t x, int8_t y, int8_t wheel)
 {
-	mouseReport.x = x;
-	mouseReport.y = y;
-	mouseReport.wheel = wheel;
-	USB_HID_Send_Report(&mouseReport, sizeof(mouseReport));
+    mouseReport.x = x;
+    mouseReport.y = y;
+    mouseReport.wheel = wheel;
+    USB_HID_Send_Report(&mouseReport, sizeof(mouseReport));
 }
 
 void USBMouse::click(uint8_t button)
 {
-	mouseReport.buttons = button;
-	move(0,0,0);
-	delay(100);
-	mouseReport.buttons = 0;
-	move(0,0,0);
+    mouseReport.buttons = button;
+    move(0,0,0);
+    delay(100);
+    mouseReport.buttons = 0;
+    move(0,0,0);
 }
 
 void USBMouse::press(uint8_t button)
 {
-	buttons(mouseReport.buttons | button);
+    buttons(mouseReport.buttons | button);
 }
 
 void USBMouse::release(uint8_t button)
 {
-	buttons(mouseReport.buttons & ~button);
+    buttons(mouseReport.buttons & ~button);
 }
 
 bool USBMouse::isPressed(uint8_t button)
 {
-	if ((mouseReport.buttons & button) > 0)
-	{
-		return true;
-	}
+    if ((mouseReport.buttons & button) > 0) {
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 //Preinstantiate Object

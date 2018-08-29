@@ -26,7 +26,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "hw_config.h"
 #include "rtc_hal_impl.h"
-#include "service_debug.h"
 
 RTC_HandleTypeDef RtcHandle;
 

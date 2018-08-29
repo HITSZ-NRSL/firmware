@@ -90,7 +90,7 @@
 #endif
 #define RTC_Alarm_IRQ_PRIORITY              3       //RTC Alarm Interrupt
 #define RTC_WKUP_IRQ_PRIORITY               4       //RTC Seconds Interrupt
-#define TIM2_IRQ_PRIORITY                   6       //TIM2 CC Interrupt(Button Use)
+#define TIM_IRQ_PRIORITY                    6       //TIM Elapsed Interrupt
 #define EXTI15_10_IRQ_PRIORITY              8       //User Interrupt
 #define EXTI9_5_IRQ_PRIORITY                9       //User Interrupt
 #define EXTI0_IRQ_PRIORITY                  10      //User Interrupt

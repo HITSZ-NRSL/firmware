@@ -166,7 +166,7 @@ void Enter_Flash_Test(void)
         } else {
             failed_count ++;
         }
-        BOOT_DEBUG("success_count = %d, failed_count = %d\r\n", success_count, failed_count);
+        //BOOT_DEBUG("success_count = %d, failed_count = %d\r\n", success_count, failed_count);
         delay(1000);
     }
 }

@@ -32,7 +32,7 @@
 #include "enums_hal.h"
 
 /* Include for debug capabilty */
-//#define MDM_DEBUG
+#define MDM_DEBUG
 
 #undef putc
 #undef getc

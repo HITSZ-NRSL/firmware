@@ -24,11 +24,7 @@
  */
 
 /* Includes ------------------------------------------------------------------*/
-#include "hw_config.h"
 #include "pwm_hal.h"
-#include "gpio_hal.h"
-#include "pinmap_impl.h"
-
 
 /*
  * @brief Should take an integer 0-255 and create a PWM signal with a duty cycle from 0-100%.
@@ -78,11 +74,6 @@ void HAL_PWM_Write_Ext(uint16_t pin, uint32_t value)
  */
 void HAL_PWM_Write_With_Frequency_Ext(uint16_t pin, uint32_t value, uint32_t pwm_frequency)
 {
-    EESP8266_Pin_Info* PIN_MAP = HAL_Pin_Map();
-    pin_t gpio_pin = PIN_MAP[pin].gpio_pin;
-
-    __analogWriteFreq(pwm_frequency);
-    __analogWrite(gpio_pin, value);
 }
 
 uint16_t HAL_PWM_Get_Frequency(uint16_t pin)
@@ -97,12 +88,12 @@ uint16_t HAL_PWM_Get_AnalogValue(uint16_t pin)
 
 uint32_t HAL_PWM_Get_Frequency_Ext(uint16_t pin)
 {
-    return __analogWriteGetFreq(pin);
+    return 0;
 }
 
 uint32_t HAL_PWM_Get_AnalogValue_Ext(uint16_t pin)
 {
-    return __analogWriteGetValue(pin);
+    return 0;
 }
 
 uint32_t HAL_PWM_Get_Max_Frequency(uint16_t pin)
@@ -112,14 +103,14 @@ uint32_t HAL_PWM_Get_Max_Frequency(uint16_t pin)
 
 uint8_t HAL_PWM_Get_Resolution(uint16_t pin)
 {
-    int i = 0;
-    uint32_t range = __analogWriteGetRange();
+    return 0;
+}
 
-    for(i = 0; range >> 1; i++ );
-    return i;
+uint8_t HAL_PWM_Timer_Resolution(uint16_t pin)
+{
+    return 16;
 }
 
 void HAL_PWM_Set_Resolution(uint16_t pin, uint8_t resolution)
 {
-    __analogWriteRange(2 << resolution);
 }

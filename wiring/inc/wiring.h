@@ -28,7 +28,7 @@
 #include "rng_hal.h"
 #include "config.h"
 #include "intorobot_macros.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 #include "wiring_arduino.h"
 #include "wiring_constants.h"
 #include "wiring_stream.h"

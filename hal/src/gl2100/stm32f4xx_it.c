@@ -31,7 +31,6 @@
 #include <stdbool.h>
 #include "stm32f4xx.h"
 #include "stm32f4xx_it.h"
-#include "service_debug.h"
 
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
@@ -50,9 +49,6 @@ extern TIM_HandleTypeDef TimHandle;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
-void HAL_USART1_Handler(UART_HandleTypeDef *huart) __attribute__ ((weak));
-void Wiring_USART2_Interrupt_Handler(void) __attribute__ ((weak));
-void WifiDrv_USART1_Interrupt_Handler(void);
 
 /******************************************************************************/
 /*            Cortex-M4 Processor Exceptions Handlers                         */
@@ -103,12 +99,10 @@ __attribute__((externally_visible)) void prvGetRegistersFromStack( uint32_t *pul
     if (SCB->CFSR & (1<<25) /* DIVBYZERO */) {
         // stay consistent with the core and cause 5 flashes
         UsageFault_Handler();
-    }
-    else {
+    } else {
         //PANIC(HardFault,"HardFault");
         /* Go to infinite loop when Hard Fault exception occurs */
-        while (1)
-        {
+        while (1) {
         }
     }
 }
@@ -136,8 +130,7 @@ void HardFault_Handler(void)
 void MemManage_Handler(void)
 {
     /* Go to infinite loop when Memory Manage exception occurs */
-    while (1)
-    {
+    while (1) {
     }
 }
 
@@ -149,8 +142,7 @@ void MemManage_Handler(void)
 void BusFault_Handler(void)
 {
     /* Go to infinite loop when Bus Fault exception occurs */
-    while (1)
-    {
+    while (1) {
     }
 }
 
@@ -197,84 +189,11 @@ void PendSV_Handler(void)
 }
 */
 
-#if 0
-/**
- * @brief  This function handles SysTick Handler.
- * @param  None
- * @retval None
- */
-void SysTick_Handler(void)
-{
-    System1MsTick();
-    /* Handle short and generic tasks for the device HAL on 1ms ticks */
-    HAL_1Ms_Tick();
-    HAL_SysTick_Handler();
-    //HAL_System_Interrupt_Trigger(SysInterrupt_SysTick, NULL);
-}
-#endif
 /******************************************************************************/
 /*                 STM32F4xx Peripherals Interrupt Handlers                   */
 /*  Add here the Interrupt Handler for the used peripheral(s) (PPP), for the  */
 /*  available peripheral interrupt handler's name please refer to the startup */
 /*  file (startup_stm32f4xx.s).                                               */
 /******************************************************************************/
-#if 0
-/**
- * @brief  This function handles USB-On-The-Go FS global interrupt request.
- * @param  None
- * @retval None
- */
-void OTG_FS_IRQHandler(void)
-{
-    HAL_PCD_IRQHandler(&hpcd);
-}
-
-/**
- * @brief  This function handles USARTx interrupt request.
- * @param  None
- * @retval None
- */
-void USART1_IRQHandler(void)
-{
-    //HAL_USART1_Handler();
-}
-
-/**
- * @brief  This function handles USARTx interrupt request.
- * @param  None
- * @retval None
- */
-void USART2_IRQHandler(void)
-{
-    Wiring_USART2_Interrupt_Handler();
-    //HAL_UART_IRQHandler(&UartHandle);
-}
-
-#endif
-
-
-extern TIM_HandleTypeDef Timer2Handle;
-extern TIM_HandleTypeDef Timer3Handle;
-extern TIM_HandleTypeDef Timer4Handle;
-extern TIM_HandleTypeDef Timer5Handle;
-extern TIM_HandleTypeDef Timer9Handle;
-extern TIM_HandleTypeDef Timer10Handle;
-extern TIM_HandleTypeDef Timer11Handle;
-
-void TIM1_BRK_TIM9_IRQHandler(void)
-{
-//    HAL_TIM_IRQHandler(&Timer9Handle);
-}
-
-void TIM1_UP_TIM10_IRQHandler(void)
-{
-//    HAL_TIM_IRQHandler(&Timer10Handle);
-}
-
-void TIM1_TRG_COM_TIM11_IRQHandler(void)
-{
- //   HAL_TIM_IRQHandler(&Timer11Handle);
-}
-
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

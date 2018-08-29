@@ -23,9 +23,9 @@
 */
 
 #include <string.h>
-#include "timer_hal.h"
+#include "tick_hal.h"
 #include "delay_hal.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 extern "C" {
 #include "lwip/dns.h"
@@ -37,15 +37,7 @@ extern "C" {
 #include "esp32-hal-wifi.h"
 #include "net_hal.h"
 
-#define HAL_WIFI_DEBUG
-
-#ifdef HAL_WIFI_DEBUG
-#define HALWIFI_DEBUG(...)  do {DEBUG(__VA_ARGS__);}while(0)
-#define HALWIFI_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#else
-#define HALWIFI_DEBUG(...)
-#define HALWIFI_DEBUG_D(...)
-#endif
+const static char *TAG = "hal-wifi";
 
 static ScanDoneCb _scanDoneCb = NULL;
 
@@ -53,17 +45,17 @@ static volatile uint32_t esp32_wifi_timeout_start;
 static volatile uint32_t esp32_wifi_timeout_duration;
 
 inline void ARM_WIFI_TIMEOUT(uint32_t dur) {
-    esp32_wifi_timeout_start = HAL_Timer_Get_Milli_Seconds();
+    esp32_wifi_timeout_start = HAL_Tick_Get_Milli_Seconds();
     esp32_wifi_timeout_duration = dur;
-    //HALWIFI_DEBUG("esp32 WIFI WD Set %d\r\n",(dur));
+    //MOLMC_LOGD(TAG, "esp32 WIFI WD Set %d",(dur));
 }
 inline bool IS_WIFI_TIMEOUT() {
-    return esp32_wifi_timeout_duration && ((HAL_Timer_Get_Milli_Seconds()-esp32_wifi_timeout_start)>esp32_wifi_timeout_duration);
+    return esp32_wifi_timeout_duration && ((HAL_Tick_Get_Milli_Seconds()-esp32_wifi_timeout_start)>esp32_wifi_timeout_duration);
 }
 
 inline void CLR_WIFI_TIMEOUT() {
     esp32_wifi_timeout_duration = 0;
-    //HALWIFI_DEBUG("esp32 WIFI WD Cleared, was %d\r\n", esp32_wifi_timeout_duration);
+    //MOLMC_LOGD(TAG, "esp32 WIFI WD Cleared, was %d", esp32_wifi_timeout_duration);
 }
 
 #if CONFIG_FREERTOS_UNICORE
@@ -75,25 +67,23 @@ inline void CLR_WIFI_TIMEOUT() {
 static xQueueHandle _network_event_queue;
 static TaskHandle_t _network_event_task_handle = NULL;
 
-#ifdef HAL_WIFI_DEBUG
 const char * system_event_reasons[] = { "UNSPECIFIED", "AUTH_EXPIRE", "AUTH_LEAVE", "ASSOC_EXPIRE", "ASSOC_TOOMANY", "NOT_AUTHED", "NOT_ASSOCED", "ASSOC_LEAVE", "ASSOC_NOT_AUTHED", "DISASSOC_PWRCAP_BAD", "DISASSOC_SUPCHAN_BAD", "IE_INVALID", "MIC_FAILURE", "4WAY_HANDSHAKE_TIMEOUT", "GROUP_KEY_UPDATE_TIMEOUT", "IE_IN_4WAY_DIFFERS", "GROUP_CIPHER_INVALID", "PAIRWISE_CIPHER_INVALID", "AKMP_INVALID", "UNSUPP_RSN_IE_VERSION", "INVALID_RSN_IE_CAP", "802_1X_AUTH_FAILED", "CIPHER_SUITE_REJECTED", "BEACON_TIMEOUT", "NO_AP_FOUND", "AUTH_FAIL", "ASSOC_FAIL", "HANDSHAKE_TIMEOUT" };
 #define reason2str(r) ((r>176)?system_event_reasons[r-176]:system_event_reasons[r-1])
-#endif
 
 static esp_err_t _eventCallback(void *arg, system_event_t *event)
 {
     if(event->event_id == SYSTEM_EVENT_SCAN_DONE) {
-        HALWIFI_DEBUG("SYSTEM_EVENT_SCAN_DONE\r\n");
+        MOLMC_LOGD(TAG, "SYSTEM_EVENT_SCAN_DONE");
         _scanDoneCb();
     }
     else if(event->event_id == SYSTEM_EVENT_STA_DISCONNECTED) {
         uint8_t reason = event->event_info.disconnected.reason;
-        HALWIFI_DEBUG("SYSTEM_EVENT_STA_DISCONNECTED reason = %u - %s\r\n", reason, reason2str(reason));
+        MOLMC_LOGD(TAG, "SYSTEM_EVENT_STA_DISCONNECTED reason = %u - %s", reason, reason2str(reason));
         if(reason == WIFI_REASON_NO_AP_FOUND) {
         } else if(reason == WIFI_REASON_AUTH_FAIL || reason == WIFI_REASON_ASSOC_FAIL) {
         } else if(reason == WIFI_REASON_BEACON_TIMEOUT || reason == WIFI_REASON_HANDSHAKE_TIMEOUT) {
         } else if(reason == WIFI_REASON_AUTH_EXPIRE) {
-            HALWIFI_DEBUG("reconnect\r\n");
+            MOLMC_LOGD(TAG, "reconnect");
             if(esp32_getAutoReconnect()) {
                 esp32_begin();
             }
@@ -102,17 +92,17 @@ static esp_err_t _eventCallback(void *arg, system_event_t *event)
         HAL_NET_notify_disconnected();
     }
     else if(event->event_id == SYSTEM_EVENT_STA_START) {
-        //HALWIFI_DEBUG("SYSTEM_EVENT_STA_START\r\n");
+        //MOLMC_LOGD(TAG, "SYSTEM_EVENT_STA_START");
     }
     else if(event->event_id == SYSTEM_EVENT_STA_STOP) {
-        //HALWIFI_DEBUG("SYSTEM_EVENT_STA_STOP\r\n");
+        //MOLMC_LOGD(TAG, "SYSTEM_EVENT_STA_STOP");
     }
     else if(event->event_id == SYSTEM_EVENT_STA_GOT_IP) {
-        HALWIFI_DEBUG("SYSTEM_EVENT_STA_GOT_IP\r\n");
+        MOLMC_LOGD(TAG, "SYSTEM_EVENT_STA_GOT_IP");
         /*
            tcpip_adapter_ip_info_t ip;
            tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
-           HALWIFI_DEBUG("%x\r\n", ip.ip.addr);
+           MOLMC_LOGD(TAG, "%x", ip.ip.addr);
            */
         HAL_NET_notify_dhcp(true);
         HAL_NET_notify_connected();
@@ -362,11 +352,11 @@ static bool _smartConfigDone = false;
 static void smartConfigCallback(uint32_t st, void* result)
 {
     smartconfig_status_t status = (smartconfig_status_t) st;
-    HALWIFI_DEBUG("beginSmartConfig status = %d\r\n", status);
+    MOLMC_LOGD(TAG, "beginSmartConfig status = %d", status);
     if (status == SC_STATUS_LINK) {
         wifi_sta_config_t *sta_conf = reinterpret_cast<wifi_sta_config_t *>(result);
-        HALWIFI_DEBUG("ssid     = %s\r\n", sta_conf->ssid);
-        HALWIFI_DEBUG("password = %s\r\n", sta_conf->password);
+        MOLMC_LOGD(TAG, "ssid     = %s", sta_conf->ssid);
+        MOLMC_LOGD(TAG, "password = %s", sta_conf->password);
         esp_wifi_set_config(WIFI_IF_STA, (wifi_config_t *)sta_conf);
         esp_wifi_connect();
     } else if (status == SC_STATUS_LINK_OVER) {
@@ -376,7 +366,7 @@ static void smartConfigCallback(uint32_t st, void* result)
 
 bool esp32_beginSmartConfig()
 {
-    HALWIFI_DEBUG("esp32_beginSmartConfig\r\n");
+    MOLMC_LOGD(TAG, "esp32_beginSmartConfig");
     if (_smartConfigStarted) {
         return false;
     }
@@ -399,7 +389,7 @@ bool esp32_beginSmartConfig()
 
 bool esp32_stopSmartConfig()
 {
-    HALWIFI_DEBUG("esp8266_stopSmartConfig\r\n");
+    MOLMC_LOGD(TAG, "esp8266_stopSmartConfig");
     if (!_smartConfigStarted) {
         return true;
     }

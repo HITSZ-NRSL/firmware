@@ -27,7 +27,6 @@
 #include "interrupts_hal.h"
 #include "hw_config.h"
 #include "pinmap_impl.h"
-#include "service_debug.h"
 
 
 //Interrupts

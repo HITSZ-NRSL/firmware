@@ -37,7 +37,7 @@
 #include "hw_ticks.h"
 #include "stdlib_noniso.h"
 #include "sdkconfig.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 #ifdef __cplusplus
 extern "C" {

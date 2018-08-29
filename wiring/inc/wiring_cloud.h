@@ -33,7 +33,7 @@
 #include "interrupts_hal.h"
 #include "string_convert.h"
 #include <functional>
-#include "service_debug.h"
+#include "molmc_log.h"
 
 class CloudDatepointClass {
     public:
@@ -259,8 +259,8 @@ class CloudClass: public CloudDatepointClass, public Print{
             return intorobot_sync_time();
         }
 
-        static bool connected(void) { return intorobot_cloud_flag_connected(); }
-        static bool disconnected(void) { return !connected(); }
+        static bool connected(void) {return intorobot_cloud_flag_connected();}
+        static bool disconnected(void) {return !connected();}
         static void connect(void) {
             intorobot_cloud_flag_connect();
             /*
@@ -271,7 +271,7 @@ class CloudClass: public CloudDatepointClass, public Print{
             }
             */
         }
-        static void disconnect(void) { intorobot_cloud_flag_disconnect(); }
+        static void disconnect(void) {intorobot_cloud_flag_disconnect();}
         static void process(void) {
             //application_checkin();
             intorobot_process();
@@ -282,7 +282,7 @@ class CloudClass: public CloudDatepointClass, public Print{
         static int available(void) {
             return intorobot_debug_info_available();
         }
-        static String deviceID(void) { return intorobot_deviceID(); }
+        static String deviceID(void) {return intorobot_deviceID();}
         static void keepAlive(uint16_t sec) {
             intorobot_cloud_keepalive(sec);
         }
@@ -304,16 +304,16 @@ class CloudClass: public CloudDatepointClass {
             return LoRaWanActiveStatus();
         }
         static bool disconnected(void) {
-            if(LoRaWanActiveStatus() == -1){
+            if(LoRaWanActiveStatus() == -1) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
         }
         static int connect(join_mode_t mode, uint16_t timeout) {
             if(mode == JOIN_ABP){
                 return LoRaWan.joinABP();
-            }else{
+            } else {
                 return LoRaWan.joinOTAA(timeout);
             }
         }
@@ -322,10 +322,10 @@ class CloudClass: public CloudDatepointClass {
             LoRaMacAbortRun();
             LoRaWan.setMacClassType(CLASS_A);
         }
-        static void setProtocol(protocol_mode_t mode){
-            if(mode == PROTOCOL_LORAWAN){
+        static void setProtocol(protocol_mode_t mode) {
+            if(mode == PROTOCOL_LORAWAN) {
                 LoRaWanResume();
-            }else{
+            } else {
                 LoRaWanPause();
             }
         }
@@ -333,7 +333,7 @@ class CloudClass: public CloudDatepointClass {
             //application_checkin();
             intorobot_process();
         }
-        static String deviceID(void) { return intorobot_deviceID(); }
+        static String deviceID(void) {return intorobot_deviceID();}
 };
 #endif
 

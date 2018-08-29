@@ -26,7 +26,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "spi_hal.h"
 #include "pinmap_impl.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 #include "esp8266-hal-spi.h"
 
 

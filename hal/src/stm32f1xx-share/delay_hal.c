@@ -26,7 +26,7 @@
 #include "delay_hal.h"
 #include "hw_config.h"
 #include "watchdog_hal.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 
 /*******************************************************************************
 * Function Name  : Delay
@@ -37,13 +37,13 @@
 *******************************************************************************/
 void HAL_Delay_Milliseconds(uint32_t nTime)
 {
-    system_tick_t start_millis = HAL_Timer_Get_Milli_Seconds();
+    system_tick_t start_millis = HAL_Tick_Get_Milli_Seconds();
 
     while (1)
     {
         HAL_IWDG_Feed();
 
-        system_tick_t elapsed_millis = HAL_Timer_Get_Milli_Seconds() - start_millis;
+        system_tick_t elapsed_millis = HAL_Tick_Get_Milli_Seconds() - start_millis;
 
         if (elapsed_millis > nTime)
         {

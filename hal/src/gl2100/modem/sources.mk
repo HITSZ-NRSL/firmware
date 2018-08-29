@@ -13,3 +13,5 @@ CPPSRC += $(call target_files,$(TARGET_HAL_MODEM_PATH)/src/,*.cpp)
 
 # ASM source files included in this build.
 ASRC +=
+
+

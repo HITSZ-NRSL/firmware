@@ -1,21 +1,21 @@
 /**
  ******************************************************************************
-  Copyright (c) 2013-2014 IntoRobot Team.  All right reserved.
+ Copyright (c) 2013-2014 IntoRobot Team.  All right reserved.
 
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation, either
-  version 3 of the License, or (at your option) any later version.
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public
+ License as published by the Free Software Foundation, either
+ version 3 of the License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, see <http://www.gnu.org/licenses/>.
-  ******************************************************************************
-*/
+ You should have received a copy of the GNU Lesser General Public
+ License along with this library; if not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************
+ */
 
 #include "wiring_time.h"
 #include "rtc_hal.h"
@@ -55,40 +55,40 @@ static void Refresh_UnixTime_Cache(time_t unix_time);
 /* Convert Unix/RTC time to Calendar time */
 static struct tm Convert_UnixTime_To_CalendarTime(time_t unix_time)
 {
-	struct tm *calendar_time;
-	calendar_time = localtime(&unix_time);
-	calendar_time->tm_year += 1900;
-	return *calendar_time;
+    struct tm *calendar_time;
+    calendar_time = localtime(&unix_time);
+    calendar_time->tm_year += 1900;
+    return *calendar_time;
 }
 
 /* Convert Calendar time to Unix/RTC time */
 /*
-static time_t Convert_CalendarTime_To_UnixTime(struct tm calendar_time)
-{
-	calendar_time.tm_year -= 1900;
-	time_t unix_time = mktime(&calendar_time);
-	return unix_time;
-}
-*/
+   static time_t Convert_CalendarTime_To_UnixTime(struct tm calendar_time)
+   {
+   calendar_time.tm_year -= 1900;
+   time_t unix_time = mktime(&calendar_time);
+   return unix_time;
+   }
+   */
 
 /* Get converted Calendar time */
 /*
- static struct tm Get_CalendarTime(void)
-{
-	time_t unix_time = HAL_RTC_Get_UnixTime();
-	unix_time += time_zone_cache;
-	struct tm calendar_time = Convert_UnixTime_To_CalendarTime(unix_time);
-	return calendar_time;
-}
- */
+   static struct tm Get_CalendarTime(void)
+   {
+   time_t unix_time = HAL_RTC_Get_UnixTime();
+   unix_time += time_zone_cache;
+   struct tm calendar_time = Convert_UnixTime_To_CalendarTime(unix_time);
+   return calendar_time;
+   }
+   */
 
 /* Set Calendar time as Unix/RTC time */
 /*
-static void Set_CalendarTime(struct tm calendar_time)
-{
-	HAL_RTC_Set_UnixTime(Convert_CalendarTime_To_UnixTime(calendar_time));
-}
-*/
+   static void Set_CalendarTime(struct tm calendar_time)
+   {
+   HAL_RTC_Set_UnixTime(Convert_CalendarTime_To_UnixTime(calendar_time));
+   }
+   */
 
 /* Refresh Unix/RTC time cache */
 static void Refresh_UnixTime_Cache(time_t unix_time)
@@ -96,8 +96,8 @@ static void Refresh_UnixTime_Cache(time_t unix_time)
     unix_time += time_zone_cache;
     if(unix_time != unix_time_cache)
     {
-            calendar_time_cache = Convert_UnixTime_To_CalendarTime(unix_time);
-            unix_time_cache = unix_time;
+        calendar_time_cache = Convert_UnixTime_To_CalendarTime(unix_time);
+        unix_time_cache = unix_time;
     }
 }
 
@@ -106,160 +106,160 @@ const char* TimeClass::format_spec = TIME_FORMAT_DEFAULT;
 /* current hour */
 int TimeClass::hour()
 {
-	return hour(now());
+    return hour(now());
 }
 
 /* the hour for the given time */
 int TimeClass::hour(time_t t)
 {
-	Refresh_UnixTime_Cache(t);
-	return calendar_time_cache.tm_hour;
+    Refresh_UnixTime_Cache(t);
+    return calendar_time_cache.tm_hour;
 }
 
 /* current hour in 12 hour format */
 int TimeClass::hourFormat12()
 {
-	return hourFormat12(now());
+    return hourFormat12(now());
 }
 
 /* the hour for the given time in 12 hour format */
 int TimeClass::hourFormat12(time_t t)
 {
-	Refresh_UnixTime_Cache(t);
-	if(calendar_time_cache.tm_hour == 0)
-		return 12;	//midnight
-	else if( calendar_time_cache.tm_hour > 12)
-		return calendar_time_cache.tm_hour - 12 ;
-	else
-		return calendar_time_cache.tm_hour ;
+    Refresh_UnixTime_Cache(t);
+    if(calendar_time_cache.tm_hour == 0)
+        return 12;	//midnight
+    else if( calendar_time_cache.tm_hour > 12)
+        return calendar_time_cache.tm_hour - 12 ;
+    else
+        return calendar_time_cache.tm_hour ;
 }
 
 /* returns true if time now is AM */
 uint8_t TimeClass::isAM()
 {
-	return !isPM(now());
+    return !isPM(now());
 }
 
 /* returns true the given time is AM */
 uint8_t TimeClass::isAM(time_t t)
 {
-	return !isPM(t);
+    return !isPM(t);
 }
 
 /* returns true if time now is PM */
 uint8_t TimeClass::isPM()
 {
-	return isPM(now());
+    return isPM(now());
 }
 
 /* returns true the given time is PM */
 uint8_t TimeClass::isPM(time_t t)
 {
-	return (hour(t) >= 12);
+    return (hour(t) >= 12);
 }
 
 /* current minute */
 int TimeClass::minute()
 {
-	return minute(now());
+    return minute(now());
 }
 
 /* the minute for the given time */
 int TimeClass::minute(time_t t)
 {
-	Refresh_UnixTime_Cache(t);
-	return calendar_time_cache.tm_min;
+    Refresh_UnixTime_Cache(t);
+    return calendar_time_cache.tm_min;
 }
 
 /* current seconds */
 int TimeClass::second()
 {
-	return second(now());
+    return second(now());
 }
 
 /* the second for the given time */
 int TimeClass::second(time_t t)
 {
-	Refresh_UnixTime_Cache(t);
-	return calendar_time_cache.tm_sec;
+    Refresh_UnixTime_Cache(t);
+    return calendar_time_cache.tm_sec;
 }
 
 /* current day */
 int TimeClass::day()
 {
-	return day(now());
+    return day(now());
 }
 
 /* the day for the given time */
 int TimeClass::day(time_t t)
 {
-	Refresh_UnixTime_Cache(t);
-	return calendar_time_cache.tm_mday;
+    Refresh_UnixTime_Cache(t);
+    return calendar_time_cache.tm_mday;
 }
 
 /* the current weekday */
 int TimeClass::weekday()
 {
-	return weekday(now());
+    return weekday(now());
 }
 
 /* the weekday for the given time */
 int TimeClass::weekday(time_t t)
 {
-	Refresh_UnixTime_Cache(t);
-	return (calendar_time_cache.tm_wday + 1);//Arduino's weekday representation
+    Refresh_UnixTime_Cache(t);
+    return (calendar_time_cache.tm_wday + 1);//Arduino's weekday representation
 }
 
 /* current month */
 int TimeClass::month()
 {
-	return month(now());
+    return month(now());
 }
 
 /* the month for the given time */
 int TimeClass::month(time_t t)
 {
-	Refresh_UnixTime_Cache(t);
-	return (calendar_time_cache.tm_mon + 1);//Arduino's month representation
+    Refresh_UnixTime_Cache(t);
+    return (calendar_time_cache.tm_mon + 1);//Arduino's month representation
 }
 
 /* current four digit year */
 int TimeClass::year()
 {
-	return year(now());
+    return year(now());
 }
 
 /* the year for the given time */
 int TimeClass::year(time_t t)
 {
-	Refresh_UnixTime_Cache(t);
-	return calendar_time_cache.tm_year;
+    Refresh_UnixTime_Cache(t);
+    return calendar_time_cache.tm_year;
 }
 
 /* return the current time as seconds since Jan 1 1970 */
 time_t TimeClass::now()
 {
-	return HAL_RTC_Get_UnixTime();
+    return HAL_RTC_Get_UnixTime();
 }
 
 time_t TimeClass::local()
 {
-	return HAL_RTC_Get_UnixTime()+time_zone_cache;
+    return HAL_RTC_Get_UnixTime()+time_zone_cache;
 }
 
 /* set the time zone (+/-) offset from GMT */
 void TimeClass::zone(float GMT_Offset)
 {
-	if(GMT_Offset < -12 || GMT_Offset > 13)
-	{
-		return;
-	}
-	time_zone_cache = GMT_Offset * 3600;
+    if(GMT_Offset < -12 || GMT_Offset > 13)
+    {
+        return;
+    }
+    time_zone_cache = GMT_Offset * 3600;
 }
 
 float TimeClass::zone()
 {
-	return time_zone_cache / 3600.0;
+    return time_zone_cache / 3600.0;
 }
 
 /* set the given time as unix/rtc time */
@@ -303,16 +303,13 @@ String TimeClass::timeFormatImpl(tm* calendar_time, const char* format, int time
     // while we are not using stdlib for managing the timezone, we have to do this manually
     if (!time_zone) {
         strcpy(time_zone_str, "Z");
-    }
-    else {
+    } else {
         snprintf(time_zone_str, 10, "%+03d:%02u", time_zone/3600, abs(time_zone/60)%60);
     }
 
     // replace %z with the timezone
-    for (size_t i=0; i<len-1; i++)
-    {
-        if (format_str[i]=='%' && format_str[i+1]=='z')
-        {
+    for (size_t i=0; i<len-1; i++) {
+        if (format_str[i]=='%' && format_str[i+1]=='z') {
             size_t tzlen = strlen(time_zone_str);
             memcpy(format_str+i+tzlen, format_str+i+2, len-i-1);    // +1 include the 0 char
             memcpy(format_str+i, time_zone_str, tzlen);

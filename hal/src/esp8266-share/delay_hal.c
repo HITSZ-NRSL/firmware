@@ -43,10 +43,10 @@ void HAL_Delay_Milliseconds(uint32_t millis)
 {
     volatile system_tick_t start_millis, current_millis, elapsed_millis;
 
-    start_millis = HAL_Timer_Get_Milli_Seconds();
+    start_millis = HAL_Tick_Get_Milli_Seconds();
     while (1)
     {
-        current_millis = HAL_Timer_Get_Milli_Seconds();
+        current_millis = HAL_Tick_Get_Milli_Seconds();
         elapsed_millis = current_millis - start_millis;
         //Check for wrapping
         if (elapsed_millis < 0)

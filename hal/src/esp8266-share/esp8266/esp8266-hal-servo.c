@@ -18,7 +18,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 #include "esp8266-hal-servo.h"
 #include "esp8266-hal-gpio.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 #define min(a,b) ((a)<(b)?(a):(b))
 #define max(a,b) ((a)>(b)?(a):(b))

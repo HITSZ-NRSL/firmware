@@ -23,7 +23,7 @@
 #include "soc/i2c_struct.h"
 #include "soc/dport_reg.h"
 #include "esp32-hal-gpio.h"
-#include "timer_hal.h"
+#include "tick_hal.h"
 #include "delay_hal.h"
 
 //#define I2C_DEV(i)   (volatile i2c_dev_t *)((i)?DR_REG_I2C1_EXT_BASE:DR_REG_I2C_EXT_BASE)
@@ -210,10 +210,10 @@ i2c_err_t i2cWrite(i2c_t * i2c, uint16_t address, bool addr_10bit, uint8_t * dat
         i2c->dev->ctr.trans_start = 1;
 
         //WAIT Transmission
-        uint32_t startAt = HAL_Timer_Get_Milli_Seconds();
+        uint32_t startAt = HAL_Tick_Get_Milli_Seconds();
         while(1) {
             //have been looping for too long
-            if((HAL_Timer_Get_Milli_Seconds() - startAt)>50){
+            if((HAL_Tick_Get_Milli_Seconds() - startAt)>50){
                 //log_e("Timeout! Addr: %x", address >> 1);
                 I2C_MUTEX_UNLOCK();
                 return I2C_ERROR_BUS;
@@ -236,7 +236,7 @@ i2c_err_t i2cWrite(i2c_t * i2c, uint16_t address, bool addr_10bit, uint8_t * dat
             //Transmission did not finish and ACK_ERR is set
             if(i2c->dev->int_raw.ack_err) {
                 //log_w("Ack Error! Addr: %x", address >> 1);
-                while((i2c->dev->status_reg.bus_busy) && ((HAL_Timer_Get_Milli_Seconds() - startAt)<50));
+                while((i2c->dev->status_reg.bus_busy) && ((HAL_Tick_Get_Milli_Seconds() - startAt)<50));
                 I2C_MUTEX_UNLOCK();
                 return I2C_ERROR_ACK;
             }
@@ -310,11 +310,11 @@ i2c_err_t i2cRead(i2c_t * i2c, uint16_t address, bool addr_10bit, uint8_t * data
     while (!stopped) {
         //WAIT Transmission
         /* uint32_t startAt = millis(); */
-        uint32_t startAt = HAL_Timer_Get_Milli_Seconds();
+        uint32_t startAt = HAL_Tick_Get_Milli_Seconds();
         while(1) {
             //have been looping for too long
             /* if((millis() - startAt)>50){ */
-            if((HAL_Timer_Get_Milli_Seconds() - startAt)>50){
+            if((HAL_Tick_Get_Milli_Seconds() - startAt)>50){
                 //log_e("Timeout! Addr: %x, index %d", (address >> 1), index);
                 I2C_MUTEX_UNLOCK();
                 return I2C_ERROR_BUS;
@@ -337,7 +337,7 @@ i2c_err_t i2cRead(i2c_t * i2c, uint16_t address, bool addr_10bit, uint8_t * data
             //Transmission did not finish and ACK_ERR is set
             if(i2c->dev->int_raw.ack_err) {
                 //log_w("Ack Error! Addr: %x", address >> 1);
-                while((i2c->dev->status_reg.bus_busy) && ((HAL_Timer_Get_Milli_Seconds() - startAt)<50));
+                while((i2c->dev->status_reg.bus_busy) && ((HAL_Tick_Get_Milli_Seconds() - startAt)<50));
                 I2C_MUTEX_UNLOCK();
                 return I2C_ERROR_ACK;
             }

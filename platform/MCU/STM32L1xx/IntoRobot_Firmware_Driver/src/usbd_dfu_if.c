@@ -28,7 +28,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_dfu_if.h"
 #include "stm32l1xx_hal_conf.h"
-#include "service_debug.h"
 
 
 /* Private typedef -----------------------------------------------------------*/

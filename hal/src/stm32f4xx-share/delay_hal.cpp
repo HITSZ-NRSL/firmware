@@ -34,13 +34,13 @@ void HAL_Delay_Milliseconds(uint32_t millis)
 #if 1
     os_delay(millis);
 #else
-    system_tick_t start_millis = HAL_Timer_Get_Milli_Seconds();
+    system_tick_t start_millis = HAL_Tick_Get_Milli_Seconds();
 
     while (1)
     {
         HAL_IWDG_Feed();
 
-        system_tick_t elapsed_millis = HAL_Timer_Get_Milli_Seconds() - start_millis;
+        system_tick_t elapsed_millis = HAL_Tick_Get_Milli_Seconds() - start_millis;
 
         if (elapsed_millis > millis)
         {

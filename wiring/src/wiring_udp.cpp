@@ -28,18 +28,7 @@
 #include "wlan_hal.h"
 #include "wiring_constants.h"
 
-/*debug switch*/
-//#define WIRING_UDP_DEBUG
-
-#ifdef WIRING_UDP_DEBUG
-#define WUDP_DEBUG(...)    do {DEBUG(__VA_ARGS__);}while(0)
-#define WUDP_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#define WUDP_DEBUG_DUMP    DEBUG_DUMP
-#else
-#define WUDP_DEBUG(...)
-#define WUDP_DEBUG_D(...)
-#define WUDP_DEBUG_DUMP
-#endif
+const static char *TAG = "wire-udp";
 
 using namespace intorobot;
 
@@ -87,15 +76,13 @@ uint8_t UDP::begin(uint16_t port, network_interface_t nif)
 uint8_t UDP::begin(IPAddress remoteIP, uint16_t remotePort, uint16_t port, network_interface_t nif)
 {
     bool bound = 0;
-    if(Network.from(nif).ready())
-    {
+    if(Network.from(nif).ready()) {
         _sock = socket_create(AF_INET, SOCK_DGRAM, IPPROTO_UDP, port, nif);
-        if (socket_handle_valid(_sock))
-        {
+        if (socket_handle_valid(_sock)) {
             sockaddr_t tSocketAddr;
             int connected = 0;
 
-            WUDP_DEBUG("udp begin success! create socket %d\r\n",_sock);
+            MOLMC_LOGD(TAG, "udp begin success! create socket %d",_sock);
             flush();
             tSocketAddr.sa_family = AF_INET;
             tSocketAddr.sa_data[0] = (remotePort & 0xFF00) >> 8;
@@ -108,13 +95,10 @@ uint8_t UDP::begin(IPAddress remoteIP, uint16_t remotePort, uint16_t port, netwo
             uint32_t ot = HAL_NET_SetNetWatchDog(S2M(MAX_SEC_WAIT_CONNECT));
             connected = (socket_connect(_sock, &tSocketAddr, sizeof(tSocketAddr)) == 0 ? 1 : 0);
             HAL_NET_SetNetWatchDog(ot);
-            if(connected)
-            {
-                WUDP_DEBUG("upd connect success! create socket %d\r\n", _sock);
-            }
-            else
-            {
-                WUDP_DEBUG("upd connect failed!\r\n");
+            if(connected) {
+                MOLMC_LOGD(TAG, "upd connect success! create socket %d", _sock);
+            } else {
+                MOLMC_LOGD(TAG, "upd connect failed!");
                 stop();
             }
             _remoteIP = remoteIP;
@@ -122,9 +106,8 @@ uint8_t UDP::begin(IPAddress remoteIP, uint16_t remotePort, uint16_t port, netwo
             _port = port;
             _nif = nif;
             bound = true;
-        }
-        else {
-            WUDP_DEBUG("udp begin failed!\r\n");
+        } else {
+            MOLMC_LOGD(TAG, "udp begin failed!");
             stop();
             bound = false;
         }
@@ -139,9 +122,8 @@ int UDP::available()
 
 void UDP::stop()
 {
-    WUDP_DEBUG("udp stop: close socket %d\r\n", _sock);
-    if (isOpen(_sock))
-    {
+    MOLMC_LOGD(TAG, "udp stop: close socket %d", _sock);
+    if (isOpen(_sock)) {
         socket_close(_sock);
     }
     _sock = socket_handle_invalid();
@@ -155,12 +137,10 @@ int UDP::beginPacket()
 
 int UDP::beginPacket(const char *remoteHost, uint16_t remotePort)
 {
-    if(Network.from(_nif).ready())
-    {
+    if(Network.from(_nif).ready()) {
         HAL_IPAddress ip_addr;
 
-        if(inet_gethostbyname((char*)remoteHost, strlen(remoteHost), &ip_addr, _nif, NULL) == 0)
-        {
+        if(inet_gethostbyname((char*)remoteHost, strlen(remoteHost), &ip_addr, _nif, NULL) == 0) {
             IPAddress remote_addr(ip_addr);
             return beginPacket(remote_addr, remotePort);
         }
@@ -202,7 +182,7 @@ int UDP::sendPacket(const uint8_t* buffer, size_t buffer_size, IPAddress remoteI
     remoteSockAddr.sa_data[5] = remoteIP[3];
 
     int rv = socket_sendto(_sock, buffer, buffer_size, 0, &remoteSockAddr, sizeof(remoteSockAddr));
-    WUDP_DEBUG("udp sendPacket(buffer=%lx, size=%d)=%d\r\n",buffer, buffer_size, rv);
+    MOLMC_LOGD(TAG, "udp sendPacket(buffer=%lx, size=%d)=%d",buffer, buffer_size, rv);
     return rv;
 }
 
@@ -240,14 +220,12 @@ int UDP::parsePacket()
 int UDP::receivePacket(uint8_t* buffer, size_t size)
 {
     int ret = -1;
-    if(Network.from(_nif).ready() && isOpen(_sock) && buffer)
-    {
+    if(Network.from(_nif).ready() && isOpen(_sock) && buffer) {
         sockaddr_t remoteSockAddr;
         socklen_t remoteSockAddrLen = sizeof(remoteSockAddr);
 
         ret = socket_receivefrom(_sock, buffer, size, 0, &remoteSockAddr, &remoteSockAddrLen);
-        if (ret > 0)
-        {
+        if (ret > 0) {
             _remotePort = remoteSockAddr.sa_data[0] << 8 | remoteSockAddr.sa_data[1];
             _remoteIP = &remoteSockAddr.sa_data[2];
         }
@@ -263,8 +241,7 @@ int UDP::read()
 int UDP::read(unsigned char* buffer, size_t len)
 {
     int read = -1;
-    if (available())
-    {
+    if (available()) {
         read = min(int(len), available());
         memcpy(buffer, &_buffer[_offset], read);
         _offset += read;
@@ -279,8 +256,8 @@ int UDP::peek()
 
 void UDP::flush()
 {
-  _offset = 0;
-  _total = 0;
+    _offset = 0;
+    _total = 0;
 }
 
 size_t UDP::printTo(Print& p) const

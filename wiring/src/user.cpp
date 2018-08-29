@@ -39,10 +39,12 @@ void loop() __attribute((weak));
  * Declare weak setup/loop implementations so that they are always defined.
  */
 
-void setup()  {
+void setup()
+{
 }
 
-void loop() {
+void loop()
+{
 }
 #endif
 
@@ -84,8 +86,8 @@ void usbSerialEvent() __attribute__((weak));
 
 void _post_loop()
 {
-	serialEventRun();
-	//application_checkin();
+    serialEventRun();
+    //application_checkin();
 }
 
 /**
@@ -93,33 +95,36 @@ void _post_loop()
  */
 void serialEventRun()
 {
-    if (serialEvent && Serial.available()>0)
+    if (serialEvent && Serial.available()>0) {
         serialEvent();
+    }
 
 #ifdef configWIRING_USARTSERIAL1_ENABLE
-    if (serialEvent1 && Serial1.available()>0)
+    if (serialEvent1 && Serial1.available()>0) {
         serialEvent1();
+    }
 #endif
 
 #ifdef configWIRING_USARTSERIAL2_ENABLE
-    if (serialEventRun2) serialEventRun2();
+    if (serialEventRun2) {serialEventRun2();}
 #endif
 
 #ifdef configWIRING_USARTSERIAL3_ENABLE
-    if (serialEventRun3) serialEventRun3();
+    if (serialEventRun3) {serialEventRun3();}
 #endif
 
 #ifdef configWIRING_USARTSERIAL4_ENABLE
-    if (serialEventRun4) serialEventRun4();
+    if (serialEventRun4) {serialEventRun4();}
 #endif
 
 #ifdef configWIRING_USARTSERIAL5_ENABLE
-    if (serialEventRun5) serialEventRun5();
+    if (serialEventRun5) {serialEventRun5();}
 #endif
 
 #ifdef configWIRING_USBSERIAL_ENABLE
-    if (usbSerialEvent && SerialUSB.available()>0)
+    if (usbSerialEvent && SerialUSB.available() > 0) {
         usbSerialEvent();
+    }
 #endif
 }
 
@@ -151,11 +156,11 @@ static retained volatile uint32_t __backup_sram_signature;
 static bool backup_ram_was_valid_ = false;
 const uint32_t signature = 0x9A271C1E;
 
-bool __backup_ram_was_valid() { return backup_ram_was_valid_; }
+bool __backup_ram_was_valid() {return backup_ram_was_valid_;}
 
 #else
 
-bool __backup_ram_was_valid() { return false; }
+bool __backup_ram_was_valid() {return false;}
 
 #endif
 
@@ -176,8 +181,8 @@ void module_user_init_hook()
 // todo - add a RNG define for that capability
 #if defined(STM32F2XX)
     if (random_seed_from_cloud) {
-    		uint32_t seed = HAL_RNG_GetRandomNumber();
-    		random_seed_from_cloud(seed);
+        uint32_t seed = HAL_RNG_GetRandomNumber();
+        random_seed_from_cloud(seed);
     }
 #endif
 }

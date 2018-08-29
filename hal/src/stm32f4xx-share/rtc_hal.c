@@ -24,6 +24,7 @@
 
 RTC_HandleTypeDef RtcHandle;
 
+const static char *TAG = "hal";
 static bool rtcState = true;
 /**
   * @brief RTC MSP Initialization
@@ -106,7 +107,7 @@ static void RTC_CalendarAlarmConfig(void)
 
     if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
     {
-        DEBUG("RTC CalendarAlarmConfig SetDate Error!\r\n");
+        MOLMC_LOGD(TAG, "RTC CalendarAlarmConfig SetDate Error!");
     }
 
     /*##-2- Configure the Time #################################################*/
@@ -120,7 +121,7 @@ static void RTC_CalendarAlarmConfig(void)
 
     if (HAL_RTC_SetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BCD) != HAL_OK)
     {
-        DEBUG("RTC CalendarAlarmConfig SetTime Error!\r\n");
+        MOLMC_LOGD(TAG, "RTC CalendarAlarmConfig SetTime Error!");
     }
 }
 
@@ -150,7 +151,7 @@ void HAL_RTC_Initial()
 
     if (HAL_RTC_Init(&RtcHandle) != HAL_OK)
     {
-        DEBUG("RTC Init Error!\r\n");
+        MOLMC_LOGD(TAG, "RTC Init Error!");
     }
     RTC_CalendarAlarmConfig();
 }
@@ -233,7 +234,7 @@ void HAL_RTC_Set_UnixTime(time_t value)
 
     if(HAL_RTC_SetDate(&RtcHandle,&sdatestructure,RTC_FORMAT_BCD) != HAL_OK)
     {
-        DEBUG("RTC Set_UnixTime SetDate failed!\r\n");
+        MOLMC_LOGD(TAG, "RTC Set_UnixTime SetDate failed!");
     }
 
     /*##-2- Configure the Time #################################################*/
@@ -247,7 +248,7 @@ void HAL_RTC_Set_UnixTime(time_t value)
 
     if (HAL_RTC_SetTime(&RtcHandle, &stimestructure, RTC_FORMAT_BCD) != HAL_OK)
     {
-        DEBUG("RTC Set_UnixTime SetTime failed!\r\n");
+        MOLMC_LOGD(TAG, "RTC Set_UnixTime SetTime failed!");
     }
 }
 
@@ -282,7 +283,7 @@ void HAL_RTC_Set_UnixAlarm(time_t value)
     if(HAL_RTC_SetAlarm_IT(&RtcHandle,&salarmstructure,RTC_FORMAT_BCD) != HAL_OK)
     {
         /* Initialization Error */
-        DEBUG("RTC CalendarAlarmConfig SetAlarm Error!\r\n");
+        MOLMC_LOGD(TAG, "RTC CalendarAlarmConfig SetAlarm Error!");
     }
 }
 
@@ -312,7 +313,7 @@ void HAL_RTC_SetCallbacks(const void (*handle)(), void* reserved)
  */
 void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)
 {
-    DEBUG("RTC Alarm Callback\r\n");
+    MOLMC_LOGD(TAG, "RTC Alarm Callback");
 }
 
 /**

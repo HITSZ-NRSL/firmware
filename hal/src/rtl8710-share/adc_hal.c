@@ -24,9 +24,6 @@
  */
 
 #include "adc_hal.h"
-#include "pinmap_impl.h"
-#include "hw_config.h"
-//#include "gpio_hal_h"
 
 void HAL_ADC_Set_Sample_Time(uint8_t ADC_SampleTime)
 {
@@ -35,21 +32,10 @@ void HAL_ADC_Set_Sample_Time(uint8_t ADC_SampleTime)
 /*
  * @brief Read the analog value of a pin.
  * Should return a 16-bit value, 0-65536 (0 = LOW, 65536 = HIGH)
- * Note: ADC input voltage range is 0 - 1.0V
+ * Note: ADC is 12-bit. Currently it returns 0-4096
  */
 int32_t HAL_ADC_Read(uint16_t pin)
 {
-    EESP8266_Pin_Info* PIN_MAP = HAL_Pin_Map();
-
-    if (PIN_MAP[pin].pin_mode != AN_INPUT)
-    {
-        HAL_GPIO_Save_Pin_Mode(pin);
-        HAL_Pin_Mode(pin, AN_INPUT);
-    }
-
-    if(PIN_MAP[pin].gpio_pin == 17) {
-        return system_adc_read();
-    }
     return 0;
 }
 

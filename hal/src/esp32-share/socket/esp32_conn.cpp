@@ -31,15 +31,7 @@ extern "C" {
 #include <lwip/netdb.h>
 }
 
-//#define HAL_SOCKET_DEBUG
-
-#ifdef HAL_SOCKET_DEBUG
-#define HALSOCKET_DEBUG(...)  do {DEBUG(__VA_ARGS__);}while(0)
-#define HALSOCKET_DEBUG_D(...)  do {DEBUG_D(__VA_ARGS__);}while(0)
-#else
-#define HALSOCKET_DEBUG(...)
-#define HALSOCKET_DEBUG_D(...)
-#endif
+const static char *TAG = "hal-socket";
 
 #ifdef putc
 #undef putc
@@ -85,7 +77,7 @@ int Esp32ConnClass::socketCreate(IpProtocol ipproto, int port)
     if (socket != MDM_SOCKET_ERROR) {
         int sockfd  = lwip_socket(AF_INET, ipproto == MDM_IPPROTO_UDP ? SOCK_DGRAM : SOCK_STREAM , 0);
         if(sockfd < 0) {
-            HALSOCKET_DEBUG("Error! socket create failed!\r\n");
+            MOLMC_LOGD(TAG, "Error! socket create failed!");
             return MDM_SOCKET_ERROR;
         }
         _sockets[socket].handle = sockfd;
@@ -106,7 +98,7 @@ int Esp32ConnClass::socketCreate(IpProtocol ipproto, int port)
             tSocketAddr.sa_data[5] = 0;
             bind(_sockets[socket].handle, &tSocketAddr, sizeof(tSocketAddr));
             fcntl(_sockets[socket].handle, F_SETFL, O_NONBLOCK);
-            HALSOCKET_DEBUG("OK! %s Socket %d was created\r\n", "UDP", socket);
+            MOLMC_LOGD(TAG, "OK! %s Socket %d was created", "UDP", socket);
         } else if(MDM_IPPROTO_TCP == _sockets[socket].ipproto) {
             /*  Unimplemented: connect timeout
                 struct timeval tv;
@@ -114,7 +106,7 @@ int Esp32ConnClass::socketCreate(IpProtocol ipproto, int port)
                 tv.tv_usec = 0;
                 setsockopt(_sockets[socket].handle, SOL_SOCKET, SO_CONTIMEO, (char *)&tv, sizeof(struct timeval));
                 */
-            HALSOCKET_DEBUG("OK! %s Socket %d was created\r\n", "TCP", socket);
+            MOLMC_LOGD(TAG, "OK! %s Socket %d was created", "TCP", socket);
         } else { //tcp server
             memset(&tSocketAddr, 0, sizeof(tSocketAddr));
             tSocketAddr.sa_family = AF_INET;
@@ -127,10 +119,10 @@ int Esp32ConnClass::socketCreate(IpProtocol ipproto, int port)
             bind(_sockets[socket].handle, &tSocketAddr, sizeof(tSocketAddr));
             listen(_sockets[socket].handle , 4);
             fcntl(_sockets[socket].handle, F_SETFL, O_NONBLOCK);
-            HALSOCKET_DEBUG("OK! %s Socket %d was created\r\n", "TCP SERVER", socket);
+            MOLMC_LOGD(TAG, "OK! %s Socket %d was created", "TCP SERVER", socket);
         }
     } else {
-        HALSOCKET_DEBUG("Error! socket create failed!\r\n");
+        MOLMC_LOGD(TAG, "Error! socket create failed!");
     }
     return socket;
 }
@@ -162,10 +154,10 @@ bool Esp32ConnClass::socketConnect(int socket, const MDM_IP& ip, int port)
     }
 
     if(_sockets[socket].connected) {
-        HALSOCKET_DEBUG("OK! %s Socket %d connected! remote_ip:" IPSTR ", remote_port:%d\r\n", (_sockets[socket].ipproto?"UDP":"TCP"),\
+        MOLMC_LOGD(TAG, "OK! %s Socket %d connected! remote_ip:" IPSTR ", remote_port:%d", (_sockets[socket].ipproto?"UDP":"TCP"),\
                 socket, IPNUM(ip), port);
     } else {
-        HALSOCKET_DEBUG("Error! %s Socket %d failed! remote_ip:" IPSTR ", remote_port:%d\r\n", (_sockets[socket].ipproto?"UDP":"TCP"), \
+        MOLMC_LOGD(TAG, "Error! %s Socket %d failed! remote_ip:" IPSTR ", remote_port:%d", (_sockets[socket].ipproto?"UDP":"TCP"), \
                 socket, IPNUM(ip), port);
     }
     return ok;
@@ -175,7 +167,7 @@ bool Esp32ConnClass::socketIsConnected(int socket)
 {
     bool ok = false;
     ok = ISSOCKET(socket) && _sockets[socket].connected;
-    //HALSOCKET_DEBUG("socket %d is Connected: %s\r\n", socket, ok?"yes":"no");
+    //MOLMC_LOGD(TAG, "socket %d is Connected: %s", socket, ok?"yes":"no");
     return ok;
 }
 
@@ -201,7 +193,7 @@ int Esp32ConnClass::socketAccept(int socket)
                 if(setsockopt(_sockets[tcpSocket].handle, SOL_SOCKET, SO_KEEPALIVE, (char*)&val, sizeof(int)) == ESP_OK) {
                     val = false;//noDelay
                     if(setsockopt(_sockets[tcpSocket].handle, IPPROTO_TCP, TCP_NODELAY, (char*)&val, sizeof(int)) == ESP_OK) {
-                        HALSOCKET_DEBUG("OK! %s tcpSocket %d was created\r\n", "TCP server client", tcpSocket);
+                        MOLMC_LOGD(TAG, "OK! %s tcpSocket %d was created", "TCP server client", tcpSocket);
                         return tcpSocket;
                     }
                 }
@@ -215,7 +207,7 @@ bool Esp32ConnClass::socketClose(int socket)
 {
     bool ok = false;
     if (ISSOCKET(socket) && (_sockets[socket].connected || _sockets[socket].open)) {
-        HALSOCKET_DEBUG("OK! %s socket %d close!\r\n", (_sockets[socket].ipproto?"UDP":"TCP"), socket);
+        MOLMC_LOGD(TAG, "OK! %s socket %d close!", (_sockets[socket].ipproto?"UDP":"TCP"), socket);
         close(_sockets[socket].handle);
         _sockets[socket].connected = false;
         _sockets[socket].open = false;
@@ -247,16 +239,16 @@ bool Esp32ConnClass::socketFree(int socket)
     // make sure it is closed
     socketClose(socket);
     if(_socketFree(socket)) {
-        HALSOCKET_DEBUG("OK! socket %d free!\r\n", socket);
+        MOLMC_LOGD(TAG, "OK! socket %d free!", socket);
         return true;
     }
-    HALSOCKET_DEBUG("Error! socket %d free failed!\r\n", socket);
+    MOLMC_LOGD(TAG, "Error! socket %d free failed!", socket);
     return false;
 }
 
 int Esp32ConnClass::socketSend(int socket, const char * buf, int len)
 {
-    HALSOCKET_DEBUG("OK! socket:%d send data len:%d!\r\n", socket,len);
+    MOLMC_LOGD(TAG, "OK! socket:%d send data len:%d!", socket,len);
     int cnt = len;
     while (cnt > 0) {
         int blk = USO_MAX_WRITE;
@@ -282,7 +274,7 @@ int Esp32ConnClass::socketSend(int socket, const char * buf, int len)
 
 int Esp32ConnClass::socketSendTo(int socket, MDM_IP ip, int port, const char * buf, int len)
 {
-    HALSOCKET_DEBUG("OK! socket:%d send data to ip:" IPSTR ", port:%d, len:%d!\r\n", socket,IPNUM(ip),port,len);
+    MOLMC_LOGD(TAG, "OK! socket:%d send data to ip:" IPSTR ", port:%d, len:%d!", socket,IPNUM(ip),port,len);
     int cnt = len;
     while (cnt > 0) {
         int blk = USO_MAX_WRITE;
@@ -325,7 +317,7 @@ int Esp32ConnClass::socketReadable(int socket)
         int count;
         int res = ioctl(_sockets[socket].handle, FIONREAD, &count);
         if(res < 0) {
-            HALSOCKET_DEBUG("ERROR! socket : %d !\r\n", socket);
+            MOLMC_LOGD(TAG, "ERROR! socket : %d !", socket);
             _sockets[socket].connected  = false;
         }
 
@@ -354,7 +346,7 @@ int Esp32ConnClass::socketReadable(int socket)
         } else {
             _sockets[socket].remote_port = si_other.sa_data[0]<<8 | si_other.sa_data[1];
             _sockets[socket].remote_ip = IPADR(si_other.sa_data[2], si_other.sa_data[3], si_other.sa_data[4], si_other.sa_data[5]);
-            HALSOCKET_DEBUG("OK! socket:%d rev data, remote_ip:" IPSTR ", port:%d, len:%d!\r\n", socket, IPNUM(_sockets[socket].remote_ip), _sockets[socket].remote_port, res);
+            MOLMC_LOGD(TAG, "OK! socket:%d rev data, remote_ip:" IPSTR ", port:%d, len:%d!", socket, IPNUM(_sockets[socket].remote_ip), _sockets[socket].remote_port, res);
             int n=0;
             for(n=0; n < res ; n++) {
                 if (_sockets[socket].pipe->writeable()) {

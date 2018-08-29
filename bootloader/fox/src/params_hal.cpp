@@ -7,7 +7,7 @@
 #include "flash_map.h"
 #include "flash_storage_impl.h"
 #include "intorobot_macros.h"
-#include "service_debug.h"
+#include "molmc_log.h"
 
 #define EEPROM_BOOT_PARAMS_MAX_SIZE                        (512)    //参数区大小
 
