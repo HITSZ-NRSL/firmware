@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <ctype.h>
-#include "utils_queue.h"
+#include "sys/queue.h"
 #include "molmc_log.h"
 #include "wiring_ticks.h"
 #include "wiring_usartserial.h"

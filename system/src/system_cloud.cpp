@@ -410,7 +410,8 @@ void cloud_data_receive_callback(uint8_t *payload, uint32_t len)
     MOLMC_LOGD(TAG, "OK! Rev datapoint data <%d>: ", len);
     MOLMC_LOGD_BUFFER_HEX(TAG, payload, len);
 
-    if(intorobotParseReceiveDatapoints(payload, len)) {
+    if(!System.featureEnabled(SYSTEM_FEATURE_DATA_PROTOCOL_ENABLED)
+            || intorobotParseReceiveDatapoints(payload, len)) {
         system_notify_event(event_cloud_comm, ep_cloud_comm_data, payload, len);
     }
 }

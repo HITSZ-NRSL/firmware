@@ -27,6 +27,7 @@
 #include "pwm_hal.h"
 #include "pinmap_impl.h"
 #include "hw_config.h"
+#include "molmc_log.h"
 
 const static char *TAG = "hal";
 
