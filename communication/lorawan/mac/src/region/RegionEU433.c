@@ -575,10 +575,10 @@ bool RegionEU433RxConfig( RxConfigParams_t* rxConfig, int8_t* datarate )
     Radio.SetChannel( frequency );
 
     #if  0 
-    MOLMC_LOGD(TAG, "rx freq=%d\r\n",frequency);
-    MOLMC_LOGD(TAG, "bandwidth = %d\r\n",rxConfig->Bandwidth);
-    MOLMC_LOGD(TAG, "datarate = %d\r\n",phyDr);
-    MOLMC_LOGD(TAG, "rxContinuous = %d\r\n",rxConfig->RxContinuous);
+    MOLMC_LOGD(TAG, "rx freq=%d",frequency);
+    MOLMC_LOGD(TAG, "bandwidth = %d",rxConfig->Bandwidth);
+    MOLMC_LOGD(TAG, "datarate = %d",phyDr);
+    MOLMC_LOGD(TAG, "rxContinuous = %d",rxConfig->RxContinuous);
     #endif
     // Radio configuration
     if( dr == DR_7 )
@@ -621,10 +621,10 @@ bool RegionEU433TxConfig( TxConfigParams_t* txConfig, int8_t* txPower, TimerTime
     Radio.SetChannel( Channels[txConfig->Channel].Frequency );
 
     #if 1
-    MOLMC_LOGD(TAG, "loramac tx frequency = %d\r\n",Channels[txConfig->Channel].Frequency);
-    MOLMC_LOGD(TAG, "tx power=%d\r\n",phyTxPower);
-    MOLMC_LOGD(TAG, "bandwidth=%d\r\n",bandwidth);
-    MOLMC_LOGD(TAG, "datarate=%d\r\n",phyDr);
+    MOLMC_LOGD(TAG, "loramac tx frequency = %d",Channels[txConfig->Channel].Frequency);
+    MOLMC_LOGD(TAG, "tx power=%d",phyTxPower);
+    MOLMC_LOGD(TAG, "bandwidth=%d",bandwidth);
+    MOLMC_LOGD(TAG, "datarate=%d",phyDr);
     #endif
 
     if( txConfig->Datarate == DR_7 )

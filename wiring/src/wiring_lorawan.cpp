@@ -75,7 +75,6 @@ int LoRaWanClass::sendConfirmed(uint8_t port, uint8_t *buffer, uint16_t len, uin
     if( LoRaMacMcpsRequest( &mcpsReq ) == LORAMAC_STATUS_OK ) {
         MOLMC_LOGD(TAG, "LoRaWan send confirm frame status OK!!!");
         _macSendStatus = LORAMAC_SENDING;
-        INTOROBOT_LORAWAN_RESP_SERVER_ACK = false;
         if(_timeout == 0){
             return LORAMAC_SENDING;
         }
@@ -125,7 +124,7 @@ int LoRaWanClass::sendUnconfirmed(uint8_t port, uint8_t *buffer, uint16_t len, u
         mcpsReq.Req.Unconfirmed.fBufferSize = 0;
         mcpsReq.Req.Unconfirmed.Datarate = _macDatarate;
     } else {
-        // MOLMC_LOGD(TAG, "LoRaWan send unconfirmed frame");
+        MOLMC_LOGD(TAG, "LoRaWan send unconfirmed frame");
         mcpsReq.Type = MCPS_UNCONFIRMED;
         mcpsReq.Req.Unconfirmed.fPort = port;
         mcpsReq.Req.Unconfirmed.fBuffer = buffer;
@@ -136,11 +135,11 @@ int LoRaWanClass::sendUnconfirmed(uint8_t port, uint8_t *buffer, uint16_t len, u
     if( LoRaMacMcpsRequest( &mcpsReq ) == LORAMAC_STATUS_OK ) {
         MOLMC_LOGD(TAG, "LoRaWan send unnconfirm frame status OK!!!");
         _macSendStatus = LORAMAC_SENDING;
-        INTOROBOT_LORAWAN_RESP_SERVER_ACK = false;
         if(_timeout == 0) {
             return LORAMAC_SENDING;
         }
     } else {
+        MOLMC_LOGD(TAG, "LoRaWan send unnconfirm frame status FAIL!!!");
         _macSendStatus = LORAMAC_SEND_FAIL;
         return LORAMAC_SEND_FAIL;
     }

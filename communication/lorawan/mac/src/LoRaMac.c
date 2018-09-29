@@ -842,7 +842,7 @@ static void OnRadioRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t
                 address |= ( (uint32_t)payload[pktHeaderLen++] << 16 );
                 address |= ( (uint32_t)payload[pktHeaderLen++] << 24 );
 
-                MOLMC_LOGD(TAG, "LoRaMacDevAddr Receive = 0x%x\r\n",address);
+                MOLMC_LOGD(TAG, "LoRaMacDevAddr Receive = 0x%x",address);
 
                 if( address != LoRaMacDevAddr )
                 {
@@ -1058,7 +1058,7 @@ static void OnRadioRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t
                                 McpsIndication.BufferSize = frameLen;
                                 McpsIndication.RxData = true;
                                 #if 1
-                                MOLMC_LOGD(TAG, "decrypt payload length = %d\r\n",frameLen);
+                                MOLMC_LOGD(TAG, "decrypt payload length = %d",frameLen);
                                 MOLMC_LOGD(TAG, "decrypt payload:");
                                 MOLMC_LOGD_BUFFER_HEX(TAG, LoRaMacRxPayload,frameLen);
                                 #endif
@@ -1981,8 +1981,8 @@ static LoRaMacStatus_t ScheduleTx( void )
         RxWindow1Delay = LoRaMacParams.JoinAcceptDelay1 + RxWindow1Config.WindowOffset;
         RxWindow2Delay = LoRaMacParams.JoinAcceptDelay2 + RxWindow2Config.WindowOffset;
         /* RxWindow2Delay = LoRaMacParams.JoinAcceptDelay2; //A类入网时间 */
-        MOLMC_LOGD(TAG, "rx1 window join delay = %d\r\n",RxWindow1Delay);
-        MOLMC_LOGD(TAG, "rx2 window join delay = %d\r\n",RxWindow2Delay);
+        MOLMC_LOGD(TAG, "rx1 window join delay = %d",RxWindow1Delay);
+        MOLMC_LOGD(TAG, "rx2 window join delay = %d",RxWindow2Delay);
     }
     else
     {
@@ -1994,11 +1994,11 @@ static LoRaMacStatus_t ScheduleTx( void )
         RxWindow2Delay = LoRaMacParams.ReceiveDelay2 + RxWindow2Config.WindowOffset;
         /* RxWindow1Delay = LoRaMacParams.ReceiveDelay1; //固定 RX1接收窗口打开时间 */
         /* RxWindow2Delay = LoRaMacParams.ReceiveDelay2; //固定 RX2接收窗口打开时间 */
-        MOLMC_LOGD(TAG, "rx1 window delay = %d\r\n",RxWindow1Delay);
-        MOLMC_LOGD(TAG, "rx2 window delay = %d\r\n",RxWindow2Delay);
+        MOLMC_LOGD(TAG, "rx1 window delay = %d",RxWindow1Delay);
+        MOLMC_LOGD(TAG, "rx2 window delay = %d",RxWindow2Delay);
     }
 
-    MOLMC_LOGD(TAG, "dutyCycleTimeOff=%d\r\n",dutyCycleTimeOff);
+    MOLMC_LOGD(TAG, "dutyCycleTimeOff=%d",dutyCycleTimeOff);
     // Schedule transmission of frame
     if( dutyCycleTimeOff == 0 )
     {
@@ -2248,7 +2248,7 @@ LoRaMacStatus_t PrepareFrame( LoRaMacHeader_t *macHdr, LoRaMacFrameCtrl_t *fCtrl
 
     #if 1
     //debug 打印组包数据
-    MOLMC_LOGD(TAG, "frame length = %d\r\n",LoRaMacBufferPktLen);
+    MOLMC_LOGD(TAG, "frame length = %d",LoRaMacBufferPktLen);
     MOLMC_LOGD(TAG, "frame data:");
     MOLMC_LOGD_BUFFER_HEX(TAG, LoRaMacBuffer,LoRaMacBufferPktLen);
     #endif

@@ -48,7 +48,6 @@ volatile bool INTOROBOT_LORAWAN_JOINED          = false;   //lorawan激活通过
 volatile bool INTOROBOT_LORAWAN_CONNECTED       = false;   //lorawan发送版本信息完毕 已连接平台
 volatile bool INTOROBOT_LORAWAN_JOIN_ENABLE     = false;   //入网使能 true使能
 volatile bool INTOROBOT_LORAWAN_JOINING         = false;   //入网中
-volatile bool INTOROBOT_LORAWAN_RESP_SERVER_ACK = false;   //c类时回复服务器确认帧
 
 static LoRaMacPrimitives_t LoRaMacPrimitives;
 static LoRaMacCallback_t LoRaMacCallbacks;
@@ -118,9 +117,7 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
                     LoRaWan._uplinkDatarate = mcpsConfirm->Datarate;
                     LoRaWan._txPower = mcpsConfirm->TxPower;
                     LoRaWan._macRunStatus = ep_lorawan_mcpsconfirm_unconfirmed;
-                    if(!INTOROBOT_LORAWAN_RESP_SERVER_ACK) {
-                        system_notify_event(event_lorawan_status,ep_lorawan_send_success);
-                    }
+                    system_notify_event(event_lorawan_status,ep_lorawan_send_success);
                     break;
                 }
             case MCPS_CONFIRMED:
@@ -155,9 +152,7 @@ static void McpsConfirm( McpsConfirm_t *mcpsConfirm )
             LoRaWan._ackReceived = false;
         }
         LoRaWan._macSendStatus = LORAMAC_SEND_FAIL;
-        if(!INTOROBOT_LORAWAN_RESP_SERVER_ACK) {
-            system_notify_event(event_lorawan_status,ep_lorawan_send_fail);
-        }
+        system_notify_event(event_lorawan_status,ep_lorawan_send_fail);
     }
 }
 
@@ -206,7 +201,6 @@ static void McpsIndication( McpsIndication_t *mcpsIndication )
             }
         case MCPS_CONFIRMED:
             {
-                LoRaWanOnEvent(LORAWAN_EVENT_MCPSINDICATION_CONFIRMED);
                 break;
             }
         case MCPS_PROPRIETARY:
@@ -455,21 +449,6 @@ void LoRaWanGetABPParams(uint32_t &devAddr, uint8_t *nwkSkey, uint8_t *appSkey)
     }
 }
 
-//回复平台控制类型的数据点来通知服务器节点已收到
-//发送空的确认包
-void LoRaWanRespondServerConfirmedFrame(void)
-{
-    McpsReq_t mcpsReq;
-    mcpsReq.Type = MCPS_UNCONFIRMED;
-    mcpsReq.Req.Unconfirmed.fBuffer = NULL;
-    mcpsReq.Req.Unconfirmed.fBufferSize = 0;
-    mcpsReq.Req.Unconfirmed.Datarate = LoRaWan.getDataRate();
-
-    if( LoRaMacMcpsRequest( &mcpsReq ) == LORAMAC_STATUS_OK ) {
-        MOLMC_LOGD(TAG, "LoRaWan send empty frame status OK!!!");
-    }
-}
-
 bool intorobot_lorawan_flag_connected(void)
 {
     if (INTOROBOT_LORAWAN_JOINED && INTOROBOT_LORAWAN_CONNECTED) {
@@ -538,14 +517,6 @@ void LoRaWanOnEvent(lorawan_event_t event)
             break;
 
         case LORAWAN_EVENT_RX_COMPLETE:
-            break;
-
-        case LORAWAN_EVENT_MCPSINDICATION_CONFIRMED:
-            MOLMC_LOGD(TAG, "LoRaWanOnEvent Respond Server ACK");
-            if(LoRaWan.getMacClassType() == CLASS_C) {
-                INTOROBOT_LORAWAN_RESP_SERVER_ACK = true;
-                LoRaWanRespondServerConfirmedFrame();
-            }
             break;
 
         default:

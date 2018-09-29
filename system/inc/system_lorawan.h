@@ -69,8 +69,6 @@ void os_getDevEui(uint8_t *buf);
 void os_getAppEui(uint8_t *buf);
 void os_getAppKey(uint8_t *buf);
 
-extern volatile bool INTOROBOT_LORAWAN_RESP_SERVER_ACK;
-
 #ifdef __cplusplus
 }
 #endif
